@@ -1,0 +1,211 @@
+
+body {
+    background-color: rgb(244, 234, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+}
+.form{
+    background-color: white;
+}
+
+.form-container {
+    background: rgb(32, 0, 0);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 850px;
+    width: 90%;
+    overflow: hidden;
+    
+}
+
+
+.form-header {
+    background: #673ab7;
+    color: white;
+    padding: 30px 40px 20px;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.form-description {
+    font-size: 14px;
+    opacity: 0.9;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* ====== Form Content ====== */
+.form {
+    padding: 0 40px 30px;
+    
+}
+
+/* ====== Questions ====== */
+.question-block {
+    padding: 24px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.question-number {
+    font-size: 16px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.question-type {
+    font-size: 14px;
+    color: #5f6368;
+}
+
+.question-text {
+    font-size: 16px;
+    line-height: 24px;
+    color: #202124;
+    margin-bottom: 16px;
+}
+
+/* ====== Text Inputs ====== */
+.text-input-container {
+    max-width: 600px;
+    position: relative;
+}
+
+.text-input {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #dadce0;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.text-input:focus {
+    border-bottom: 2px solid #673ab7;
+}
+
+
+.underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #673ab7;
+    transition: width 0.3s;
+}
+
+.text-input:focus ~ .underline {
+    width: 100%;
+}
+
+/* ====== Radio Buttons ====== */
+.radio-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 0;
+    position: relative;
+}
+
+.radio-container {
+    margin-right: 12px;
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.radio-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
+
+.radio-checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #5f6368;
+    border-radius: 50%;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+}
+
+.radio-input:checked + .radio-checkmark {
+    border-color: #673ab7;
+    background-color: #673ab7;
+}
+
+.radio-input:checked + .radio-checkmark::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Label text */
+.radio-label {
+    font-size: 16px;
+    color: #202124;
+}
+
+/* ====== Submit Button ====== */
+.submit-button {
+    background: #673ab7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+    margin-top: 24px;
+}
+
+.submit-button:hover {
+    background: #5e35b1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+@media (max-width: 768px) {
+
+
+    .form-header,
+    .form {
+        padding: 20px;
+    }
+}

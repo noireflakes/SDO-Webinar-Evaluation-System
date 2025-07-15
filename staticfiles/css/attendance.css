@@ -1,0 +1,105 @@
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #e7ebff;
+    }
+    .container {
+      display: flex;
+
+    }
+    .logo {
+    
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+      
+      .logo img {
+    
+        width: 4000px;
+        height: auto;
+        margin-right: 10px;
+      }
+      
+      .logo h2 {
+        font-size: 18px;
+        color: #1f1f1f;
+      }
+    .sidebar {
+      width: 220px;
+      background-color: white;
+      min-height: 100vh;
+      padding-top: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+    .sidebar a {
+      display: block;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: black;
+    }
+    .sidebar a.active, .sidebar a:hover {
+      background-color: #4b61ff;
+      color: white;
+      border-radius: 8px;
+    }
+    .main-content {
+      flex: 1;
+    }
+    .header {
+      background-color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0px 1px 5px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      color: #1e1e1e;
+    }
+    .content {
+      padding: 30px;
+    }
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .event {
+      border: 1px solid #f0f0f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+    }
+    .event-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .event-subtitle {
+      font-size: 14px;
+      color: gray;
+    }
+    .event-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .present {
+      background-color: #e0f7e0;
+      color: #2e7d32;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #777;
+    }

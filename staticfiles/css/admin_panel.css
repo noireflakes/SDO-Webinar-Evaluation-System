@@ -1,0 +1,82 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: rgb(44, 62, 80);
+    padding: 20px 0;
+    color: #ffffff;
+    z-index: 1000;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links li {
+    padding: 15px 20px;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+
+.nav-links li a:hover {
+    background-color: #34495e;
+    border-radius: 5px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.contents{
+    margin-left: 180px;
+}
+
+.webinar{
+    margin-top: 2rem;
+    background-color: white;
+
+    border-radius: 5%;
+}
+
+.webinar_detail{
+    width: 100px;
+    height: auto;
+}
+.description {
+    display: justify;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.muted-btn {
+    background-color:  rgb(44, 62, 80);
+    margin-top: 4rem;
+    margin-left: 50rem;  
+  
+    color: #fff;  }
+
+.muted-btn:hover {
+    background-color: rgb(69, 81, 94);;    
+    color: #fff;               
+}

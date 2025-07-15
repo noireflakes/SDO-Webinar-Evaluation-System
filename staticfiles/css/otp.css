@@ -1,0 +1,162 @@
+/* otp.css */
+
+:root {
+    --bright_purple: #4c43ce;
+    --monotone_skyblue: #dfe6fc;
+    --white: #ffffff;
+    --black: #252525;
+    --light_gray: #f5f5f5;
+    --medium_gray: #e0e0e0;
+    --dark_gray: #757575;
+    --error_red: #d32f2f;
+}
+
+body {
+    background-color: var(--monotone_skyblue);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+/* OTP Container */
+form {
+    background-color: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+}
+
+/* Header */
+h2 {
+    color: var(--black);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+/* OTP Input */
+#otp {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--medium_gray);
+    border-radius: 8px;
+    font-size: 18px;
+    letter-spacing: 2px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+#otp:focus {
+    border-color: var(--bright_purple);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 67, 206, 0.2);
+}
+
+/* Submit Button */
+input[type="submit"] {
+    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+    color: white;
+    border: none;
+    padding: 14px;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(76, 67, 206, 0.1);
+}
+
+input[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 67, 206, 0.15);
+}
+
+/* Timer & Resend Link */
+.timer {
+    margin-top: 20px;
+    color: var(--dark_gray);
+    font-size: 14px;
+}
+
+.otp-send-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--bright_purple);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.otp-send-link:hover {
+    text-decoration: underline;
+}
+
+/* Debug Info (hidden by default) */
+div:empty {
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    form {
+        padding: 30px 20px;
+    }
+    
+    h2 {
+        font-size: 20px;
+    }
+    
+    #otp {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    input[type="submit"] {
+        padding: 12px;
+    }
+}
+
+/* Error State */
+.error {
+    color: var(--error_red);
+    background-color: #fce8e6;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: none; /* Show with JavaScript when needed */
+}

@@ -1,0 +1,226 @@
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f7fafc;
+    min-height: calc(100vh - 64px);
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-title {
+    font-size: 28px;
+    color: #2D3748;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    color: #a0aec0;
+}
+
+.search-box input {
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: white;
+    width: 240px;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+/* Certificate Sections */
+.certificate-section {
+    margin-bottom: 40px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.section-title {
+    font-size: 18px;
+    color: #2D3748;
+    margin: 0;
+    font-weight: 600;
+}
+
+.section-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.section-badge.ongoing {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.section-badge.completed {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+/* Certificate Grid */
+.certificate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Certificate Card */
+.certificate-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.certificate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-color: #c7d2fe;
+}
+
+.card-header {
+    height: 160px;
+    overflow: hidden;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.certificate-card:hover .card-image {
+    transform: scale(1.03);
+}
+
+.card-body {
+    padding: 16px;
+}
+
+.card-title {
+    font-size: 16px;
+    color: #2D3748;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #718096;
+}
+
+.meta-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-footer {
+    display: flex;
+    padding: 12px 16px;
+    border-top: 1px solid #edf2f7;
+    gap: 8px;
+}
+
+.btn-download, .btn-preview {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-download {
+    background-color: #4f46e5;
+    color: white;
+}
+
+.btn-download:hover {
+    background-color: #4338ca;
+}
+
+.btn-preview {
+    background-color: white;
+    color: #4f46e5;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-preview:hover {
+    background-color: #f5f3ff;
+    border-color: #c7d2fe;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: #cbd5e0;
+    margin-bottom: 16px;
+}
+
+.empty-text {
+    color: #718096;
+    margin: 0;
+    font-size: 14px;
+}

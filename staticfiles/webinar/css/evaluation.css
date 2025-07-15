@@ -1,0 +1,336 @@
+/* evaluation.css - Clean Professional Design */
+body {
+    background-color: #e8e1fa;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.evaluation-form {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 30px;
+    background: #ffffff;
+    color: #495057;
+    line-height: 1.6;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    border-top: 5px solid #6f42c1; 
+}
+.form-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-header h1 {
+    font-size: 26px;
+    color: #343a40;
+    margin-bottom: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.form-header h2 {
+    font-size: 18px;
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-weight: 400;
+}
+
+.author, .date {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 20px 0;
+}
+
+
+.info-table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+}
+
+.info-table td {
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.schoolid-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.schoolid-label input {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-left: 10px;
+    width: 150px;
+}
+
+.sex-label {
+    font-weight: 500;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sex-label label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+
+.rating-scale {
+    margin: 25px 0;
+    padding: 15px;
+    background-color: #fcf5ff;
+    border-radius: 6px;
+    border-top: 4px solid #6f42c1;
+}
+
+.rating-scale h3 {
+    font-size: 17px;
+    color: #343a40;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.scale-options {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #495057;
+    gap: 10px;
+}
+
+.scale-options span {
+    padding: 5px 10px;
+
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Evaluation Sections */
+.evaluation-section {
+    margin: 30px 0;
+}
+
+.evaluation-section h3 {
+    color: #343a40;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.evaluation-section h4 {
+    color: #495057;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+/* Rating Table */
+.rating-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+}
+
+.rating-table h2 {
+    color: #343a40;
+    font-size: 16px;
+    padding: 12px;
+    background-color: #fef3ff;
+    text-align: left;
+    font-weight: 600;
+    border-left: 4px solid #6f42c1;
+}
+
+.rating-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.rating-table tr:last-child td {
+    border-bottom: none;
+}
+
+.rating-table tr:hover td {
+    background-color: #f8f9fa;
+}
+
+.rating-table input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #adb5bd;
+    border-radius: 50%;
+    margin: 0 3px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.rating-table input[type="radio"]:checked {
+    border-color: #6f42c1;
+}
+
+.rating-table input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #6f42c1;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+}
+
+/* Comments Section */
+.comments-section {
+    margin: 30px 0;
+}
+
+.comments-section h3 {
+    color: #343a40;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.comments-box {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    min-height: 120px;
+    font-family: inherit;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    resize: vertical;
+}
+
+.comments-box:focus {
+    outline: none;
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
+}
+
+/* Submit Button */
+.submit-btn {
+    background: #6f42c1;
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 25px;
+    display: block;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.submit-btn:hover {
+    background: #5a32a8;
+    box-shadow: 0 2px 10px rgba(111, 66, 193, 0.3);
+}
+/* QR Generator Button Styles */
+.qr-generator-container {
+    margin: 25px 0;
+    text-align: center;
+}
+
+.generate-qr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #6f42c1;
+    color: white;
+    padding: 14px 28px;
+    font-size: 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(111, 66, 193, 0.2);
+}
+
+.generate-qr-btn:hover {
+    background: #5a32a8;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+    transform: translateY(-1px);
+}
+
+.generate-qr-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(111, 66, 193, 0.2);
+}
+
+.btn-icon {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .evaluation-form {
+        padding: 20px;
+        margin: 15px;
+    }
+    
+    .scale-options {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .rating-table {
+        font-size: 13px;
+    }
+    
+    .rating-table td {
+        padding: 10px 5px;
+    }
+    
+    .info-table {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .schoolid-label input {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    
+    .sex-label {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .submit-btn {
+        padding: 12px 20px;
+    }
+}
