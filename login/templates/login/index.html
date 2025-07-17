@@ -16,14 +16,14 @@
             <li><img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo"></li>
             <li><a class="active" href="#header-section">Home</a></li>            
             <li><a href="#events-section">Events and Announcements</a></li>
-            <li><a href="#events-section">Provides</a></li>
+            <li><a href="#guidelines">Guidelines</a></li>
             <li><a href="#aboutus-section">About us</a></li>
             {% if user.is_authenticated %}
-                <li class="log-button"><a href="{% url 'logout' %}">Logout</a></li>
+                <div class="log-button"><a href="{% url 'logout' %}">Logout</a></div>
 
             
             {% else %}
-                <li class="log-button" ><a  href="{% url 'login' %}">Login</a></li>
+                <div class="log-button" ><a  href="{% url 'login' %}">Login</a></div>
             {% endif %}
         </ul>
     </nav>
@@ -96,7 +96,7 @@
     </section>
 
 
-    <section class="participant-guidelines">
+    <section id="guidelines" class="participant-guidelines">
       
       <h2 class="title">Participant Guidelines</h2>
       

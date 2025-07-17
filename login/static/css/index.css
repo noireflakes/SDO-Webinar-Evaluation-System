@@ -78,17 +78,28 @@ li a:hover{
     margin-left: auto;
     padding: 5px;
     width: 70px;
+   
+    
+    font-weight: 500;
 
     text-align: center;
     box-shadow: 2px 2px 2px rgba(77, 77, 77, 0.1);
+    transition: blackground-color 0.3s ease-in;
+    
 
 }
 .log-button a{
   color: rgb(0, 0, 0);
   font-size: 15px;
+  text-decoration: none;
+  font-weight: 500;
 }
 .log-button:hover{
-    background-color: #40399bc0;
+   background-color: #b3b0fc;
+   border: none;
+
+  
+
 }
 
 

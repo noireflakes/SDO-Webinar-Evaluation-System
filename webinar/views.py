@@ -46,9 +46,12 @@ def make_webinar(request):
 def webinar_detail(request, id):
     webinar=get_object_or_404(Webinar, id=id)
 
-    return render(request, "webinar/webinar_detail.html",{
-        'webinar':webinar
-    })
+    if request.user.is_authenticated:
+
+        return render(request, "webinar/webinar_detail.html",{
+            'webinar':webinar
+        })
+    return redirect("index")
 
 def events_data(request):
     events = []
