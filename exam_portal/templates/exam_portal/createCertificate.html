@@ -216,35 +216,37 @@
             flip();
         }
 
-        function drawAllParagraphs(maxWidth, y) {
-            const subject = document.getElementById("certificate-subject").value;
-            const address = document.getElementById("certificate-address").value;
-            const date = document.getElementById("certificate-date").value;
+function drawAllParagraphs(maxWidth, y) {
+    const subject = document.getElementById("certificate-subject").value;
+    const address = document.getElementById("certificate-address").value;
+    const date = document.getElementById("certificate-date").value;
 
-            ctx.textAlign = "center";
-            ctx.fillStyle = "black";
-            ctx.font = " 16px 'Bookman Old Style'";
-            y+=10
-            const x = canvas.width / 2/2;
-            const lineHeight = 25;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "black";
+    const fontSize = 15;
+    const lineHeight = 25;
+    const fontFamily = "'Bookman Old Style'";
+    const x = canvas.width / 2/2;
+    y += 10;
 
-            function drawParagraphBlock(paragraph , font) {
-                const words = paragraph.split(" ");
-                let line = "";
-                for (let i = 0; i < words.length; i++) {
-                    const testLine = line + words[i] + " ";
-                    if (ctx.measureText(testLine).width > maxWidth && i > 0) {
-                        ctx.font=`${font} 16px 'Bookman Old Style'`
-                        ctx.fillText(line, x, y);
-                        line = words[i] + " ";
-                        y += lineHeight;
-                    } else {
-                        line = testLine;
-                    }
-                }
-                ctx.fillText(line, x, y);
-                y += lineHeight; 
+    function drawParagraphBlock(paragraph, fontWeight) {
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        const words = paragraph.split(" ");
+        let line = "";
+
+        for (let i = 0; i < words.length; i++) {
+            const testLine = line + words[i] + " ";
+            if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+                ctx.fillText(line.trim(), x, y);
+                line = words[i] + " ";
+                y += lineHeight;
+            } else {
+                line = testLine;
             }
+        }
+        ctx.fillText(line.trim(), x, y);
+        y += lineHeight;
+    }
 
             drawParagraphBlock(subject, "");
             drawParagraphBlock(address, "italic");
@@ -254,7 +256,7 @@
         async function downloadPDF() {
             const { jsPDF } = window.jspdf;
 
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+            const dataUrl = canvas.toDataURL("image/jpeg", .92);
 
             const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
 

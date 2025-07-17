@@ -39,13 +39,14 @@
         <a href="{% url 'attendance' %}" class="nav-item">Attendance</a>
     
         <a href="{% url 'aboutus' %}" class="nav-item">About Us</a>
+        <div class="logout" >
+            <a href="{% url 'logout' %}">
+            <img   src="{% static 'icons/exit.png' %}" alt="">
+            Logout
+            </a> 
+        </div>
     </nav>
-    <div class="logout" >
-        <a href="{% url 'logout' %}">
-          <img   src="{% static 'icons/exit.png' %}" alt="">
-          Logout
-        </a> 
-      </div>
+
   </aside>
 
 

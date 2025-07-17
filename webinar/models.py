@@ -4,10 +4,8 @@ from django.contrib.auth.models import User
 
 
 class Webinar(models.Model): 
-
     title=models.CharField(max_length=20)
     description=models.CharField(max_length=1000)
- 
     number_of_speaker=models.IntegerField(default=1)
     event_type=models.CharField(max_length=20, null=True ,blank=True)
     start_date=models.DateField(null=True ,blank=True)
@@ -31,6 +29,7 @@ class WebinarAttendees(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendees", null=True, blank=True)
     school_id=models.CharField(max_length=20, null=True)
     email=models.EmailField()
+    attendance=models.IntegerField(default=0)
 
 
 class ResponseQuestionaire(models.Model):

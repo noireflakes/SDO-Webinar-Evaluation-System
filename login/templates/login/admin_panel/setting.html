@@ -30,18 +30,13 @@
       <h2>SDO Baliwag</h2>
     </div>
     <nav class="nav">
-        <a href="{% url 'admin_events' %}" class="nav-item">Event</a>
-        <a href="{% url 'admin_calendar' %}" class="nav-item">Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="nav-item">Certificate</a>
-        <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
-        <a href="{% url 'admin_setting' %}" class="nav-item active">Settting</a>
+      <a href="{% url 'index' %}" class="nav-item ">Events</a>
+      <a href="{% url 'calendar' %}" class="nav-item">Calendar</a>
+      <a href="{% url 'certificate' %}" class="nav-item">Certificate</a>
+      <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
+      <a href="{% url 'admin_setting' %}" class="nav-item active">Settting</a>
+      <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
     </nav>
-    <div class="logout" >
-      <a href="{% url 'logout' %}">
-        <img   src="{% static 'icons/exit.png' %}" alt="">
-        Logout
-      </a> 
-    </div>
   </aside>
 
 
@@ -53,16 +48,22 @@
       {% csrf_token %}
       <div class="form-grid">
         <div class="form-group">
+          <label for="username">Username</label>
+          <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
+          <p style="color:red;">{{ user_taken }}</p>
+        </div>
+        
+        <div class="form-group">
           <label for="fullname">Full Name</label>
-          <input name="fullname" id="fullname" type="text" placeholder="Bronny" />
+          <input name="fullname" id="fullname" type="text" placeholder="{{ user.first_name }} {{ user.last_name }}" />
         </div>
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input id="email" name="email" type="email" placeholder="bronny123@example.com" />
+          <input id="email" name="email" type="email" placeholder="{{ user.email }}" />
         </div>
         <div class="form-group">
           <label for="number">Phone Number</label>
-          <input id="number" name="number" type="tel" placeholder="+1 (555) 123-4567" />
+          <input id="number" name="number" type="tel" placeholder="{{ user.user_profile.number}}" />
         </div>
         <div class="form-group">
           <label for="school">School Insitution</label>
@@ -82,12 +83,14 @@
       <div class="form-group">
           <label for="current_password">Current Password</label>
           <input type="text" name="current_password" id="current_password" />
+          <p style="color:red;" >{{ error_password }}</p>
       </div>
       <div class="form-group">
-          <label for="new_password">Current Password</label>
+          <label for="new_password">New Password</label>
           <input type="text" name="new_password" id="new_password" />
       </div>
       <input type="submit" value="Confirm Changes">
+      
 
 
     </form>

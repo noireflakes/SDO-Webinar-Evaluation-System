@@ -205,6 +205,10 @@ def questionaire(request, id):
 
                     )
           
+            attendee=get_object_or_404(WebinarAttendees, user=userprofile.user)
+            attendee.attendance=1
+            attendee.save()
+
 
             return redirect("index")
 

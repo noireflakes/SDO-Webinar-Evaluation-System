@@ -36,24 +36,26 @@
 
     
     <section id="header-section">
-      <div class="header-container" style="background-image: url('{% static 'asset/2.jpg' %}');">
+      <div class="header-container" style="background-image: url('{% static 'asset/header-bg.jpg' %}');">
 
         <div class="background-overlay"></div>
 
         <div class="header-contents">
           <h2>Empowering Excellence in Education Through Streamlined Events & Evaluations</h2>
-          <p>This platform enhances event management with efficient attendance tracking, insightful
+
+          <div class="container">
+            <p>This platform enhances event management with efficient attendance tracking, insightful
           participant feedback collection, and seamless certificate generation</p>
 
           <div class="header-button">
             <a href="#aboutus-section">
               <button >Learn More</button>
             </a>
-            <a href="{% url 'login' %}">
-              <button>Login</button>
-
-            </a>
+    
             
+
+          </div>
+
           </div>
         </div>
 
@@ -87,61 +89,49 @@
                 
             {% endfor %}
         </div>
+        <div class="blob one"></div>
+        <div class="blob two"></div>
             
 
     </section>
 
-    </section  id="provides-section" class="provides-section">
-      <h2 class="title">Provides</h2>
-      <div class="provide-container" >
-        <div class="provide-card">
-          <div class="icon-container">
-            <i class="bi bi-people-fill"></i>
-          </div>
-          <div class="provide-contents">
-            <h4>Networking</h4>
-            <p>Connect with peers and grow your network</p>
-          </div>
 
+    <section class="participant-guidelines">
+      
+      <h2 class="title">Participant Guidelines</h2>
+      
+      
 
-        </div>
-              <div class="provide-card">
-          <div class="icon-container"><i class="bi bi-award-fill"></i>
-          </div>
-          <div class="provide-contents">
-            <h4>Certificate</h4>
-            <p>Earn a certificate for your participation.</p>
-              
+      <div class="container participant-cont">
+        
+        <ul>
+          <li><h4>How to Prepare</h4></li>
+          <li>Check the date, time, and venue: Make sure you know exactly where it will be held and how long it will run.</li>
+          <li>Plan your travel: Know the best route so you can arrive at least 15 minutes early.</li>
 
+          <li><h4>How to answer</h4></li>
+          <li>Be honest: Share what you truly think — what was helpful, what could be better.
+Be specific: Instead of just rating “Average,” you can add short comments like
+“It was a bit fast The way the Speaker is talking, maybe slow down next time.”</li>
+          <li>Was the topic well explained?</li>
+          <li>Did the instructor make it interesting?</li>
+          <li>Was the system easy to join and navigate?</li>
 
+        </ul>
 
-          </div>
-
-
-        </div>
-              <div class="provide-card">
-          <div class="icon-container"><i class="bi bi-person-video3"></i> 
-          </div>
-          <div class="provide-contents">
-            <h4>In Person</h4>
-            <p>Attend live, face-to-face sessions.</p>
-          </div>
-
-
-        </div>
 
       </div>
-
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#b89ff1" fill-opacity="1" d="M0,160L120,133.3C240,107,480,53,720,58.7C960,64,1200,128,1320,160L1440,192L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z"></path></svg>
+      <div class="guideline-bg"></div>
     </section>
 
     <section id="aboutus-section" class="aboutus-section">
+      
+      <h2 class="title">About us</h2>
       <div class="aboutus-container">
-        <div class="img-container">
-          <img src="{% static 'asset/1.jpg' %}" alt="">
 
-        </div>
         <div class="aboutus-contents">
-          <h2>About us</h2>
+
           <p>The Schools Division Office of Baliwag is dedicated to promoting excellence through efficient event 
 management and evaluation. This platform streamlines attendance tracking, collects valuable participant 
 feedback, and ensures seamless certificate generation. Committed to continuous improvement, we strive to 
@@ -151,9 +141,14 @@ education community.
 
 
         </div>
+        <div class="img-container">
+          <img src="{% static 'asset/3.jpg' %}" alt="">
+
+        </div>
 
       </div>
-
+      <svg class="aboutus-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#ebe3fb" fill-opacity="1" d="M0,224L80,192C160,160,320,96,480,64C640,32,800,32,960,48C1120,64,1280,96,1360,112L1440,128L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>
+      <div class="about-bg-cl"></div>
     </section>
 
 

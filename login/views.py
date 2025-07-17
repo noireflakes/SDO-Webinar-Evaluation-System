@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import UserProfile
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.mail import send_mail
@@ -22,7 +23,7 @@ def index(request):
 
     if request.user.is_authenticated:
         
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.is_staff:
             return redirect('admin_events')
         else:
             return redirect('user_dashboard')
@@ -299,10 +300,13 @@ def delete_user(request, id):
 
     return redirect("admin_users")
 
-
 def edit_user(request):
     user = User.objects.get(id=request.user.id)
     profile = UserProfile.objects.get(user=user)
+    user_taken="username already taken"
+
+    redirection=["admin_panel/setting.html","user_nav/user_setting.html"]
+    redirected=""
 
     if request.method == 'POST':
         full_name = request.POST.get('fullname', '').strip()
@@ -317,10 +321,24 @@ def edit_user(request):
             else:
                 first_name = name[0]
                 last_name = ' '.join(name[1:])
-            user.username=first_name
+
+            
             user.first_name = first_name
             user.last_name = last_name
 
+        username=request.POST.get('username')
+        if username:
+            if User.objects.filter(username=username):
+                if request.user.is_superuser or request.user.is_staff:
+                    redirected=redirection[0]
+                else:
+                    redirected=redirection[1]
+                return render(request, f"login/{redirected}",{
+                    "user_taken":user_taken
+                })
+            user.username=username
+
+        
         email = request.POST.get("email")
         img = request.FILES.get("img")  
         number = request.POST.get('number')
@@ -344,17 +362,42 @@ def edit_user(request):
     else:
         return redirect("user_setting")
 
-
-
+@login_required
 def change_password(request):
-    user=User.objects.get(id=request.user.id)
-    if request.method=='POST':
-        if request.POST.get("current_password")==user.password:
-            new_password=request.POST.get("new_password")
-            user.password=new_password
-            user.save()
-    if request.user.is_superuser or request.user.is_staff:
-        return redirect("admin_setting")
-    else:
-        return redirect("user_setting")
+    user = request.user
+
+    redirection=["admin_panel/setting.html","user_nav/user_setting.html"]
+    redirected=""
+
+    if request.method == 'POST':
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        
+        if current_password and new_password:
+
+            if user.check_password(current_password):
+                print("that password is check")
+                user.set_password(new_password)
+                user.save()
+
+            
+                update_session_auth_hash(request, user)
+
+                if user.is_superuser or user.is_staff:
+
+                    return redirect("admin_setting")
+                else:
+                    return redirect("user_setting")
+            else:
+                if request.user.is_staff or request.user.is_admin:
+                    redirected=redirection[0]
+                else:
+                    redirected=redirection[1]
+
+                return render(request, f'login/{redirected}', {
+                    'error_password': 'Current password is incorrect.'
+                })
+
+
+
 

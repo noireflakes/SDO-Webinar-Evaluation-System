@@ -31,18 +31,14 @@
         <h2>SDO Baliwag</h2>
       </div>
       <nav class="nav">
-          <a href="{% url 'admin_events' %}" class="nav-item">Event</a>
-          <a href="{% url 'admin_calendar' %}" class="nav-item ">Calendar</a>
-          <a href="{% url 'admin_certificate' %}" class="nav-item active">Certificate</a>
-          <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
-          <a href="{% url 'admin_setting' %}" class="nav-item">Settting</a>
+        <a href="{% url 'admin_events' %}" class="nav-item">Event</a>
+        <a href="{% url 'admin_calendar' %}" class="nav-item ">Calendar</a>
+        <a href="{% url 'admin_certificate' %}" class="nav-item active">Certificate</a>
+        <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
+        <a href="{% url 'admin_setting' %}" class="nav-item">Settting</a>
+        <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
       </nav>
-      <div class="logout" >
-        <a href="{% url 'logout' %}">
-          <img   src="{% static 'icons/exit.png' %}" alt="">
-          Logout
-        </a> 
-      </div>
+
         
     </aside>
     
