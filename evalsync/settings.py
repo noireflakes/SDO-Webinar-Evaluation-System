@@ -115,11 +115,39 @@ WSGI_APPLICATION = 'evalsync.wsgi.application'
 
 import dj_database_url
 
+
+
+import os
+from dotenv import load_dotenv
+from urllib.parse import urlparse, parse_qsl
+
+
+load_dotenv("venv") 
+
+
+DATABASE_URL = file.DB_CONNECT
+
+if DATABASE_URL is None:
+    raise ValueError("DATABASE_URL is not set in the .env file")
+
+# Use urlparse to decode the DATABASE_URL
+parsed = urlparse(DATABASE_URL)
+
+# SAFELY build the DATABASES dictionary for Neon
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3'
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': parsed.path[1:],  # Remove leading slash
+        'USER': parsed.username,
+        'PASSWORD': parsed.password,
+        'HOST': parsed.hostname,
+        'PORT': parsed.port or 5432,
+        # Avoid 'search_path' option for Neon pooled connections
+        'OPTIONS': {},
+    }
 }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

@@ -13,3 +13,5 @@ SMS_ENDPOINT="https://api.semaphore.co/api/v4/messages"
 
 
 ADMIN_EMAIL='johnphilipbaylon3@gmail.com'
+
+DB_CONNECT="postgresql://neondb_owner:npg_kqIH2GAdXu5t@ep-orange-queen-ae9n53bd-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require&options=-csearch_path=public"
