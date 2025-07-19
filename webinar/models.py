@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 class Webinar(models.Model): 
-    title=models.CharField(max_length=20)
+    title=models.CharField(max_length=100)
     description=models.CharField(max_length=1000)
     number_of_speaker=models.IntegerField(default=1)
     event_type=models.CharField(max_length=20, null=True ,blank=True)
