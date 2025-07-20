@@ -1,181 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{
+    padding: 0;
+    margin: 0;
+}
+body, html{
+    width: 100%;
+    height: 100%;
+}
+
 body{
     background-color: aliceblue;
 }
 .contents {
     
     padding: 2rem;
-    background-color: #dce0ee;
+  
 
 
-}
-body{
-    background-color:#313647 ;
 }
 
 
 h1{
-    text-align: center;
-    font-weight: 600;
-    font-size: 50px;
+    text-align: left;
+    font-weight: 400;
+    font-size: 40px;
+
+    border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
+    border-top: solid 4px;
+    font-family: 'poppins','san-serif';
 }
 
 .title-container{
     display: flex;
-    margin-top: 40px;
-    justify-content: center;
+    margin-top: 20px;
+    justify-content: left;
 
     border-radius: 3%;
     color:#2d3748 ;
 }
-.webinar-card{
-   
-    width:380px;
-    height:450px;
-    background: rgba(255, 255, 255, 0.86);
-    backdrop-filter: blur(8px);
-   
-    color:rgb(0, 0, 0);
-    padding:  50px;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 0;
-    padding-bottom: 150px;
-    margin:50px;
-    border-radius: 3%;
-    border: 1px solid rgb(206, 206, 206);
-    
-    overflow: hidden;
-    
-}
-.webinar-banner{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-   
-}
 
-.webinar-contents{
-    font-size: 14px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-top: 30px;
- 
- 
+.btn-container{
+    margin-top: 5%;
+    
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-right: 15px;
-    margin-left: 15px;
-    margin-bottom: 10px;
-    
-    
- 
+    justify-content: right;
 }
-
-p{
-    margin-top: 10px;
-}
-.webinar-detail{
-
+.create-btn{
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6) ;
+    padding:5px;
+    width: 15%;
+    font-size: 16px;
     text-decoration: none;
-    color: white;
-    padding: 10px;
-    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-    border-radius: 10%;
-    width: 20%;
-    
-    margin-right: 14px;
-    margin-bottom: 10px;
+    color:white;
     text-align: center;
-    
+    border-radius: 25px;
 }
-.webinar-button{
+
+.bi-plus{
+    font-weight: 900;
+    font-size: 18px;
+
+}
+
+.create-btn:hover{
+    background: linear-gradient(135deg, #332d99, #422c77) ;
+
+}
+
+
+.row{
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-evenly;
+    margin-top: 30px;
+
 }
 
-.webinar-card:hover{
-    transition-duration: .2s;
-    transition-timing-function: ease-in;
-    transform: translateY(-4px);
-
-    box-shadow: 10px 10px 10px#a5afce;
+.webinar-card{
     
-    border: 1px dashed rgb(137, 2, 155);
-   
+    width: 40%;
+    background-color: white;
+    padding: 0;
 
-
-
-
-    border-radius: 3%;
-    
-
-    
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 40px;
+    box-shadow: 2px 2px 2px rgb(172, 172, 172);
 }
-
-.webinar-detail:hover{
-    background-color: #7873d1;
-    transition-duration: 1.5s;
-    transition-timing-function: ease-in-out;
-    transform: rotateY(360deg);
-}
-
-.add-webinar{
+.webinar-contents{
+    width: 90%;
     display: flex;
-    justify-content: center;
+    margin-left: 20px;
     align-items: center;
-  
-    background-color: rgba(182, 182, 182, 0.329);
+    
+    flex-direction: column;
+}
+.webinar-img{
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
 
 }
-.add-webinar-link{
-    margin-top: 9.5rem;
-    font-size: 150px;
-    color:gray
-}
 
+.img-container{
+
+    margin: 0;
+    padding: 0;
+
+}
 .webinar-title{
     font-size: 20px;
-    font-weight: 600;
+}
+
+.date-time-cont{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-weight: 500;
+    color:grey;
+    font-size: 14px;
+
+  
+}
+
+.webinar-btn{
+   
+    width: 100%;
+    display: flex;
+    justify-content: right;
+
+}
+.webinar-detail{
+    text-decoration: none;
+    color:white;
+    font-weight: 400;
+    padding:10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
 }
 
 
 
-.create-event {
-    text-align: left;
-    background-color: #5A67D8;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin: 16px 0;
-    display: inline-block;
-    transition: background 0.2s ease;
+@media screen and (max-width:700px) {
+    h1{
+        font-size: 30px;
+    }
+    .create-btn{
+        width: 40%;
+        background-color: red;
+    }
+
+    .webinar-card{
+        width: 80%;
+    }
+
     
 }
-.create-event a{
-    color: #ffffff;
-}
-.create-event:hover {
-    background-color: #434190;
-}
-
-.p-3{
-    background-color: #e2e5fc;
-}
-
-
-/* Fix the card layout on small screens */
-@media (max-width: 768px) {
-    .webinar .row {
-        flex-direction: column;
-    }
-
-    .webinar .col-12 {
-        margin-bottom: 1rem;
-    }
-}
-
-
 
 
 

@@ -4,6 +4,7 @@
     --white:#ffffff;
     --black:#252525;
 }
+
 html, body{
   width: 100%;
   height: 100%;
@@ -624,6 +625,8 @@ button{
   
 }
 
+
+
 .participant-cont{
   background-color: rgba(248, 248, 248, 0.2);
   backdrop-filter: blur(2px);
@@ -708,3 +711,57 @@ svg{
   top: 650px;
   position: absolute;
 }
+
+
+@media screen and (max-width: 819px) {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x:hidden;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .participant-cont {
+    width: 80%;
+   
+  }
+  .guideline-curve{
+    top: 65%;
+  }
+  #aboutus-section{
+    padding-bottom: 50px;
+  }
+  .aboutus-container{
+    
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-evenly;
+  }
+
+  .aboutus-contents{
+    margin-top: 10px;
+    width: 80%;
+  }
+  .aboutus-bg{
+    top: 30%;
+  }
+  .log-button{
+    margin-right: 5px;
+  }
+
+
+}
+
+
+
+
+
+
+  
