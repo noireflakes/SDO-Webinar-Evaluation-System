@@ -198,7 +198,7 @@ def questionaire(request, id):
 
                 ResponseQuestionaire.objects.create(
                         webinar=webinar,
-                        user=request.user,
+                        user=userprofile.user,
                         type=catergory,
                         q1=response[0],
                         q2=response[1],
