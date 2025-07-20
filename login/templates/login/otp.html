@@ -13,21 +13,23 @@
 {% endif %}
 
 <div>{{ otp_code }}</div>
-<form action="{% url 'otp' %}" method="post">
+<form action="{% url 'otp' %}" method="post" id="form">
     {% csrf_token %}
     <h2>Enter OTP</h2>
     <input id="otp" name="otp" type="text" required placeholder="Enter OTP" maxlength="6">
     <input type="submit" value="Submit">
+    <div id="timer" class="timer"></div>
 </form>
 
-<div id="timer" class="timer"></div>
 <div><a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' %}">Send OTP again?</a></div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const timerElement = document.getElementById("timer");
         const otpSendButton = document.getElementById("otp_send_button");
-        let timeLeft = 30;
+       
+
+        let timeLeft = 300;
 
         const counter = setInterval(function() {
             if (timeLeft > 0) {

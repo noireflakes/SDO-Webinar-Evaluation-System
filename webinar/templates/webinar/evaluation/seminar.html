@@ -14,6 +14,7 @@
 
 
         </div>
+        
         {% if user.is_staff or user.is_superuser %}
             <div class="qr-generator-container">
                 <a href="{% url 'qr_evalution' webinar.id %}" class="generate-qr-btn">

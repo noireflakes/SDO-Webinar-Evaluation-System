@@ -12,9 +12,6 @@ from io import BytesIO
 from django.contrib.auth.models import User
 
 
-
-
-
 def test_result(request, web_id, type, id):
     webinar=get_object_or_404(Webinar, id=web_id)
     user=get_object_or_404(User, id=id)
@@ -61,7 +58,6 @@ def display_result(request, id):
        
     })
 
-
 def rounded_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
 
@@ -104,7 +100,6 @@ def rounded_data(request, id):
     }
 
     return JsonResponse(evaluations)
-
 
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
@@ -176,7 +171,7 @@ def test_score(request, id, type):
     
 
 def generate_qr(request, id, type):
-    url = 'http://127.0.0.1:8000'
+    url = 'https://sdo-webinar-evaluation-system.onrender.com/'
     
     qr=TestQR.objects.filter(test__id=id, type=type)
 
@@ -208,12 +203,12 @@ def qr_evalution(request, id):
     type=webinar.event_type
     qr=EvalQR.objects.filter(test__id=id, type=type)
     
-    url=f"http://127.0.0.1:8000/webinar/questionaire/{webinar.id}/"
+    url=f"https://sdo-webinar-evaluation-system.onrender.com/webinar/questionaire/{webinar.id}/"
 
     if not qr:
         
         webinar=Webinar.objects.get(id=id)
-        url_path=f'{url}/webinar/display_test/{id}/{type}'
+        url_path=url
         qr = qrcode.make(url_path)
         
         # Save to database

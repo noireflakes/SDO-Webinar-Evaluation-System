@@ -12,7 +12,9 @@
     align-items: center;
     margin-bottom: 32px;
 }
-
+a{
+    text-decoration: none;
+}
 .page-title {
     font-size: 28px;
     color: #2D3748;

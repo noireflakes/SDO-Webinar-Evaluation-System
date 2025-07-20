@@ -54,8 +54,9 @@
         <div class="form-group">
           <label for="fullname">Username</label>
           <input name="fullname" id="fullname" type="text" placeholder="{{ user.username}}" />
+          <p style="color: rend;" >{{ user_taken }}</p>
         </div>
-        <p style="color: rend;" >{{ user_taken }}</p>
+        
         <div class="form-group">
           <label for="fullname">Full Name</label>
           <input name="fullname" id="fullname" type="text" placeholder="{{ user.first_name }} {{ user.last_name }}" />

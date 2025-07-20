@@ -33,6 +33,7 @@ def index(request):
     })
 
 def login_view(request):
+    credential_error=""
     if request.method=="POST":
         username=request.POST.get("username")
         password=request.POST.get("password")
@@ -43,7 +44,10 @@ def login_view(request):
             request.session['username']=username
         
             return redirect(generate_otp)
-    return render(request, 'login/login.html')
+        else:
+            credential_error="Invalid Username or Password"
+        
+    return render(request, 'login/login.html',{"credential_error":credential_error})
 
 def logout_view(request):
     logout(request)
@@ -56,38 +60,41 @@ def generate_otp(request):
 
     user = get_object_or_404(User, username=username)
 
-    # Check if the OTP secret key is already in session
     if 'otp_secret_key' not in request.session:
         request.session['otp_secret_key'] = pyotp.random_base32()
 
     otp_secret_key = request.session['otp_secret_key']
-    totp = pyotp.TOTP(otp_secret_key)
+
+   
+    totp = pyotp.TOTP(otp_secret_key, interval=300)
     otp_code = totp.now()
 
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
 
-        # Verify if the user OTP is valid
-        if totp.verify(user_otp, valid_window=1):  
+       
+        if totp.verify(user_otp, valid_window=0):
             login(request, user)
             request.session.modified = True
             del request.session['otp_secret_key']
             del request.session['username']
-            return redirect('index')  
+            return redirect('index')
         else:
             return render(request, 'login/otp.html', {
-                'otp': otp_code
+                'otp': otp_code,
+                'error': 'Invalid or expired OTP.'
             })
 
     send_mail(
-        'OTP Code',
+        f'OTP Code {otp_code}',
         f'Your OTP code is: {otp_code} Description description description',
         settings.EMAIL_HOST_USER,
         [user.email],
         fail_silently=False
     )
 
-    return render(request, 'login/otp.html', {'otp': otp_code,})
+    return render(request, 'login/otp.html', {'otp': otp_code})
+
 
 def event_data(request):
     data=[]
@@ -104,12 +111,17 @@ def event_data(request):
 #user
 def user_dashboard(request):
 
-    today=timezone.now().date()
-    upcoming_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__gte=today )   
+    today = timezone.localtime().date()
+    upcoming_webinar=WebinarAttendees.objects.filter(user=request.user  , webinar__start_date__gte=today)   
     past_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__lt=today )
     upcoming_messages=""
     history_messages=""
-    
+    print("hello")
+    print(today)
+    test=WebinarAttendees.objects.get(id=1)
+    print(test.user)
+    print(request.user.id)
+    print(f"UPCOMING: {upcoming_webinar} , PAST: {past_webinar}")
     if not upcoming_webinar.exists():
         upcoming_messages="No webinar asssigned to you please wait for further notice"
     
@@ -147,12 +159,13 @@ def certificate(request):
     )
     completed_webinars = Webinar.objects.filter(
         until_date__lt=today,
-
         attendees__user=request.user
     )
+    print(ongoing_webinars)
+    print(completed_webinars)
     
     return render(request, 'login/user_nav/certificate.html', {
-        'ongoind_webinars':ongoing_webinars,
+        'ongoing_webinars':ongoing_webinars,
         'completed_webinars': completed_webinars
     })
 

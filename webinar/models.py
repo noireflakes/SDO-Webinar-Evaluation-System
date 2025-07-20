@@ -29,7 +29,7 @@ class WebinarAttendees(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendees", null=True, blank=True)
     school_id=models.CharField(max_length=20, null=True)
     email=models.EmailField()
-    attendance=models.IntegerField(default=0)
+    attendance=models.IntegerField(default=0)  
 
 
 class ResponseQuestionaire(models.Model):
