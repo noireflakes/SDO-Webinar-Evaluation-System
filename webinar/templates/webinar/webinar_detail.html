@@ -33,14 +33,17 @@
             <p>{{ webinar.description }}</p>
         </div>
         <div class="webinar-img-container" >
-            <img src="{{ webinar.banner.url }}" alt="">
+            <div class="img-con" >
+                <div class="transparent" >  </div>
+                                <img src="{{ webinar.banner.url }}" alt="">
+
+            </div>
             <div class="img-contents">
-            <div class="catergory"><div class="type"> {{ webinar.type }} Webinar</div>
-             <div class="certi"> {{ webinar.type }} Earn Certificate</div></div>
             <div class="content">
-            <p class="time"><i class="bi bi-clock"></i>   {{ webinar.time }}  </p>
-            <p class="date" ><i class="bi bi-calendar-event"></i>   {{ webinar.start_date }} - {{ webinar.until_date }}</p>
-            <p><i class="bi bi-geo-alt"></i>   {{ webinar.venue }}</p>
+                <h5> {{ webinar.title }} </h5>
+                <p class="date" ><i class="bi bi-calendar-event"></i>   {{ webinar.start_date }} - {{ webinar.until_date }}</p>
+                <p class="time"><i class="bi bi-clock"></i>   {{ webinar.time|time:"h:i A" }}   </p>
+                <p><i class="bi bi-geo-alt"></i>   {{ webinar.venue }}</p>
             </div>
             </div>
         </div>
@@ -52,10 +55,10 @@
 <section class="admin-controls">
     <h2>Admin Controls</h2>
     <div class="admin-container" >
-        <a class="register" href="{% url 'register' webinar.id %}"><i class="fas fa-user-plus"></i> Register Attendees</a>
-        <a class="statistics" href="{% url 'display_result' webinar.id %}"><i class="fas fa-chart-bar"></i> View Statistics</a>
-        <a class="create-test"  href="{% url 'create_test' webinar.id %}"><i class="fas fa-edit"></i> Create Test</a>
-        <a class="create-test"  href="{% url 'questionaire' webinar.id %}"><i class="fas fa-edit"></i>Evaluation</a>
+        <a class="register btn" href="{% url 'register' webinar.id %}"><i class="fas fa-user-plus"></i> Register Attendees</a>
+        <a class="statistics btn" href="{% url 'display_result' webinar.id %}"><i class="fas fa-chart-bar"></i> View Statistics</a>
+        <a class="create-test btn"  href="{% url 'create_test' webinar.id %}"><i class="fas fa-edit"></i> Create Test</a>
+        <a class="create-test btn"  href="{% url 'questionaire' webinar.id %}"><i class="fas fa-edit"></i>Evaluation</a>
 
     </div>
 </section>

@@ -33,13 +33,9 @@
           <a href="{% url 'calendar' %}" class="nav-item  ">Upcoming Events</a>
           <a href="{% url 'certificate' %}" class="nav-item active">Certificate</a>
           <a href="{% url 'user_setting' %}" class="nav-item">Settting</a>
+          <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
       </nav>
-      <div class="logout" >
-        <a href="{% url 'logout' %}">
-          <img   src="{% static 'icons/exit.png' %}" alt="">
-          Logout
-        </a> 
-      </div>
+
     </aside>
 <div class="main-content">
    <div class="main-content">

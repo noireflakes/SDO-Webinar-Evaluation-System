@@ -102,19 +102,20 @@
   </div>
 </footer>
 
+
 <script>
 
   document.querySelectorAll('a').forEach(link => {
     const url = new URL(link.href, window.location.href);
 
-    // Make sure it’s an internal link and not # or JS
+   
     if (url.origin === window.location.origin && !link.href.includes('#')) {
       link.addEventListener('click', function (e) {
         e.preventDefault();
         document.body.classList.add('slide-out');
         setTimeout(() => {
           window.location.href = link.href;
-        }, 400); // Match CSS duration
+        }, 400); 
       });
     }
   });
