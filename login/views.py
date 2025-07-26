@@ -240,12 +240,15 @@ def register_user(request):
         email=request.POST.get("user_email")
         password=request.POST.get("user_password")
         school_id=request.POST.get("school_id")
-        username=name[0]
+        username=full_name
 
         if User.objects.filter(username=username).exists():
             messages.error(request,"username Already Exist")
+            return redirect('admin_users')
+            
         elif User.objects.filter(email=email).exists():
             messages.error(request,"Email Already Exist")
+            return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
             profile=UserProfile.objects.create(user=user, school_id=school_id)
@@ -284,7 +287,7 @@ def create_admin(request):
 
             email = request.POST.get("admin_email")
             password = request.POST.get("admin_password")
-            username = name[0]
+            username = full_name
 
             if User.objects.filter(username=username).exists():
                 messages.error(request, "Username already exists.")

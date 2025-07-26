@@ -117,34 +117,13 @@ import dj_database_url
 
 
 
-import os
-from dotenv import load_dotenv
-from urllib.parse import urlparse, parse_qsl
 
 
-load_dotenv("venv") 
 
 
-DATABASE_URL = file.DB_CONNECT
 
-if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL is not set in the .env file")
-
-# Use urlparse to decode the DATABASE_URL
-parsed = urlparse(DATABASE_URL)
-
-# SAFELY build the DATABASES dictionary for Neon
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': parsed.path[1:],  # Remove leading slash
-        'USER': parsed.username,
-        'PASSWORD': parsed.password,
-        'HOST': parsed.hostname,
-        'PORT': parsed.port or 5432,
-        # Avoid 'search_path' option for Neon pooled connections
-        'OPTIONS': {},
-    }
+    'default': dj_database_url.config( conn_max_age=600, ssl_require=True )
 }
 
 

@@ -60,13 +60,24 @@
                 </div>
                 <div class="form-group">
                     <label for="username">School Id:</label>
-                    <input type="text" id="username" name="username"class="form-control" placeholder="Enter User Username">
+                    <input type="text" id="school_id" name="school_id"class="form-control" placeholder="Enter User Username">
                 </div>
                 <div class="form-group">
                     <label for="user_password">Password</label>
                     <input type="password" id="user_password" name="user_password" class="form-control" placeholder="Enter password">
                 </div>
                 <button type="submit" class="btn btn-primary">Register User</button>
+                {% if messages %}
+                    <div class="message-container">
+                        {% for message in messages %}
+                        {% if "error" in message.tags %}
+                            <div class="alert alert-{{ message.tags }}" style="color: red;">
+                            {{ message }}
+                            </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </form>
         </div>
         

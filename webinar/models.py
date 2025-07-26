@@ -36,6 +36,7 @@ class ResponseQuestionaire(models.Model):
       webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="evaluation")
       user=models.ForeignKey(User, on_delete=models.CASCADE)
       type=models.CharField(max_length=100, null=True, blank=True)
+      sex=models.CharField(max_length=50, null=True, blank=True)
       q1=models.IntegerField(null=True)
       q2=models.IntegerField(null=True)
       q3=models.IntegerField(null=True)
