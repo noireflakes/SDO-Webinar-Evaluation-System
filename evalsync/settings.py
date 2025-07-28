@@ -55,32 +55,32 @@ INSTALLED_APPS = [
 ]
 
 #env
-
-
-
-#BASE DIR
+env = environ.Env()
+environ.Env.read_env()
+import sys
+print("Active venv path:", sys.prefix)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #MEDIA STORAGE
-
-env = environ.Env()
-environ.Env.read_env()
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env("CLOUD_NAME"),
     'API_KEY': env("CLOUD_API_KEY"),
     'API_SECRET': env("CLOUD_SECRET_KEY")
 }
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+
+#BASE D
 #STATIC
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 #EMAIL
-print("HEWLLLO")
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")

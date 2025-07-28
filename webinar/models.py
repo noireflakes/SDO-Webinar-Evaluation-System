@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+
+from cloudinary_storage.storage import MediaCloudinaryStorage
 # Create your models here.
 
 
@@ -11,15 +13,14 @@ class Webinar(models.Model):
     start_date=models.DateField(null=True ,blank=True)
     until_date=models.DateField(null=True, blank=True)
     time=models.TimeField(max_length=20)
-    banner=models.ImageField(upload_to='banner')
+    banner=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='banner')
     venue=models.CharField(max_length=500)
 
-    def __str__(self):
-        return f"{self.title} - {self.venue}"
+
 
 class Speaker(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="speaker")
-    img=models.ImageField(upload_to="SpeakerProfile",blank=True,default='UserProfile/1.jpg', null=True)
+    img=models.ImageField(storage=MediaCloudinaryStorage(), upload_to="SpeakerProfile",blank=True,default='UserProfile/1.jpg', null=True)
     name=models.CharField(max_length=250)
     email=models.EmailField(max_length=250, null=True)
 
@@ -62,7 +63,6 @@ class Choice(models.Model):
     question=models.ForeignKey(Test_Question,related_name="choices", on_delete=models.CASCADE,blank=True, null=True)
     text_option=models.CharField(max_length=200, blank=True, null=True)
     is_correct=models.BooleanField(default=False)
-
 
 
 class TestResponse(models.Model):
