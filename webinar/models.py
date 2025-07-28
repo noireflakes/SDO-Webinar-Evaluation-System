@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 class Webinar(models.Model): 
-    title=models.CharField(max_length=100)
+    title=models.CharField(max_length=200)
     description=models.CharField(max_length=1000)
     number_of_speaker=models.IntegerField(default=1)
     event_type=models.CharField(max_length=20, null=True ,blank=True)
@@ -12,7 +12,7 @@ class Webinar(models.Model):
     until_date=models.DateField(null=True, blank=True)
     time=models.TimeField(max_length=20)
     banner=models.ImageField(upload_to='banner')
-    venue=models.CharField(max_length=40)
+    venue=models.CharField(max_length=500)
 
     def __str__(self):
         return f"{self.title} - {self.venue}"
@@ -20,14 +20,14 @@ class Webinar(models.Model):
 class Speaker(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="speaker")
     img=models.ImageField(upload_to="SpeakerProfile",blank=True,default='UserProfile/1.jpg', null=True)
-    name=models.CharField(max_length=30)
-    email=models.EmailField(max_length=30, null=True)
+    name=models.CharField(max_length=250)
+    email=models.EmailField(max_length=250, null=True)
 
 
 class WebinarAttendees(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="attendees")
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendees", null=True, blank=True)
-    school_id=models.CharField(max_length=20, null=True)
+    school_id=models.CharField(max_length=80, null=True)
     email=models.EmailField()
     attendance=models.IntegerField(default=0)  
 
@@ -54,8 +54,8 @@ class Comment(models.Model):
 class Test_Question(models.Model):
     webinar = models.ForeignKey(Webinar, on_delete=models.CASCADE, blank=True, null=True ,related_name="question")
     question = models.CharField(max_length=500 , blank=True, null=True)
-    test_type = models.CharField(max_length=30, blank=True, null=True) 
-    question_type = models.CharField(max_length=50, blank=True, null=True) 
+    test_type = models.CharField(max_length=100, blank=True, null=True) 
+    question_type = models.CharField(max_length=100, blank=True, null=True) 
     correct_answered = models.CharField(max_length=200, blank=True, null=True)  
 
 class Choice(models.Model):

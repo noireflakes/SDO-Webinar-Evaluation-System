@@ -121,7 +121,10 @@ import dj_database_url
 
 
 
+import environ
 
+env = environ.Env()
+environ.Env.read_env()
 DATABASES = {
     'default': dj_database_url.config( conn_max_age=600, ssl_require=True )
 }
