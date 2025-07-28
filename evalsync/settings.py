@@ -12,17 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
-
-
+import rest_framework
+from . import file
+import environ
+import dj_database_url
 
 
 
@@ -41,16 +34,10 @@ CSRF_TRUSTED_ORIGIN=[
     'https://*.onrender.com','127.0.0.1', 'localhost',
 ]
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-import rest_framework
-
 # Application definition
-
 INSTALLED_APPS = [
     'login',
     'webinar',
@@ -63,19 +50,51 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django_cleanup.apps.CleanupConfig',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
-from . import file
+#env
 
-#email_set_up
-EMAIL_BACKEND = file.EMAIL_BACKEND
-EMAIL_HOST = file.EMAIL_HOST
-EMAIL_PORT = file.EMAIL_PORT
-EMAIL_USE_TLS = file.EMAIL_USE_TLS
-EMAIL_HOST_USER = file.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = file.EMAIL_HOST_PASSWORD 
 
-ADMIN_EMAIL= file.ADMIN_EMAIL
+
+#BASE DIR
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+#MEDIA STORAGE
+
+env = environ.Env()
+environ.Env.read_env()
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env("CLOUD_NAME"),
+    'API_KEY': env("CLOUD_API_KEY"),
+    'API_SECRET': env("CLOUD_SECRET_KEY")
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+#STATIC
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+#EMAIL
+print("HEWLLLO")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+ADMIN_EMAIL= env("ADMIN_EMAIL")
+
+
+#DATBASE
+DATABASES = {
+    'default': dj_database_url.config( conn_max_age=600, ssl_require=True )
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -109,27 +128,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'evalsync.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-import dj_database_url
-
-
-
-
-
-
-
-import environ
-
-env = environ.Env()
-environ.Env.read_env()
-DATABASES = {
-    'default': dj_database_url.config( conn_max_age=600, ssl_require=True )
-}
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -149,7 +149,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -161,11 +160,8 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
