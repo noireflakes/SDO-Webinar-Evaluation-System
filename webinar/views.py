@@ -4,15 +4,18 @@ from django.db.models import Avg,F
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core import serializers
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 import qrcode
 from django.contrib import messages 
 import re
 from login.models import UserProfile
-# Create your views here.
 
+
+#create events
 def make_webinar(request):
     if request.method=='POST':
+
+        #get event info
         title=request.POST.get('title')
         description=request.POST.get('description')
         number_of_speaker=int(request.POST.get('number_of_speaker'))
@@ -23,23 +26,23 @@ def make_webinar(request):
         banner=request.FILES.get('banner')
         venue=request.POST.get('venue')
 
-
+        #save event info
         webninar=Webinar(title=title,
-                         description=description, number_of_speaker=number_of_speaker, event_type=event_type,
-                         start_date=start_date, until_date=until_date, time=time, banner=banner,
-                         venue=venue)
+        description=description, number_of_speaker=number_of_speaker, event_type=event_type,
+        start_date=start_date, until_date=until_date, time=time, banner=banner,
+        venue=venue)
         webninar.save()
 
+        #save speakers
         for i in range(1,number_of_speaker+1):
             speaker_name=request.POST.get(f'speaker_name{i}')
             speaker_email=request.POST.get(f'speaker_email{i}')
             img=request.FILES.get(f'speaker_photo{i}')
-            speaker=Speaker(webinar=webninar,img=img, name=speaker_name, email=speaker_email)
+            speaker=Speaker(webinar=webninar, img=img, name=speaker_name, email=speaker_email)
             speaker.save()
-        return redirect('index')
 
-        
-        
+        return redirect('index')
+    
     return render(request, 'webinar/makewebinar.html')
 
 
@@ -47,10 +50,10 @@ def webinar_detail(request, id):
     webinar=get_object_or_404(Webinar, id=id)
 
     if request.user.is_authenticated:
-
         return render(request, "webinar/webinar_detail.html",{
             'webinar':webinar
         })
+    messages.error(request, "Please Login first to access the Events.")
     return redirect("index")
 
 def events_data(request):

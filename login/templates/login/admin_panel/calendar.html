@@ -46,19 +46,13 @@
    
     </aside>
 
-
-
-    
-
-    
     <div class="main-content">
 
-  
       <section class="calendar-section">
-                  <div class="title">
-          <h2>Calendar</h2>
-    <p>Stay Updated with Upcoming Events and Seminar</p>
-    </div>
+        <div class="title"><h2>Calendar</h2>
+          <p>Stay Updated with Upcoming Events and Seminar</p>
+        </div>
+
         <div id="calendar"></div>
       </section>
 
@@ -69,13 +63,13 @@
       <section class="events-section">
         <h3>Upcoming Events</h3>
 
-        <div class="event-container">
+        <div class="events-container">
           {% if upcoming_webinars %}
             {% for up_webinar in upcoming_webinars %}
               <div class="event-card">
-                <h6>{{ up_webinar.webinar.title }}</h6>
-                <p class="address">{{ up_webinar.webinar.address }}</p>
-                <p class="date">{{ up_webinar.webinar.start_date }} – {{ up_webinar.webinar.until_date }}</p>
+                <h6>{{ up_webinar.title }}</h6>
+                <p class="address">{{ up_webinar.address }}</p>
+                <p class="date">{{ up_webinar.start_date }} – {{ up_webinar.until_date }}</p>
               </div>
             {% endfor %}
           {% else %} 
@@ -105,20 +99,7 @@
 
 <script>
 
-  document.querySelectorAll('a').forEach(link => {
-    const url = new URL(link.href, window.location.href);
 
-   
-    if (url.origin === window.location.origin && !link.href.includes('#')) {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.body.classList.add('slide-out');
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 400); 
-      });
-    }
-  });
 
   document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');

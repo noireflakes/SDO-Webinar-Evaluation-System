@@ -14,7 +14,7 @@
 <script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
 {% endblock %}
 
-{% block body%}
+{% block body %}
 
 <div class="page-transition">
   <div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
@@ -64,24 +64,29 @@
 
 <section class="events-section">
   <h3>Upcoming Events</h3>
-
   <div class="event-container">
     {% if upcoming_webinars %}
+    <script>
+      console.log("this line was executed")
+      console.log("{{ upcoming_webinars }}")
+    </script>
       {% for up_webinar in upcoming_webinars %}
         <div class="event-card">
           <h6>{{ up_webinar.webinar.title }}</h6>
-          <p class="address">{{ up_webinar.webinar.address }}</p>
+          <p class="address">{{ up_webinar.webinar.venue }}</p>
           <p class="date">{{ up_webinar.webinar.start_date }} – {{ up_webinar.webinar.until_date }}</p>
         </div>
       {% endfor %}
     {% else %} 
       <p class="no-event">No Scheduled Upcoming Webinar</p>
+
+    
     {% endif %}
   </div>
 
 
 </section>
-
+  <h1>Hello</h1>
     </div>
   </div>
 </div>

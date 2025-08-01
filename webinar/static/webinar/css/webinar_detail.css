@@ -1,5 +1,5 @@
 body{
-    background-color: rgb(217, 207, 255);
+     background-color:rgb(227, 213, 233);
 }
 
 .header-section{
@@ -7,17 +7,15 @@ body{
    
     width: 100%;
     background-color: rgb(44, 44, 44);
-
     
-   
     
 }
 
 .header-container{
-    
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 320px;
+    
     width: 600px;
     padding-top: 20px;
    
@@ -29,10 +27,11 @@ body{
 }
 
 .header-container h2{
-    font-size: 50px;
-    font-weight: 600;
+    font-size: 40px;
+    font-weight: 500;
     border-top: 3px solid;
-    border-image: linear-gradient(to right, rgb(114, 52, 114), rgb(2, 2, 73))1;
+    border-image: linear-gradient(to right, rgb(177, 94, 176), rgb(70, 82, 185)) 1;
+
     margin-top: 120px;
 }
 
@@ -54,7 +53,13 @@ body{
     position: relative;
     background-color: rgb(0, 0, 0);
     width: 100%;
-    height: 400px;
+    height: 300px;
+    overflow: hidden;
+    
+}
+
+.img-con img{
+    object-fit: cover;
 }
 .webinar-img-container{
     
@@ -71,15 +76,10 @@ body{
 }
 
 
-.transparent{
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    z-index: 1;
-}
+
 
 .webinar-contents{
-    width: 500px;
+    width: 40%;
     padding: 40px;
     background-color: white;
 }
@@ -118,6 +118,7 @@ body{
     font-size: 14px;
     padding-bottom: 10px;
     height: 50%;
+
   
 
 }
@@ -133,25 +134,13 @@ p{
 }
 
 .bi{
-    font-size: 15px;
+    font-size: 12px;
 }
 .catergory{
     display: flex;
     flex-direction: row;
 }
-.certi{
-    background-color: rgb(252, 171, 184);
-    color:rgb(180, 68, 105);
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px;
-    border-radius: 60px;
-    width: 150px;
-    text-align: center;
-    margin-left: 10px;
-    
 
-}
 .webinar-contents{
     display: flex;
     align-items: center;
@@ -189,7 +178,7 @@ p{
     width: 100%;
     height: 150px;
     border-radius: 50%;
-     margin-top: 30px;
+    margin-top: 30px;
 
 }
 .instrutor-card h2{

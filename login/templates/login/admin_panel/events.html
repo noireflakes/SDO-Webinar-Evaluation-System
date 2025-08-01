@@ -14,10 +14,7 @@
 {% endblock %}
 
 {% block body%}
-
-<div class='page-transition' >
-
-    <div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
+  <div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
     <div class="topbar-right d-flex align-items-center gap-3">
         <a href="#" class="notification-icon position-relative">
             <img class="bell" src="{% static 'icons/bell.png' %}" alt="Notifications" style="width: 24px;">
@@ -28,6 +25,7 @@
         </a>
     </div>
   </div>
+
   <div class="app-container">
     <aside class="sidebar">
       <div class="logo">
@@ -63,17 +61,20 @@
         <div class="container-fluid webinar mt-4">
             <div class="row">
                 {% for webinar in webinars %}
-                <div class="webinar-card" >
-                    <div class="img-container">
-                        <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
+                 
+                    <div class="webinar-card" >
+                      <div class="img-container">
+                          <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
+                      </div>
+                      <div class="webinar-contents">
+                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}  </p></div>
+                          <h2 class="webinar-title">{{ webinar.title }}</h2>
+                          <p>{{ webinar.description|truncatewords:16  }}</p>
+                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">View Details</a></div>
+                      </div>
                     </div>
-                    <div class="webinar-contents">
-                      <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}  </p></div>
-                        <h2 class="webinar-title">{{ webinar.title }}</h2>
-                        <p>{{ webinar.description|truncatewords:16  }}</p>
-                    <div class="webinar-btn"> <a class="webinar-detail"href="{% url 'webinar_detail' webinar.id %}">View Details</a></div>
-                    </div>
-                </div>
+
+                 
                 
                 {% endfor %}
             </div>

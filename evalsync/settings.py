@@ -58,7 +58,7 @@ INSTALLED_APPS = [
 env = environ.Env()
 environ.Env.read_env()
 import sys
-print("Active venv path:", sys.prefix)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #MEDIA STORAGE
@@ -73,7 +73,7 @@ CLOUDINARY_STORAGE = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
-#BASE D
+
 #STATIC
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

@@ -14,7 +14,7 @@ from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
 # Create your views here.
 
-
+#login handler
 def index(request):
     webinar=Webinar.objects.all()
     upcoming_webinars = Webinar.objects.filter(
@@ -51,7 +51,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect(login_view)
+    return redirect("index")
 
 def generate_otp(request):
     username = request.session.get('username')
@@ -96,19 +96,10 @@ def generate_otp(request):
     return render(request, 'login/otp.html', {'otp': otp_code})
 
 
-def event_data(request):
-    data=[]
-    webinars=Webinar.objects.all()
-    
-    for webinar in webinars:
-        data.append({
-            "title":webinar.title,
-            "start":webinar.start_date.isoformat()
-        })
 
-    return JsonResponse(data, safe=False)
 
-#user
+
+#user views
 def user_dashboard(request):
 
     today = timezone.localtime().date()
@@ -135,20 +126,35 @@ def user_dashboard(request):
         "upcoming_message":upcoming_messages,
         "past_message":history_messages
     })
-    
+
+
 def calendar(request):
+    
     today=timezone.now().date()
     upcoming_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__gte=today ) 
+    
 
     return render(request,"login/user_nav/calendar.html",{
         'upcoming_webinars':upcoming_webinar
     })
 
-def attendance(request):
-    return render(request, "login/user_nav/attendance.html")
 
-def aboutus(request):
-    return render(request, "login/user_nav/aboutus.html")
+def event_data(request):
+    data=[]
+    webinars=Webinar.objects.all()
+    
+    for webinar in webinars:
+        data.append({
+            "title":webinar.title,
+            "start":webinar.start_date.isoformat()
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+def user_setting(request):
+    return render(request, "login/user_nav/user_setting.html")
+
 
 def certificate(request):
     today = timezone.now().date()
@@ -176,24 +182,17 @@ def certificate_data(request, id):
     data = serializers.serialize('json', certificate)
     return HttpResponse(data)
 
-def evaluation_nav(request):
-    return render(request, "login/user_nav/evaluation.html")
 
-def user_setting(request):
-    return render(request, "login/user_nav/user_setting.html")
-
-#ADMIN
-def admin_panel(request):
-    webinars=Webinar.objects.all()
-    return render(request, 'login/admin_panel.html',{
-        'webinars':webinars
+#admin views
+def admin_calendar(request):
+    today=timezone.now().date()
+    upcoming_webinars=Webinar.objects.filter(start_date__gte=today ) 
+    print(upcoming_webinars)
+    return render(request,"login/admin_panel/calendar.html",{
+       
+        "upcoming_webinars":upcoming_webinars
     })
 
-def admin_events(request):
-    return render(request,"login/admin_panel/events.html")
-
-def admin_calendar(request):
-    return render(request,"login/admin_panel/calendar.html")
 
 def admin_certificate(request):
     webinars=Webinar.objects.all()
@@ -204,18 +203,18 @@ def admin_certificate(request):
         'today':today
     })
 
+
 def admin_events(request):
     webinar=Webinar.objects.all()
-
-    
-
     return render(request, "login/admin_panel/events.html",{
         'webinars':webinar,
       
     })
 
+
 def admin_setting(request):
     return render(request, "login/admin_panel/setting.html")
+
 
 def admin_users(request):
     users=User.objects.all()
@@ -223,6 +222,8 @@ def admin_users(request):
         'users':users
     })
 
+
+#create user and edit credential
 def register_user(request):
     if request.method=="POST":
         full_name=request.POST.get('user_fullname',' ').strip()
@@ -253,6 +254,7 @@ def register_user(request):
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
             profile=UserProfile.objects.create(user=user, school_id=school_id)
     return redirect('admin_users')
+
 
 def generete_authorization_key(request):
    
@@ -316,6 +318,7 @@ def delete_user(request, id):
 
     return redirect("admin_users")
 
+
 def edit_user(request):
     user = User.objects.get(id=request.user.id)
     profile = UserProfile.objects.get(user=user)
@@ -377,6 +380,7 @@ def edit_user(request):
         return redirect("admin_setting")
     else:
         return redirect("user_setting")
+
 
 @login_required
 def change_password(request):

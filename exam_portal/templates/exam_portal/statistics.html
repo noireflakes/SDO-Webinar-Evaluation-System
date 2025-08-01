@@ -160,116 +160,142 @@
     }
 
     
-    document.addEventListener('DOMContentLoaded', function() {
-
-        async function fetchData(){
-            const id=parseInt("{{ webinar.id }}");
-
-                const evaluation= await fetch(`/exam_portal/rounded_data/${id}`)
-
-                const data=await evaluation.json()
-
-                console.log(data)
-                console.log("hello")
+  document.addEventListener('DOMContentLoaded', function() {
+    async function fetchData() {
+        const id = parseInt("{{ webinar.id }}");
+        const evaluation = await fetch(`/exam_portal/rounded_data/${id}`);
+        const data = await evaluation.json();
+        console.log(data);
                 
-                const chartData = {
-                    speaker: data.speaker,
-                    venue: data.venue,
-                    food: data.meal,
-                    manage: data.manage,
-                    overall: data.overall
-                };
+        const chartData = {
+            speaker: data.speaker,
+            venue: data.venue,
+            food: data.meal,
+            manage: data.manage,
+            overall: data.overall
+        };
                 
-                const labels = ['5 (Excellent)', '4 (Good)', '3 (Average)', '2 (Poor)', '1 (Very Poor)'];
-                const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
+        const labels = ['5 (Excellent)', '4 (Good)', '3 (Average)', '2 (Poor)', '1 (Very Poor)'];
+        const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
                 
-                const chartIds = ['speaker', 'venue', 'food', 'manage', 'overall'];
+        const chartIds = ['speaker', 'venue', 'food', 'manage', 'overall'];
                 
-                chartIds.forEach(id => {
-                    const ctx = document.getElementById(id).getContext('2d');
-                    
-                    new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: chartData[id],
-                                backgroundColor: colors,
-                                borderColor: '#fff',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'right',
-                                    labels: {
-                                        boxWidth: 12,
-                                        padding: 20
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: id.charAt(0).toUpperCase() + id.slice(1) + ' Evaluation',
-                                    font: {
-                                        size: 14
-                                    },
-                                    padding: {
-                                        top: 10,
-                                        bottom: 20
-                                    }
-                                },
-
-                            }
-                        }
-                    });
-                }); 
-        }fetchData()
-
-        async function TestChart(){
-            const graphIds = ['pre-test', 'post-test'];
-
-            const pre_test = "{% url 'test_score' webinar.id 'pre_test' %}";
-            const post_test = "{% url 'test_score' webinar.id 'post_test' %}";
-
-            for (const [index, id] of graphIds.entries()) {
-                const graph = document.getElementById(id);
-                const ctx = graph.getContext("2d");
-
-                const url = (index < 1) ? pre_test : post_test;
-
-        
-                const response = await fetch(url);
-                const json = await response.json();
-
-                console.log("Data JSON:", json);
-
+        chartIds.forEach(id => {
+            const ctx = document.getElementById(id).getContext('2d');
             
-                const labels = Object.keys(json.scores);
-                const data = Object.values(json.scores);
-
-                const backgroundColor = labels.map((_, i) => randomColor());
-
-                new Chart(ctx, {
-                    type: "doughnut",
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: "Number of students",
-                            data: data,
-                            backgroundColor: backgroundColor
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-
-                    }
-                });
-
+       
+            const allZero = Array.isArray(chartData[id]) && 
+                          chartData[id].slice(0, 5).every(value => value === 0);
+            
+            if (allZero) {
+                // Clear the canvas and display message
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
             }
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: chartData[id],
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: id.charAt(0).toUpperCase() + id.slice(1) + ' Evaluation',
+                            font: {
+                                size: 14
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            }
+                        },
+                    }
+                }
+            });
+        }); 
+    }
+    
+    fetchData();
+
+    async function TestChart() {
+        const graphIds = ['pre-test', 'post-test'];
+        const pre_test = "{% url 'test_score' webinar.id 'pre_test' %}";
+        const post_test = "{% url 'test_score' webinar.id 'post_test' %}";
+
+        for (const [index, id] of graphIds.entries()) {
+            const graph = document.getElementById(id);
+            const ctx = graph.getContext("2d");
+            const url = (index < 1) ? pre_test : post_test;
+            
+            const response = await fetch(url);
+            const json = await response.json();
+            console.log("Data JSON:", json);
+            
+            const labels = Object.keys(json.scores);
+            const data = Object.values(json.scores);
+            
+            // Check if all values are zero
+            const allZero = Array.isArray(data) && data.every(value => value === 0);
+            
+            if (allZero) {
+                // Clear the canvas and display message
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                continue;
+            }
+            
+            const backgroundColor = labels.map((_, i) => randomColor());
+            
+            new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Number of students",
+                        data: data,
+                        backgroundColor: backgroundColor
+                    }]
+                },
+                options: {
+                    responsive: true,
+                }
+            });
         }
+    }
+
+    function randomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = 50 + Math.random() * 10;    
+        const lightness = 45 + Math.random() * 10;     
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+    
+    TestChart();
+
 
         function randomColor() {
             const hue = Math.floor(Math.random() * 360);
