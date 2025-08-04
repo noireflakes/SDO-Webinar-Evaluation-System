@@ -13,8 +13,9 @@ from login.models import UserProfile
 
 #create events
 def make_webinar(request):
-    if request.method=='POST':
 
+
+    if request.method=='POST':
         #get event info
         title=request.POST.get('title')
         description=request.POST.get('description')
@@ -26,20 +27,59 @@ def make_webinar(request):
         banner=request.FILES.get('banner')
         venue=request.POST.get('venue')
 
-        #save event info
-        webninar=Webinar(title=title,
-        description=description, number_of_speaker=number_of_speaker, event_type=event_type,
-        start_date=start_date, until_date=until_date, time=time, banner=banner,
-        venue=venue)
-        webninar.save()
+        id=request.POST.get('event_id')
+        try:
+            webinar=Webinar.objects.get(id=id)
+            webinar.title=title
+            webinar.description=description
+            webinar.number_of_speaker=number_of_speaker
+            webinar.event_type=event_type
+            webinar.start_date=start_date
+            webinar.until_date=until_date
+            webinar.time=time
+            webinar.venue=venue
+            if banner:
+                webinar.banner=banner
+            webinar.save()
 
-        #save speakers
-        for i in range(1,number_of_speaker+1):
-            speaker_name=request.POST.get(f'speaker_name{i}')
-            speaker_email=request.POST.get(f'speaker_email{i}')
-            img=request.FILES.get(f'speaker_photo{i}')
-            speaker=Speaker(webinar=webninar, img=img, name=speaker_name, email=speaker_email)
-            speaker.save()
+            speakers=webinar.speaker.all()
+            for i in range(number_of_speaker):
+                name = request.POST.get(f'speaker_name{i}', '').strip()
+                email = request.POST.get(f'speaker_email{i}', '').strip()
+                img = request.FILES.get(f'speaker_photo{i}')
+
+                if i < len(speakers):
+                    # Update existing speaker
+                    speaker = speakers[i]
+                    if name: speaker.name = name
+                    if email: speaker.email = email
+                    if img: speaker.img = img
+                    speaker.save()
+                else:
+                    # Add new speaker
+                    if name or email or img:
+                        Speaker.objects.create(
+                            webinar=webinar,
+                            name=name,
+                            email=email,
+                            img=img
+                        )
+
+        except Webinar.DoesNotExist:
+            #save event info
+            webinar=Webinar(title=title,
+            description=description, number_of_speaker=number_of_speaker, event_type=event_type,
+            start_date=start_date, until_date=until_date, time=time, banner=banner,
+            venue=venue)
+            webinar.save()
+
+            #save speakers
+            for i in range(number_of_speaker):
+                speaker_name=request.POST.get(f'speaker_name{i}')
+                speaker_email=request.POST.get(f'speaker_email{i}')
+                img=request.FILES.get(f'speaker_photo{i}')
+                speaker=Speaker(webinar=webinar, img=img, name=speaker_name, email=speaker_email)
+                speaker.save()
 
         return redirect('index')
     
@@ -55,6 +95,16 @@ def webinar_detail(request, id):
         })
     messages.error(request, "Please Login first to access the Events.")
     return redirect("index")
+
+
+def edit_events(request, id):
+    webinar=get_object_or_404(Webinar, id=id)
+
+    
+    return render(request, "webinar/makewebinar.html",{
+        'webinar':webinar
+    })
+
 
 def events_data(request):
     events = []
@@ -254,7 +304,6 @@ def questionaire(request, id):
         })
 
 
-
 def create_test(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     
@@ -306,6 +355,7 @@ def create_test(request, id):
 
     return redirect("redirect_create_test", id=id)
 
+
 def redirect_create_test(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     question=Test_Question.objects.filter(webinar=webinar)
@@ -321,6 +371,7 @@ def redirect_create_test(request, id):
         'webinar':webinar
         
     })
+
 
 def edit_test(request, id):
     webinar=get_object_or_404(Webinar, id=id)

@@ -8,56 +8,69 @@
 {% block body %}
 
 
+
     <form action="{% url 'make_webinar' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <h3>Create Webinar</h3>
+        
+
+        {% if webinar %}
+            <h3>Edit Webinar</h3>
+
+            <div class="form-group" style="display: none">
+                <label for="title">Webinar Id:</label>
+                <input name="event_id" id="event_id" type="hidden" class="form-control" value="{{ webinar.id }}">
+            </div>
+        {% else %}
+            <h3>Create Webinar</h3>
+        {% endif %}
+
         <div class="form-group">
             <label for="title">Webinar Topic:</label>
-            <input name="title" id="title" required class="form-control">
+            <input name="title" id="title" required class="form-control" value="{{ webinar.title }}">
         </div>
 
         <div class="form-group">
             <label for="description">Description:</label>
-            <textarea name="description" id="description" required class="form-control"></textarea>
+            <textarea name="description" id="description" required class="form-control" >{{ webinar.description }}</textarea>
         </div>
 
         <div class="form-group">
             <label for="number_of_speaker">Number of Speakers:</label>
-            <input type="number" min="1" max="10" name="number_of_speaker" id="number_of_speaker" required class="form-control">
+            <input type="number" min="1" max="10" name="number_of_speaker" id="number_of_speaker" value="{{ webinar.number_of_speaker }}" required class="form-control">
         </div>
 
         <div class="form-group">
             <label for="event_type">Event Type:</label>
             <select name="event_type" id="event_type" class="form-control">
-                <option value="recognition">Recognition</option>
-                <option value="workshop">Workshop</option>
-                <option value="seminar">Seminar</option>
+                <option value="recognition" {% if webinar.event_type == "recognition" %}selected{% endif %} >Recognition</option>
+                <option value="workshop" {% if webinar.event_type == "recognition" %}selected{% endif %} >Workshop</option>
+                <option value="seminar" {% if webinar.event_type == "recognition" %}selected{% endif %}>Seminar</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" id="start_date" required class="form-control">
+            <input type="date" name="start_date" id="start_date" required class="form-control" value="{{ webinar.start_date | date:'Y-m-d' }}">
         </div>
 
         <div class="form-group">
             <label for="until_date">Until Date:</label>
-            <input type="date" name="until_date" id="until_date" required class="form-control">
+            <input type="date" name="until_date" id="until_date" required class="form-control" value="{{ webinar.until_date | date:'Y-m-d' }}">
         </div>
 
         <div class="form-group">
             <label for="event_time">Event Time:</label>
-            <input type="time" name="event_time" id="event_time" required class="form-control">
+            <input type="time" name="event_time" id="event_time" required class="form-control" value="{{ webinar.time| time:'H:i' }}">
         </div>
 
         <div class="form-group">
             <label for="banner">Event Banner:</label>
-            <input type="file" name="banner" id="banner" required class="form-control">
+            <input type="file" name="banner" id="banner" class="form-control" {% if not webinar.banner %} required {% endif %} >
         </div>
 
         <div class="form-group">
             <label for="venue">Venue:</label>
-            <input name="venue" id="venue" required class="form-control">
+            <input name="venue" id="venue" required class="form-control" value="{{ webinar.venue }}">
         </div>
 
         <div id="speakers_container"></div>
@@ -91,24 +104,25 @@
             
     
             if (!isNaN(numSpeakers) && numSpeakers >= 1 && numSpeakers <= 10) {
-                for (let i = 1; i <= numSpeakers; i++) {
+                for (let i = 0; i < numSpeakers; i++) {
                     const div = document.createElement("div");
                     div.classList.add("form-group");
                     div.innerHTML = `
-                        <h4>Speaker ${i}</h4>
+                        <h4>Speaker </h4>
                         <label for="speaker_name${i}">Name:</label>
-                        <input type="text" id="speaker_name${i}" name="speaker_name${i}" required class="form-control">
+                        <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control">
                         
-                        <label for="speaker_email${i}">Email:</label>
-                        <input type="email" id="speaker_email${i}" name="speaker_email${i}" required class="form-control">
+                        <label for="speaker_email${i}">Email:</lSabel>
+                        <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control">
 
                         <label for="speaker_photo${i}">Upload Photo:</label>
-                        <input type="file" id="speaker_photo${i}" name="speaker_photo${i}" required class="form-control">
+                        <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control">
                     `;
                     speakersContainer.appendChild(div);
                 }
             }
         });
+        inputField.dispatchEvent(new Event("input"));
     });
     </script>
 {% endblock %}

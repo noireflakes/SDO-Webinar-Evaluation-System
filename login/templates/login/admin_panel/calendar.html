@@ -16,7 +16,6 @@
 
 {% block body%}
 
-<div class="page-transition">
   <div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
     <div class="topbar-right d-flex align-items-center gap-3">
         <a href="#" class="notification-icon position-relative">
@@ -42,12 +41,9 @@
         <a href="{% url 'admin_setting' %}" class="nav-item">Settting</a>
         <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
       </nav>
-      
-   
     </aside>
 
     <div class="main-content">
-
       <section class="calendar-section">
         <div class="title"><h2>Calendar</h2>
           <p>Stay Updated with Upcoming Events and Seminar</p>
@@ -55,10 +51,6 @@
 
         <div id="calendar"></div>
       </section>
-
-
-
- 
 
       <section class="events-section">
         <h3>Upcoming Events</h3>

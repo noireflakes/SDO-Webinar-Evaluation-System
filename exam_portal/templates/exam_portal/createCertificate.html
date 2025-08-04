@@ -9,14 +9,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="instru-cont" >
+        <h3>How to Use Certificate Editor</h3>
+        <p><strong>There are two ways to use the Certificate Editor:</strong></p>
+
+        <p><strong>1. Automated Certificate Generation</strong></p>
+        <ul>
+            <li>Upload your certificate template</li>
+            <li>Click <strong>Upload</strong></li>
+            <li>You’re done!</li>
+        </ul>
+        <p>Certificates will be available for attendees to download after the event ends.</p>
+
+        <p><strong>2. Editing Feature</strong></p>
+        <ul>
+            <li>Type the text you want to add</li>
+            <li>See changes in real time</li>
+            <li>Click <strong>Apply Changes</strong> to update the certificate</li>
+        </ul>
+        <p>This will update the certificate for all users who download it after the event.</p>
+    </div>
+        
+
+    </div>
+
     <div class="sidebar">
        
         <div class="sidebar-header">
              <p><a href="{% url 'admin_certificate' %}" class="back">Back to Certificate </a></p>
             <h1>Certificate Editor</h1>
         </div>
+        <div class="sidebar-section howto-cont">
+            <h4 id="use">How to use</h4>
+            
 
-        
+            
+
+
+        </div>
         
         <div class="sidebar-section">
             
@@ -117,10 +147,30 @@
         const canvas=document.getElementById('canvas');
         const ctx=canvas.getContext('2d');
         const apply=document.getElementById("apply-btn");
-        
+
+
+
 
 
         window.onload = function () {
+
+            const howto=document.getElementById("use")
+            const instru_cont=document.getElementById("instru-cont")
+
+
+
+            howto.addEventListener("mouseenter", ()=> {
+                instru_cont.style.display="block"
+              
+
+
+            })
+            howto.addEventListener("mouseleave", ()=> {
+                instru_cont.style.display="none"
+                
+
+
+            })
 
             const box = document.getElementById("data-box");
             if (box.dataset.img === "true"){
@@ -274,9 +324,6 @@ function drawAllParagraphs(maxWidth, y) {
         function flip(){
             const canvas_container=document.getElementById("canvas-container")
             canvas_container.style.animation=" flip .6s ease";
-
-    
-  
         }
 
         function applyChanges(){
