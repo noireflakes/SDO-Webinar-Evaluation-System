@@ -42,15 +42,17 @@
 
   <div class="settings-container">
     <h2>Settings</h2>
+  <div class="settings-container">
+    <h2>Settings</h2>
 
     <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
       <h4>Personal Information</h4>
       {% csrf_token %}
       <div class="form-grid">
         <div class="form-group">
-          <label for="fullname">Username</label>
-          <input name="fullname" id="fullname" type="text" placeholder="{{ user.username}}" />
-          <p style="color: rend;" >{{ user_taken }}</p>
+          <label for="username">Username</label>
+          <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
+          <p style="color:red;">{{ user_taken }}</p>
         </div>
         
         <div class="form-group">
@@ -83,13 +85,14 @@
       <div class="form-group">
           <label for="current_password">Current Password</label>
           <input type="text" name="current_password" id="current_password" />
+          <p style="color:red;" >{{ error_password }}</p>
       </div>
       <div class="form-group">
           <label for="new_password">New Password</label>
           <input type="text" name="new_password" id="new_password" />
       </div>
       <input type="submit" value="Confirm Changes">
-      <p style="color:red;" >{{ error_password }}</p>
+      
 
 
     </form>

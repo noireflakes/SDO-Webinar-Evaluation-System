@@ -1,9 +1,17 @@
 {% extends "login/layout.html" %}
 {% load static %}
 
-{% block css %} <link rel="stylesheet" href="{% static 'webinar/css/register_attendees.css' %}"> {% endblock %}
+{% block css %}
+ <link rel="stylesheet" href="{% static 'webinar/css/register_attendees.css' %}">
+ <link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
+  {% endblock %}
 
 {% block body %}
+    <div class="top-bar">
+       
+    </div>
+    <div class="breadcrumbs" ><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Register Attendees</a></div>
+
 <div class="container-fluid registration-container">
     <form class="registration-form" action="{% url 'register' webinar.id %}" method="post">
         {% csrf_token %}
@@ -20,6 +28,15 @@
         </div>
 
         <input class="submit-button" type="submit" value="Register">
+                {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <div{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </ul>   
+        {% endif %}
     </form>
 
     <div class="attendees-section">
@@ -45,8 +62,9 @@
             </div>
         </div>
         {% endif %}
+
     </div>
 </div>
 
-<a href="{% url 'index' %}" class="back-link">Back to the homepage</a>
+
 {% endblock %}

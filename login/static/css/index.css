@@ -16,6 +16,11 @@ body {
 }
 
 /* Navigation */
+
+.nav-cont{
+    height: 55px;
+    width: 100%;
+}
 .navbar {
     display: flex;
     background-color: white;
@@ -23,6 +28,9 @@ body {
     flex-wrap: wrap;
     height: 55px;
     width: 100%;
+    position: fixed;
+    z-index: 2;
+    border-bottom: #8105b38a .5px solid ;
 }
 
 .logo {
@@ -99,11 +107,14 @@ li a:hover {
     background-size: cover;
     background-position: center;
     overflow: hidden;
+
 }
 
 #header-section {
     position: relative;
     height: 100%;
+   
+    
 }
 
 .background-overlay {

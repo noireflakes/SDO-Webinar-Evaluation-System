@@ -1,5 +1,6 @@
 body{
      background-color:rgb(227, 213, 233);
+     position: relative;
 }
 
 .header-section{
@@ -75,9 +76,6 @@ body{
 
 }
 
-
-
-
 .webinar-contents{
     width: 40%;
     padding: 40px;
@@ -93,24 +91,6 @@ body{
     
 }
 
-.type{
-    width: 90px;
-
-    background-color: rgb(195, 248, 195);
-
-
-    border-radius: 60px;
-    color: green;
-    font-weight: 600;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    margin-left: 20px;
-  
- 
-}
 .img-contents{
     margin-top: 20px;
     
@@ -174,11 +154,24 @@ p{
     justify-content: space-between;
     align-items: center;
 }
-.instrutor-card img{
-    width: 100%;
+
+.sp-cont-img{
+
+    width: 150px;
     height: 150px;
     border-radius: 50%;
+    overflow: hidden;
     margin-top: 30px;
+
+    display: flex;
+    justify-content: center;
+}
+.instrutor-card img{
+    object-fit:cover;
+    width: 100%;
+
+
+    
 
 }
 .instrutor-card h2{
@@ -199,44 +192,69 @@ a:hover{
 
 /* Admin Controls Section */
 .admin-controls {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: white;
-    margin-top: 100px;
-    border-radius: 5px;
+    position: fixed;
+    top: 50%;
+    left: 0;
+    translate: 0 -50%;
+    padding: 10px;
+    border-radius: 10px;
 }
 
-.admin-controls h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-}
+
 
 .admin-container {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
 }
 
+/* Sidebar links */
 .admin-container a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px , 20px, 12px, 20px;
     font-weight: 600;
-    font-size: 1rem;
-    border-radius: 30px;
+    font-size: 1.1rem;
+    border-radius: 60px;
     text-decoration: none;
-    transition: all 0.3s ease;
-    min-width: 180px;
-    justify-content: center;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    background-color: #2e2e2e;
+    width: 50px;
+    color: white;
+    margin-left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+
+
+
+  
 }
 
-.btn{
+
+.admin-container a:hover {
+    width: 220px;
     background-color: #2e2e2e;
+    color: white;
+    
+   
+}
+
+
+.admin-container a span {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    
+   
+}
+
+.admin-container a:hover span {
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+
 }
 
 .register {

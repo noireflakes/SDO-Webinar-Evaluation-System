@@ -83,7 +83,8 @@ def make_webinar(request):
 
         return redirect('index')
     
-    return render(request, 'webinar/makewebinar.html')
+    return render(request, 'webinar/makewebinar.html'
+    )
 
 
 def webinar_detail(request, id):

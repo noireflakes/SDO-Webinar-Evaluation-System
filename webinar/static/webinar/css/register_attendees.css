@@ -1,4 +1,7 @@
-/* register_attendees.css */
+body{
+    background-color:rgb(227, 213, 233);
+}
+
 .registration-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -6,6 +9,15 @@
     display: flex;
     gap: 30px;
 }
+a{
+    color:black;
+    text-decoration: none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
 
 .registration-form {
     flex: 1;
@@ -16,6 +28,7 @@
     position: sticky;
     top: 20px;
     height: fit-content;
+    border-top: 4px solid rgb(190, 28, 190);
 }
 
 .attendees-section {
@@ -50,7 +63,7 @@
 }
 
 .form-group input:focus {
-    border-color: #3498db;
+    border-color: rgb(190, 28, 190);
     outline: none;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
@@ -58,7 +71,7 @@
 .submit-button {
     width: 100%;
     padding: 14px;
-    background-color: #3498db;
+    background-color: rgb(173, 55, 173);
     color: white;
     border: none;
     border-radius: 6px;

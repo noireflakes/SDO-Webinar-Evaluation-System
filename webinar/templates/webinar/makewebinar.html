@@ -1,128 +1,239 @@
 {% extends "login/layout.html" %}
 {% load static %}
-
+{% block title %} <title>Create Events</title> {% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'webinar/css/create_webinar.css' %}">
+<link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
 {% endblock %}
 
 {% block body %}
-
-
-
-    <form action="{% url 'make_webinar' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+    <div class="top-bar">
+        <h4>you found a secret</h4>
+    </div>
+    {% if webinar %}
+  
+    
         
+    
+    <div class="breadcrumbs" ><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Create/Edit</a></div>
+    {% else %}
+        <div class="breadcrumbs"><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a href="" id="direct" class="bc-a">Create Event</a></div>
 
-        {% if webinar %}
-            <h3>Edit Webinar</h3>
-
-            <div class="form-group" style="display: none">
-                <label for="title">Webinar Id:</label>
-                <input name="event_id" id="event_id" type="hidden" class="form-control" value="{{ webinar.id }}">
+    {% endif %}
+    <div class="main-content">
+        
+            {% if webinar %}
+            <div class="display-event">
+            <div class="img-cont"> <img id="dp-banner" src="{% if webinar %}{{ webinar.banner.url }}{% else %}
+                https://res.cloudinary.com/djnj7wko5/image/upload/v1753711098/media/banner/Untitled_design_2_lifqjk.png
+                {% endif %}" alt="banner" ></div>
+            <div class="d-t-cont">
+                <p id="dp-event-t"> {{ webinar.time }} </p>
+                <p id="dp-event-d"> {{ webinar.start_date }} -{{ webinar.until_date }}  </p>
             </div>
-        {% else %}
-            <h3>Create Webinar</h3>
-        {% endif %}
+            <h4 id="dp-event-tl">{{ webinar.title  }}</h4>
 
-        <div class="form-group">
-            <label for="title">Webinar Topic:</label>
-            <input name="title" id="title" required class="form-control" value="{{ webinar.title }}">
+            <div class="overview-cont">
+                <h4>Overview</h4>
+                <p id="dp_d">
+                    
+                    {{ webinar.description }}
+                </p>
+
+            </div>
+
+            <p class="dp-v">{{ webinar.venue }}</p>
+
+            {% for speaker in webinar.speaker.all %}
+            <h4>Speaker</h4>
+                <div class="speaker-cont">
+                    
+                    <div class="sp-img-cont" >
+                        <img src="{{ speaker.img.url }}" alt="{{ speaker.name }}" >
+                    </div>
+
+                    <div class="sp-contents">
+                        <p>{{ speaker.name }}</p>
+                        <p>{{ speaker.email }}</p>
+                    </div>
+                    
+
+                </div>
+            {% endfor %}
+
         </div>
 
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea name="description" id="description" required class="form-control" >{{ webinar.description }}</textarea>
-        </div>
+            {% endif %}
 
-        <div class="form-group">
-            <label for="number_of_speaker">Number of Speakers:</label>
-            <input type="number" min="1" max="10" name="number_of_speaker" id="number_of_speaker" value="{{ webinar.number_of_speaker }}" required class="form-control">
-        </div>
 
-        <div class="form-group">
-            <label for="event_type">Event Type:</label>
-            <select name="event_type" id="event_type" class="form-control">
-                <option value="recognition" {% if webinar.event_type == "recognition" %}selected{% endif %} >Recognition</option>
-                <option value="workshop" {% if webinar.event_type == "recognition" %}selected{% endif %} >Workshop</option>
-                <option value="seminar" {% if webinar.event_type == "recognition" %}selected{% endif %}>Seminar</option>
-            </select>
-        </div>
 
-        <div class="form-group">
-            <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" id="start_date" required class="form-control" value="{{ webinar.start_date | date:'Y-m-d' }}">
-        </div>
+        <form action="{% url 'make_webinar' %}" method="post" enctype="multipart/form-data" id="form">
+            {% csrf_token %}
+            
 
-        <div class="form-group">
-            <label for="until_date">Until Date:</label>
-            <input type="date" name="until_date" id="until_date" required class="form-control" value="{{ webinar.until_date | date:'Y-m-d' }}">
-        </div>
+            {% if webinar %}
+                <h3>Edit Webinar</h3>
 
-        <div class="form-group">
-            <label for="event_time">Event Time:</label>
-            <input type="time" name="event_time" id="event_time" required class="form-control" value="{{ webinar.time| time:'H:i' }}">
-        </div>
+                <div class="form-group" style="display: none">
+                    <label for="title">Webinar Id:</label>
+                    <input name="event_id" id="event_id" type="hidden" class="form-control" value="{{ webinar.id }}">
+                </div>
+            {% else %}
+                <h3>Create Webinar</h3>
+            {% endif %}
 
-        <div class="form-group">
-            <label for="banner">Event Banner:</label>
-            <input type="file" name="banner" id="banner" class="form-control" {% if not webinar.banner %} required {% endif %} >
-        </div>
+            <div class="form-group">
+                <label for="banner">Event Banner:</label>
+                <input type="file" name="banner" id="banner" class="form-control" {% if not webinar.banner %} required {% endif %} >
+            </div>
 
-        <div class="form-group">
-            <label for="venue">Venue:</label>
-            <input name="venue" id="venue" required class="form-control" value="{{ webinar.venue }}">
-        </div>
+            <div class="form-group">
+                <label for="title">Webinar Title:</label>
+                <input name="title" id="title" required class="form-control" value="{{ webinar.title }}">
+            </div>
+            
 
-        <div id="speakers_container"></div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea name="description" id="description" required class="form-control" >{{ webinar.description }}</textarea>
+            </div>
 
-        <div class="form-group">
-            <input type="submit" value="Submit" class="btn btn-primary">
-        </div>
-    </form>
+            <div class="form-group">
+                <label for="number_of_speaker">Number of Speakers:</label>
+                <input type="number" min="1" max="10" name="number_of_speaker" id="number_of_speaker" value="{{ webinar.number_of_speaker }}" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="event_type">Event Type:</label>
+                <select name="event_type" id="event_type" class="form-control">
+                    <option value="recognition" {% if webinar.event_type == "recognition" %}selected{% endif %} >Recognition</option>
+                    <option value="workshop" {% if webinar.event_type == "recognition" %}selected{% endif %} >Workshop</option>
+                    <option value="seminar" {% if webinar.event_type == "recognition" %}selected{% endif %}>Seminar</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" id="start_date" required class="form-control" value="{{ webinar.start_date | date:'Y-m-d' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="until_date">Until Date:</label>
+                <input type="date" name="until_date" id="until_date" required class="form-control" value="{{ webinar.until_date | date:'Y-m-d' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="event_time">Event Time:</label>
+                <input type="time" name="event_time" id="event_time" required class="form-control" value="{{ webinar.time| time:'H:i' }}">
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="venue">Venue:</label>
+                <input name="venue" id="venue" required class="form-control" value="{{ webinar.venue }}">
+            </div>
+
+            <div id="speakers_container"></div>
+
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary">
+            </div>
+        </form>
+
+    </div>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
+            const form=document.getElementById("form")
 
-        const date_today = new Date().toISOString().split("T")[0];
-        const start_date_input = document.getElementById("start_date");
-        const until_date_input = document.getElementById("until_date");
-        
-        start_date_input.min = date_today;
-        until_date_input.min = date_today;
-        
-        document.addEventListener("change", function () {
-            until_date_input.min = start_date_input.value;
-        });
+            form.addEventListener("change", ()=>{
+                console.log("detect change")
+                const title= document.getElementById("title").value
+                const start_date= document.getElementById("start_date").value;
+                const until_date= document.getElementById("until_date").value;
+                const event_time= document.getElementById("event_time").value;
+                const description= document.getElementById("description").value;
+                console.log(`This is description: ${description}`)
+                const venue= document.getElementById("venue").value;
+                const banner= document.getElementById("banner").src;
 
-        const inputField = document.getElementById("number_of_speaker");
-        const speakersContainer = document.getElementById("speakers_container");
+                if (banner){
+                    img= new Image()
+                    img.src=banner
 
-        inputField.addEventListener("input", function () {
-            speakersContainer.innerHTML = ""; 
+                    const dp_banner=document.getElementById("dp-banner").src=banner
 
-            const numSpeakers = parseInt(inputField.value);
-            
-    
-            if (!isNaN(numSpeakers) && numSpeakers >= 1 && numSpeakers <= 10) {
-                for (let i = 0; i < numSpeakers; i++) {
-                    const div = document.createElement("div");
-                    div.classList.add("form-group");
-                    div.innerHTML = `
-                        <h4>Speaker </h4>
-                        <label for="speaker_name${i}">Name:</label>
-                        <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control">
-                        
-                        <label for="speaker_email${i}">Email:</lSabel>
-                        <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control">
-
-                        <label for="speaker_photo${i}">Upload Photo:</label>
-                        <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control">
-                    `;
-                    speakersContainer.appendChild(div);
+                    
                 }
-            }
+
+
+                const start= new Date(start_date);
+                const until= new Date(until_date);
+                
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+
+
+
+                const d_title=document.getElementById("dp-event-tl").innerHTML=title;
+                const dp_event_d=document.getElementById("dp-event-d").innerHTML=
+                `${start.toLocaleDateString('en-US', options)}- ${until.toLocaleDateString('en-US', options)}`;
+                const d_v_time=document.getElementById("dp-event-t").innerHTML=event_time;
+                
+                const d_d=document.getElementById("dp_d").innerHTML=description;
+                const dp_v=document.getElementById("dp_v").innerHTML=venue;
+
+
+
+                
+
+
+                
+
+
+                
+            })
+
+            const date_today = new Date().toISOString().split("T")[0];
+            const start_date_input = document.getElementById("start_date");
+            const until_date_input = document.getElementById("until_date");
+            
+            start_date_input.min = date_today;
+            until_date_input.min = date_today;
+            
+            document.addEventListener("change", function () {
+                until_date_input.min = start_date_input.value;
+            });
+
+            const inputField = document.getElementById("number_of_speaker");
+            const speakersContainer = document.getElementById("speakers_container");
+
+            inputField.addEventListener("input", function () {
+                speakersContainer.innerHTML = ""; 
+
+                const numSpeakers = parseInt(inputField.value);
+                
+        
+                if (!isNaN(numSpeakers) && numSpeakers >= 1 && numSpeakers <= 10) {
+                    for (let i = 0; i < numSpeakers; i++) {
+                        const div = document.createElement("div");
+                        div.classList.add("form-group");
+                        div.innerHTML = `
+                            <h4>Speaker </h4>
+                            <label for="speaker_name${i}">Name:</label>
+                            <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control">
+                            
+                            <label for="speaker_email${i}">Email:</lSabel>
+                            <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control">
+
+                            <label for="speaker_photo${i}">Upload Photo:</label>
+                            <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control">
+                        `;
+                        speakersContainer.appendChild(div);
+                    }
+                }
+            });
+            inputField.dispatchEvent(new Event("input"));
         });
-        inputField.dispatchEvent(new Event("input"));
-    });
     </script>
 {% endblock %}

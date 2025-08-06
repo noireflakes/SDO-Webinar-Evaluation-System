@@ -5,12 +5,18 @@
 {% block css %} 
 
 <link rel="stylesheet" href="{% static 'webinar/css/create_test.css' %}">
+<link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
 
 {% endblock %}
 
 {% block title %} <title>Create Test</title> {% endblock %}
 
 {% block body %}
+{% if user.is_staff or user.is_superuser %}
+    <div class="top-bar"></div>
+    <div class="breadcrumbs"><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a> › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Create Test</a></div>
+{% endif %}
+
 
 
 <div class="create-q-container">
