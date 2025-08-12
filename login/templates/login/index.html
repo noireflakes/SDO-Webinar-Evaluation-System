@@ -13,9 +13,21 @@
 
 {% block body%}
 
-  
-  <div class="nav-cont">  
-    <nav class="navbar">
+
+  <!-- desktop navbar  -->
+  <div class="nav-cont">
+    
+    
+  <nav class="hamburg" >
+ 
+    <ul class="nav-links">
+      <li><img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 3.5em; height: auto;"></li>
+      <li><button class="menu-bar"><i class="fas fa-bars" style="font-size: 2em;"></i></button></li>
+    </ul>
+
+  </nav>
+
+    <nav class="navbar" >
     <ul class="nav-links">
       <li><img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo"></li>
       <li><a class="active" href="#header-section">Home</a></li>            
@@ -30,6 +42,53 @@
     </ul>
         
   </nav></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <div class="close-cont"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></div>
+
+    <ul class="sidebar-link">
+      <li><a class="active" href="#header-section">Home</a></li>            
+      <li><a href="#events-section">Events and Announcements</a></li>
+      <li><a href="#guidelines">Guidelines</a></li>
+      <li><a href="#aboutus-section">About us</a></li>
+      {% if user.is_authenticated %}
+        <li ><a href="{% url 'logout' %}">Logout</a></li>
+      {% else %}
+        <li  ><a  href="{% url 'login' %}">Login</a></li>
+      {% endif %}
+    </ul>
+
+  </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+      let menuState=false
+      const menu=document.querySelector(".menu-bar");
+      document.addEventListener("click",()=>{
+        console.log("button has been click")
+        const sidebar= document.querySelector(".sidebar");
+        sidebar.style.blackgroundColor="black"
+        if(menuState){
+          sidebar.style.animation="slideLeft .5s ease-out forwards";
+          document.body.style.overflow = "auto";
+          menuState=false;
+          console.log(`THE MENUSTATE IS ${menuState}`)
+          
+        }else{
+          sidebar.style.animation="slideIn .5s ease-in forwards";
+          menuState=true;
+          document.body.style.overflow = "hidden";
+          console.log(`THE MENUSTATE IS ${menuState}`)
+        }
+        
+      })
+    })
+  </script>
+
+
   <section id="header-section">
     {% if messages %}
       {% for message in messages %}
@@ -41,7 +100,7 @@
     {% endif %}
 
     <!-- Header BG -->
-    <div class="header-container" style="background-image: url('{% static 'asset/header-bg.jpg' %}');">
+    <div class="header-container" style="background-image: url('{% static 'asset/hero_bg.jpg' %}');">
         <div class="background-overlay"></div>
 
         <!-- Header Contents -->
