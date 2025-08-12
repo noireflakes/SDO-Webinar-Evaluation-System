@@ -35,7 +35,7 @@ body {
 #calendar{
   display: flex;
   width: 800px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   padding: 20px;
   border-radius:5%;
   margin: 15px;
@@ -225,4 +225,19 @@ body {
   color: #888;
   font-size: 14px;
   text-align: center;
+}
+
+
+@media screen and (max-width:700px) {
+
+  .calendar-section{
+    display: none
+  }
+
+  .events-section{
+    width: 60%;
+    left: 35%;
+    height: auto;
+  }
+  
 }

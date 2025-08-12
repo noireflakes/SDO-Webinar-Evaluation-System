@@ -3,6 +3,14 @@ body {
     background-color: #e8e1fa;
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+a{
+    color:black;
+    text-decoration: none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
 
 .evaluation-form {
     max-width: 900px;

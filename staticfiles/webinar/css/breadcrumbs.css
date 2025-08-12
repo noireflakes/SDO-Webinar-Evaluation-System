@@ -1,0 +1,48 @@
+body{
+    scrollbar-width: none;
+}
+.top-bar{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #2D3748;
+    height: 100px;
+    color:#2D3748;
+
+  
+}
+a{
+    color:black;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    
+}
+
+a:hover{
+    text-decoration:underline;
+}
+.breadcrumbs{
+    width: 100%;
+    margin-bottom: 100px;
+    display: flex;
+    
+
+}
+.bc-a{
+    background: none;
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.bc-a:hover{
+    background: none;
+}
+.breadcrumbs{
+    font-size: 15px;
+}
+#direct:hover{
+    text-decoration: none; 
+
+}

@@ -1,5 +1,6 @@
 body{
-    background-color: rgb(217, 207, 255);
+     background-color:rgb(227, 213, 233);
+     position: relative;
 }
 
 .header-section{
@@ -7,17 +8,15 @@ body{
    
     width: 100%;
     background-color: rgb(44, 44, 44);
-
     
-   
     
 }
 
 .header-container{
-    
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 320px;
+    
     width: 600px;
     padding-top: 20px;
    
@@ -29,10 +28,11 @@ body{
 }
 
 .header-container h2{
-    font-size: 50px;
-    font-weight: 600;
+    font-size: 40px;
+    font-weight: 500;
     border-top: 3px solid;
-    border-image: linear-gradient(to right, rgb(114, 52, 114), rgb(2, 2, 73))1;
+    border-image: linear-gradient(to right, rgb(177, 94, 176), rgb(70, 82, 185)) 1;
+
     margin-top: 120px;
 }
 
@@ -45,24 +45,39 @@ body{
 
 }
 .webinar-img-container img{
-    width: auto;
-    height: 280px;
+    width: 100%;
+    height: auto;
+    z-index: 0;
+}
+
+.img-con{
+    position: relative;
+    background-color: rgb(0, 0, 0);
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    
+}
+
+.img-con img{
+    object-fit: cover;
 }
 .webinar-img-container{
-
+    
+    width: 32%;
     margin-top: 30px;
     border-radius: 5px;
     background-color: white;
     overflow: hidden;
     box-shadow: 4px 4px 2px rgba(77, 77, 77, 0.1);
     padding-bottom: 20px;
+    border: 1px solid rgba(168, 168, 168, 0.5);
+ 
+
 }
 
 .webinar-contents{
- 
-
-    width: 500px;
-
+    width: 40%;
     padding: 40px;
     background-color: white;
 }
@@ -70,33 +85,20 @@ body{
 .webinar-contents h4{
     font-size: 35px;
     font-weight: 600;
-
 }
-
-.type{
-    width: 90px;
-
-    background-color: rgb(195, 248, 195);
-
-
-    border-radius: 60px;
-    color: green;
-    font-weight: 600;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.content{
+    width: 90%;
     
-    margin-left: 20px;
-  
- 
 }
+
 .img-contents{
     margin-top: 20px;
     
     font-weight: 600;
     font-size: 14px;
     padding-bottom: 10px;
+    height: 50%;
+
   
 
 }
@@ -112,25 +114,13 @@ p{
 }
 
 .bi{
-    font-size: 15px;
+    font-size: 12px;
 }
 .catergory{
     display: flex;
     flex-direction: row;
 }
-.certi{
-    background-color: rgb(252, 171, 184);
-    color:rgb(180, 68, 105);
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px;
-    border-radius: 60px;
-    width: 150px;
-    text-align: center;
-    margin-left: 10px;
-    
 
-}
 .webinar-contents{
     display: flex;
     align-items: center;
@@ -164,11 +154,24 @@ p{
     justify-content: space-between;
     align-items: center;
 }
-.instrutor-card img{
+
+.sp-cont-img{
+
     width: 150px;
     height: 150px;
     border-radius: 50%;
-     margin-top: 30px;
+    overflow: hidden;
+    margin-top: 30px;
+
+    display: flex;
+    justify-content: center;
+}
+.instrutor-card img{
+    object-fit:cover;
+    width: 100%;
+
+
+    
 
 }
 .instrutor-card h2{
@@ -189,57 +192,85 @@ a:hover{
 
 /* Admin Controls Section */
 .admin-controls {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: white;
-    margin-top: 100px;
-    border-radius: 5px;
+    position: fixed;
+    top: 50%;
+    left: 0;
+    translate: 0 -50%;
+    padding: 10px;
+    border-radius: 10px;
 }
 
-.admin-controls h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-}
+
 
 .admin-container {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
 }
 
+/* Sidebar links */
 .admin-container a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px , 20px, 12px, 20px;
     font-weight: 600;
-    font-size: 1rem;
-    border-radius: 30px;
+    font-size: 1.1rem;
+    border-radius: 60px;
     text-decoration: none;
-    transition: all 0.3s ease;
-    min-width: 180px;
-    justify-content: center;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    background-color: #2e2e2e;
+    width: 50px;
+    color: white;
+    margin-left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+
+
+
+  
 }
 
 
+.admin-container a:hover {
+    width: 220px;
+    background-color: #2e2e2e;
+    color: white;
+    
+   
+}
+
+
+.admin-container a span {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    
+   
+}
+
+.admin-container a:hover span {
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+
+}
+
 .register {
-    background-color: #3498db;
+   
     color: white;
     border: 2px solid #3498db;
 }
 
 .statistics {
-    background-color: #2ecc71;
+
     color: white;
     border: 2px solid #2ecc71;
 }
 
 .create-test {
-    background-color: #9b59b6;
+
     color: white;
     border: 2px solid #9b59b6;
 }
@@ -251,22 +282,20 @@ a:hover{
 }
 
 .register:hover {
-    background-color: #2980b9;
+  
     border-color: #2980b9;
 }
 
 .statistics:hover {
-    background-color: #27ae60;
+
     border-color: #27ae60;
 }
 
 .create-test:hover {
-    background-color: #8e44ad;
+
     border-color: #8e44ad;
 }
-.register{
-    background-color: re;
-}
+
 
 .footer {
 
@@ -355,4 +384,25 @@ a:hover{
 .logo{
     width: 50px;
     height: 50px;
+}
+
+@media screen and (max-width:700px) {
+
+    .webinar-container{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+   
+        justify-content: center;
+        align-items: center;
+    }
+    .webinar-img-container{
+        width: 60%;
+    }
+    .header-container h2{
+        margin-top: 240px;
+        font-size: 30px;
+    
+    }
+    
 }

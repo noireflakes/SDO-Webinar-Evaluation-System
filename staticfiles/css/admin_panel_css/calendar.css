@@ -16,34 +16,55 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
- background: linear-gradient(to bottom right, #e7e9fa, #d6dbff);
 }
 
 
-/* Events Section (Optional Sidebar) */
 .events-section {
   background-color: white;
-  height: 90vh;
+  height: 90%;
   padding: 20px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
 
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+
+
 }
+
+.events-container{
+  
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  scrollbar-width: none; 
+
+}
+
+.main-content{
+  width: 100%;
+ 
+}
+
 #calendar{
   display: flex;
-  width: 800px;
+  background-color: blue;
+
+  width: 75% !important;
   background-color: white;
   padding: 20px;
   border-radius:5%;
   margin: 15px;
+
 }
 
 .calendar-section{
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+ 
+  
+  width: 100%;
+  
 }
 .title{
   margin: 0;
@@ -181,7 +202,7 @@ body {
   
 }
 
-.event-container {
+.events-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -195,6 +216,7 @@ body {
   border-left: 4px solid #4c43ce;
   box-shadow: 0 2px 6px rgba(79, 70, 229, 0.05);
   transition: all 0.2s ease;
+  margin-top: 3px;
 
 }
 
@@ -225,4 +247,31 @@ body {
   color: #888;
   font-size: 14px;
   text-align: center;
+}
+
+@media screen and (min-width: 1920px){
+  .calendar-section{
+    width: 90%;
+    height: 100%;
+    
+    
+   
+  }
+
+  #calendar{
+    width: 90%;
+    height: 70% !important;
+    margin-left: 30px;
+  }
+
+
+}
+
+
+@media screen and (max-width: 700px){
+
+  .calendar-section{
+    display: none;
+  }
+  
 }

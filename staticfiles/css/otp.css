@@ -17,6 +17,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
@@ -24,6 +25,7 @@ body {
 
 /* OTP Container */
 form {
+
     background-color: var(--white);
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);

@@ -1,8 +1,8 @@
-/* Main Layout - Landscape Orientation */
+
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #f8fafc;
+    background-color:  rgb(235, 230, 255);
     color: #1e293b;
     line-height: 1.6;
     min-height: 100vh;
@@ -10,7 +10,7 @@ body {
     flex-direction: column;
 }
 
-/* Settings Container - Landscape Layout */
+
 .settings-container {
     display: flex;
     flex-direction: column;
@@ -179,7 +179,6 @@ input[type="submit"] {
     padding-bottom: 0.5rem;
 }
 
-/* Status Indicators */
 .status-indicator {
     display: inline-block;
     width: 10px;

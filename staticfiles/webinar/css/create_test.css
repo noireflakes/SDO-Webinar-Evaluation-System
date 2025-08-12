@@ -1,5 +1,9 @@
 
 /* Base Styles */
+html,body{
+    width: 100%;
+ 
+}
 body {
     background-color: #e2d4ff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -9,7 +13,15 @@ body {
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+  
+
+}
+
+
+.display-event{
+    background-color: white;
+    width: 50px;
+    height: 80px;
 }
 
 /* Container Styles */
