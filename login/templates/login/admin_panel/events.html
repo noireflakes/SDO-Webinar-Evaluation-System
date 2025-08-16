@@ -9,25 +9,49 @@
 
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/events.css' %}">
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/transition.css' %}">
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
+
+{% block js %}
+  <script src="{% static 'js/sidebar.js' %}"></script>
+{% endblock %}
+
 {% block body%}
-  <div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
-    <div class="topbar-right d-flex align-items-center gap-3">
-        <a href="#" class="notification-icon position-relative">
-            <img class="bell" src="{% static 'icons/bell.png' %}" alt="Notifications" style="width: 24px;">
-        </a>
-        <span class="username fw-semibold">{{ user.username }}</span>
-        <a class="profile">
+
+  <div class="topbar">
+        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+        <div class="credential-cont">        
+          <span class="username fw-semibold">{{ user.username }}</span>
+          <a class="profile">
             <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-        </a>
-    </div>
+          </a>
+        </div>
+   
   </div>
 
   <div class="app-container">
-    <aside class="sidebar">
+
+    
+  <div class="sidebar nav-sb">
+    <div class="close-cont"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></div>
+
+    <ul class="sidebar-nav">
+        <a href="{% url 'admin_events' %}" class="sb-nav-item sb-active">Event</a>
+        <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Calendar</a>
+        <a href="{% url 'admin_certificate' %}" class="sb-nav-item ">Certificate</a>
+        <a href="{% url 'admin_users' %}" class="sb-nav-item">Users</a>
+        <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settting</a>
+        <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+    </ul>
+
+  </div>
+
+
+
+    <aside class="d-sidebar">
       <div class="logo">
         <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
         <h2>SDO Baliwag</h2>

@@ -7,14 +7,16 @@
     right: 0;
     height: 64px;
     background-color: #2D3748;
-    
     box-shadow: 0 8px 8px rgba(0,0,0,0.05);
     z-index: 100;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
     padding: 0 24px;
     color:white;
+   
+   
 }
 
 
@@ -41,10 +43,17 @@
     right: 0;
     width: 8px;
     height: 8px;
-    background-color: red;
+  
     border-radius: 50%;
 }
+.credential-cont{
+    display: flex;
+    flex-direction: row;
 
+    justify-content: space-evenly;
+    align-items: center;
+    min-width: 10em;
+}
 /*sidebar*/
 .app-container {
     display: flex;
@@ -53,7 +62,7 @@
 }
 
 /* Sidebar */
-.sidebar {
+.d-sidebar {
     width: 220px;
     background-color: rgb(255, 255, 255);
     padding: 20px;
@@ -161,7 +170,18 @@ footer a:hover {
     text-decoration: underline;
 }
 
+@media screen and (max-width:1000px) {
 
+
+    .menu-bar{
+    pointer-events: auto;
+}
+    .d-sidebar{
+        display: none;
+    }
+
+    
+}
 
 
 

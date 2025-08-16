@@ -7,37 +7,56 @@
 {% block css %} 
 <link rel="stylesheet" href="{% static 'css/bar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/setting.css' %}">
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
+
+{% block js %}
+  <script src="{% static 'js/sidebar.js' %}"></script>
+{% endblock %}  
+
 
 {% block body%}
 
 
-<div class="topbar d-flex justify-content-end align-items-center px-4 py-3">
-  <div class="topbar-right d-flex align-items-center gap-3">
-      <a href="#" class="notification-icon position-relative">
-          <img class="bell" src="{% static 'icons/bell.png' %}" alt="Notifications" style="width: 24px;">
-      </a>
-      <span class="username fw-semibold">{{ user.username }}</span>
-      <a class="profile">
-          <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-      </a>
+  <div class="topbar">
+        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+        <div class="credential-cont">        
+          <span class="username fw-semibold">{{ user.username }}</span>
+          <a class="profile">
+            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
+          </a>
+        </div>
   </div>
-</div>
 <div class="app-container">
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-      <h2>SDO Baliwag</h2>
-    </div>
-    <nav class="nav">
-          <a href="{% url 'user_dashboard' %}" class="nav-item">Dashboard</a>
-          <a href="{% url 'calendar' %}" class="nav-item ">Upcoming Events</a>
-          <a href="{% url 'certificate' %}" class="nav-item">Certificate</a>
-          <a href="{% url 'admin_setting' %}" class="nav-item active ">Settting</a>
-          <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
-    </nav>
 
-  </aside>
+<div class="sidebar nav-sb">
+    <div class="close-cont"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></div>
+
+    <ul class="sidebar-nav">
+          <a href="{% url 'user_dashboard' %}" class="sb-nav-item">Dashboard</a>
+          <a href="{% url 'calendar' %}" class="sb-nav-item">Upcoming Events</a>
+          <a href="{% url 'certificate' %}" class="sb-nav-item">Certificate</a>
+          <a href="{% url 'admin_setting' %}" class="sb-nav-item sb-active ">Settting</a>
+          <a href="{% url 'logout' %}" class="sb-nav-item">Logout </a> 
+    </ul>
+
+  </div>
+
+   <aside class="d-sidebar">
+      <div class="logo">
+        <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+        <h2>SDO Baliwag</h2>
+      </div>
+      <nav class="nav">
+          <a href="{% url 'user_dashboard' %}" class="nav-item active">Dashboard</a>
+          <a href="{% url 'calendar' %}" class="nav-item">Upcoming Events</a>
+          <a href="{% url 'certificate' %}" class="nav-item">Certificate</a>
+          <a href="{% url 'user_setting' %}" class="nav-item">Settting</a>
+          <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
+      </nav>
+
+    </aside>
 
 
   <div class="settings-container">

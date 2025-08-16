@@ -1,0 +1,152 @@
+button{
+    border: none;
+    background: none;
+}
+
+.nav-menu-bar{
+    display: none;
+}
+
+.hamburg{
+    display: none;
+    position: fixed;
+    z-index: 2;
+    flex-direction: row;
+    width: 100vw;
+    background-color: white;
+    padding-bottom: 5px;
+    border-bottom: #3d36c481 solid 2px;
+    justify-content: center;
+   
+ 
+    
+}
+
+.hamburg ul{
+    display: flex;
+    
+    flex-direction: row;
+    justify-content: center;
+    
+    justify-content: space-between;
+   
+}
+
+.sidebar ul{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    max-width: 80%;
+    min-height:50vh;
+    margin-top: 5em;
+
+}
+
+.menu-bar{
+    margin-right: 20px;
+    border: none;
+    background-color: white;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+ 
+}
+
+.hp-sb{
+    right: -80%;
+}
+.nav-sb{
+    left: -80%;
+}
+
+.sidebar{
+    position: absolute;
+    background-color: white;
+    min-height: 100% ;
+    min-width: 80%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+   
+}
+
+
+.close-cont{
+    max-width:100% ;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: end;
+    margin-top: 1em;
+    
+    margin-right: 0;
+    
+}
+.close-cont i{
+    margin-right:.7em;
+}
+.sidebar ul{
+ 
+    max-width: 50%;
+}
+
+.sidebar li{
+    list-style: none;
+  
+    
+}
+.sidebar a{
+    font-size: clamp(22px, 5vw, 24px);
+    font-weight: 500;
+    text-decoration: none;
+    color: black;
+    transition:  padding-left .3s ease-in, border-left .2s ease-in-out;
+    max-width: 100%;
+  
+    
+}
+
+.sb-nav-item:hover{
+    border-left: 5px solid black;
+
+ 
+}
+
+.sb-active{
+    border-left: 5px solid black;
+    padding-left: .5em ;
+ 
+}
+
+
+@media screen and (max-width:600px){
+        .hamburg{
+        opacity: 1;
+        display: flex;
+   
+    }
+        .nav-menu-bar{
+        display: block;
+    }
+
+    
+}
+
+@keyframes slideInRight {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(0); }
+}
+@keyframes slideOutRight {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+@keyframes slideInLeft {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+}
+@keyframes slideOutLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+

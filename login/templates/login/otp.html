@@ -2,15 +2,25 @@
 
 {% load static %}
 
-{% block css %} <link rel="stylesheet" href="{% static 'css/otp.css' %}"> {% endblock %}
+{% block css %}
+ <link rel="stylesheet" href="{% static 'css/otp.css' %}">
+ <link rel="stylesheet" href="{% static 'css/blob.css' %}">
+ 
+ {% endblock %}
 
 {% block body %}
 
+
 {% if otp %}
     <div>{{ otp }}</div>
-    <div>{{ key }}</div>
-    <div>{{ session }}</div>
+
 {% endif %}
+
+
+
+<div class="blob one blob-yellow"><p></p></div>
+<div class="blob two blob-yellow"><p></p></div>
+<div class="blob three blob-yellow"><p></p></div>
 
 <div>{{ otp_code }}</div>
 <form action="{% url 'otp' %}" method="post" id="form">

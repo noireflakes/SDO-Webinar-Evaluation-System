@@ -12,7 +12,7 @@
 }
 
 body {
-    background-color: var(--monotone_skyblue);
+    background-color:  #865dee;;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
@@ -21,6 +21,7 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 20px;
+    overflow: hidden;
 }
 
 /* OTP Container */
@@ -161,4 +162,20 @@ div:empty {
     margin-bottom: 20px;
     font-size: 14px;
     display: none; /* Show with JavaScript when needed */
+}
+
+.one{
+    top:-10%;
+    left: -5%;
+    
+}
+.two{
+    top:60%;
+    left: -10%;
+}
+
+
+.three{
+    top:10%;
+    left: 80%;
 }

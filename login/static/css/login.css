@@ -9,17 +9,22 @@
     --light_gray: #f5f5f5;
     --medium_gray: #e0e0e0;
     --dark_gray: #757575;
+
+}
+html, body {
+    height: 100%;
+    margin: 0;
 }
 
 body {
-    background-color: var(--monotone_skyblue);
+    background-color: #865dee;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     margin: 0;
-    padding: 20px;
+   padding: 0;
+    overflow: hidden; /* remove if you want scroll */
 }
 
 .login {
@@ -27,11 +32,11 @@ body {
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);
     padding: 40px;
-    width: 100%;
-    max-width: 400px;
+    min-width: 22em;
     text-align: center;
     position: relative;
     overflow: hidden;
+  
 }
 
 .login::before {
@@ -151,4 +156,20 @@ input::placeholder {
     margin-bottom: 20px;
     font-size: 14px;
     display: none; /* Hidden by default, show with JavaScript when needed */
+}
+
+.one{
+    top:10%;
+    left: 5%;
+    
+}
+.two{
+    top:60%;
+    left: 30%;
+}
+
+
+.three{
+    top:10%;
+    left: 80%;
 }

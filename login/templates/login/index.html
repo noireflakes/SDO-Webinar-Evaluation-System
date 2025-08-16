@@ -5,10 +5,15 @@
 {% block title %}<title>Home page</title>{% endblock %}
 
 {% block css %} 
-<script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{% static 'css/index.css' %}"> 
+<link rel="stylesheet" href="{% static 'css/blob.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+{% endblock %}
+
+{% block js %}
+  <script src="{% static 'js/sidebar.js' %}"></script>
 {% endblock %}
 
 {% block body%}
@@ -16,7 +21,7 @@
 
   <!-- desktop navbar  -->
   <div class="nav-cont">
-    
+
     
   <nav class="hamburg" >
  
@@ -44,15 +49,15 @@
   </nav></div>
 
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar hp-sb">
 
-    <div class="close-cont"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></div>
+    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
 
     <ul class="sidebar-link">
-      <li><a class="active" href="#header-section">Home</a></li>            
-      <li><a href="#events-section">Events and Announcements</a></li>
-      <li><a href="#guidelines">Guidelines</a></li>
-      <li><a href="#aboutus-section">About us</a></li>
+      <li><a class="sb-nav-item sb-active" href="#header-section">Home</a></li>            
+      <li><a class="sb-nav-item" href="#events-section">Notices & Events</a></li>
+      <li><a class="sb-nav-item" href="#guidelines">Guidelines</a></li>
+      <li><a class="sb-nav-item" href="#aboutus-section">About us</a></li>
       {% if user.is_authenticated %}
         <li ><a href="{% url 'logout' %}">Logout</a></li>
       {% else %}
@@ -63,30 +68,6 @@
   </div>
 
 
-  <script>
-    document.addEventListener("DOMContentLoaded", ()=>{
-      let menuState=false
-      const menu=document.querySelector(".menu-bar");
-      document.addEventListener("click",()=>{
-        console.log("button has been click")
-        const sidebar= document.querySelector(".sidebar");
-        sidebar.style.blackgroundColor="black"
-        if(menuState){
-          sidebar.style.animation="slideLeft .5s ease-out forwards";
-          document.body.style.overflow = "auto";
-          menuState=false;
-          console.log(`THE MENUSTATE IS ${menuState}`)
-          
-        }else{
-          sidebar.style.animation="slideIn .5s ease-in forwards";
-          menuState=true;
-          document.body.style.overflow = "hidden";
-          console.log(`THE MENUSTATE IS ${menuState}`)
-        }
-        
-      })
-    })
-  </script>
 
 
   <section id="header-section">
@@ -145,8 +126,8 @@
     </div>
     
     <!-- Background  --> 
-      <div class="blob one"></div>
-      <div class="blob two"></div>
+      <div class="blob one blob-purple"></div>
+      <div class="blob two blob-purple"></div>
             
     </section>
 
