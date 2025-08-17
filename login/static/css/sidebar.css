@@ -12,11 +12,12 @@ button{
     position: fixed;
     z-index: 2;
     flex-direction: row;
-    width: 100vw;
+    width: 100%;
     background-color: white;
     padding-bottom: 5px;
     border-bottom: #3d36c481 solid 2px;
     justify-content: center;
+   
    
  
     
@@ -62,6 +63,7 @@ button{
 
 .sidebar{
     position: absolute;
+ 
     background-color: white;
     min-height: 100% ;
     min-width: 80%;
@@ -128,6 +130,7 @@ button{
     }
         .nav-menu-bar{
         display: block;
+        background-color: red;
     }
 
     

@@ -31,13 +31,13 @@
 <div class="app-container">
 
 <div class="sidebar nav-sb">
-    <div class="close-cont"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></div>
+    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
 
     <ul class="sidebar-nav">
           <a href="{% url 'user_dashboard' %}" class="sb-nav-item">Dashboard</a>
           <a href="{% url 'calendar' %}" class="sb-nav-item">Upcoming Events</a>
           <a href="{% url 'certificate' %}" class="sb-nav-item">Certificate</a>
-          <a href="{% url 'admin_setting' %}" class="sb-nav-item sb-active ">Settting</a>
+          <a href="{% url 'user_setting' %}" class="sb-nav-item sb-active ">Settting</a>
           <a href="{% url 'logout' %}" class="sb-nav-item">Logout </a> 
     </ul>
 
@@ -49,18 +49,17 @@
         <h2>SDO Baliwag</h2>
       </div>
       <nav class="nav">
-          <a href="{% url 'user_dashboard' %}" class="nav-item active">Dashboard</a>
+          <a href="{% url 'user_dashboard' %}" class="nav-item ">Dashboard</a>
           <a href="{% url 'calendar' %}" class="nav-item">Upcoming Events</a>
           <a href="{% url 'certificate' %}" class="nav-item">Certificate</a>
-          <a href="{% url 'user_setting' %}" class="nav-item">Settting</a>
+          <a href="{% url 'user_setting' %}" class="nav-item active">Settting</a>
           <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
       </nav>
 
     </aside>
 
 
-  <div class="settings-container">
-    <h2>Settings</h2>
+
   <div class="settings-container">
     <h2>Settings</h2>
 

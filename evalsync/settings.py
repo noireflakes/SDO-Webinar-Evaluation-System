@@ -91,10 +91,12 @@ ADMIN_EMAIL= env("ADMIN_EMAIL")
 
 
 #DATBASE
-DATABASES = {
-    'default': dj_database_url.config( conn_max_age=600, ssl_require=True )
-}
 
+
+
+DATABASES = {
+        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

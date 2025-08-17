@@ -191,3 +191,11 @@
         display: flex;
         gap: 8px;
     }
+    @media screen and (max-width:1000px) {
+        .registration-section{
+            display: flex;
+            flex-direction: column;
+           
+        }
+        
+    }

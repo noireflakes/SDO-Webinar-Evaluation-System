@@ -20,15 +20,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
     sidebar.addEventListener("click", (event)=>{
       if (event.target.tagName.toLowerCase()==="a"){
-        console.log("sidebar close")
         CloseSidebar();
       }
     })
 
-
-
-
-    
 
 
 
@@ -45,14 +40,21 @@ document.addEventListener("DOMContentLoaded", ()=>{
         if(menuState){
           sidebar.style.animation="slideInLeft .5s ease-out forwards";
           document.body.style.overflow = "auto";
+          sidebar.style.position="absolute"
           menuState=false;
+          console.log("This is runnging rightsidebar")
           console.log(`THE MENUSTATE IS ${menuState}`)
+          console.log("slide in")
           
         }else{
           sidebar.style.animation="slideOutLeft .5s ease-in forwards";
           menuState=true;
+          sidebar.style.position="fixed"
+          console.log("This is runnging leftsidebar")
+          console.log(`This is the animation: ${sidebar.style.animation}`)
           document.body.style.overflow = "hidden";
           console.log(`THE MENUSTATE IS ${menuState}`)
+          console.log("slide out")
         }
       }
 
@@ -61,6 +63,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
           sidebar.style.animation="slideInRight .5s ease-out forwards";
           document.body.style.overflow = "auto";
           menuState=false;
+          console.log("This is runnging")
           console.log(`THE MENUSTATE IS ${menuState}`)
           
         }else{
@@ -73,8 +76,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
       function CloseSidebar(){
         sidebar.style.animation="slideInLeft .5s ease-out forwards";
-        menuState=true;
+        menuState=false;
         document.body.style.overflow = "auto";
+        console.log("close")
       }
     
 
