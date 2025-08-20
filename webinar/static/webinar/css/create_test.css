@@ -1,18 +1,15 @@
 
 /* Base Styles */
-html,body{
-    width: 100%;
- 
-}
+
 body {
     background-color: #e2d4ff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 100vh;
+
     margin: 0;
+    flex-direction: column;
+    
+   
   
 
 }
@@ -30,9 +27,14 @@ body {
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     padding: 2.5rem;
-    width: 100%;
+  
     max-width: 700px;
     transition: transform 0.3s ease;
+
+  position: relative;   
+  left: 50%;
+  transform: translateX(-50%);
+
 }
 
 
@@ -174,7 +176,8 @@ input:required:valid, select:required:valid {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    
+    box-sizing: border-box;
+    padding-bottom: 2em;
     width: 100%;
 }
 

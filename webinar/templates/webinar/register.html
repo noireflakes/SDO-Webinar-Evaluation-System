@@ -8,14 +8,17 @@
 
 {% block body %}
     <div class="top-bar">
+        <div class="breadcrumbs" >
+            <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Register Attendees</a>
+        </div>
+        <h2>{{ webinar.title }}</h2>
        
     </div>
-    <div class="breadcrumbs" ><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Register Attendees</a></div>
 
 <div class="container-fluid registration-container">
     <form class="registration-form" action="{% url 'register' webinar.id %}" method="post">
         {% csrf_token %}
-        <h2 class="form-title">Register for {{ webinar.title }}</h2>
+        <h2 class="form-title">Register Attendees</h2>
 
         <div class="form-group">
             <label for="school_id">School ID:</label>

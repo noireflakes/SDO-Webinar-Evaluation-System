@@ -15,6 +15,9 @@ class Webinar(models.Model):
     time=models.TimeField(max_length=20)
     banner=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='banner')
     venue=models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.title
     
 
 
@@ -25,6 +28,9 @@ class Speaker(models.Model):
     name=models.CharField(max_length=250)
     email=models.EmailField(max_length=250, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class WebinarAttendees(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="attendees")
@@ -33,24 +39,33 @@ class WebinarAttendees(models.Model):
     email=models.EmailField()
     attendance=models.IntegerField(default=0)  
 
+    def __str__(self):
+        return f"{self.webinar}-{self.user}"
+
 
 class ResponseQuestionaire(models.Model):
-      webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="evaluation")
-      user=models.ForeignKey(User, on_delete=models.CASCADE)
-      type=models.CharField(max_length=100, null=True, blank=True)
-      sex=models.CharField(max_length=50, null=True, blank=True)
-      q1=models.IntegerField(null=True)
-      q2=models.IntegerField(null=True)
-      q3=models.IntegerField(null=True)
-      q4=models.IntegerField(null=True)
-      q5=models.IntegerField(null=True)
-      q6=models.IntegerField(null=True)
+    webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="evaluation")
+    user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    type=models.CharField(max_length=100, null=True, blank=True)
+    sex=models.CharField(max_length=50, null=True, blank=True)
+    q1=models.IntegerField(null=True)
+    q2=models.IntegerField(null=True)
+    q3=models.IntegerField(null=True)
+    q4=models.IntegerField(null=True)
+    q5=models.IntegerField(null=True)
+    q6=models.IntegerField(null=True)
 
+    def __str__(self):
+        return f"{self.user}-{self.type}"
 
+    
 class Comment(models.Model):
-    Webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="comment")
+    webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="comment")
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="comment")
     text=models.TextField()
+    
+    def __str__(self):
+        return f"{self.webinar}-{self.user}"
 
 
 class Test_Question(models.Model):
@@ -60,10 +75,18 @@ class Test_Question(models.Model):
     question_type = models.CharField(max_length=100, blank=True, null=True) 
     correct_answered = models.CharField(max_length=200, blank=True, null=True)  
 
+    def __str__(self):
+        return f" {self.webinar}- {self.test_type}"
+
 class Choice(models.Model):
     question=models.ForeignKey(Test_Question,related_name="choices", on_delete=models.CASCADE,blank=True, null=True)
     text_option=models.CharField(max_length=200, blank=True, null=True)
     is_correct=models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.question
+
+
 
 
 class TestResponse(models.Model):
@@ -71,4 +94,7 @@ class TestResponse(models.Model):
     question=models.ForeignKey(Test_Question, on_delete=models.CASCADE,blank=True, null=True, related_name='test_reponse')
     user_input=models.CharField(max_length=200,blank=True, null=True)
     is_correct=models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user
 

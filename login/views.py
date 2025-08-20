@@ -12,6 +12,8 @@ from django.utils import timezone
 from django.core import serializers
 from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
+from exam_portal.serializer import CertificateSerilize
+import json
 # Create your views here.
 
 #login handler
@@ -177,11 +179,10 @@ def certificate(request):
 
 
 def certificate_data(request, id):
-    webinar=get_object_or_404(Webinar, id=id)
-    certificate=CertificateTemplate.objects.filter(webinar=webinar)
-    data = serializers.serialize('json', certificate)
-    return HttpResponse(data)
-
+    webinar = get_object_or_404(Webinar, id=id)
+    certificate = CertificateTemplate.objects.filter(webinar=webinar)
+    data = CertificateSerilize(certificate, many=True).data
+    return JsonResponse(data, safe=False)
 
 #admin views
 def admin_calendar(request):

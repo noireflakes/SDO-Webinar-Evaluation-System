@@ -7,8 +7,14 @@
 {% endblock %}
 {% block body %}
 {% if user.is_staff or user.is_superuser %}
-    <div class="top-bar"></div>
-    <div class="breadcrumbs" ><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Evaluation Form</a></div>
+        <div class="top-bar">
+    <div class="breadcrumbs" >
+        <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Evaluation Form</a>
+    </div>
+
+        <h2>{{ webinar.title }}</h2>
+       
+    </div>
 {% endif %}
 
 

@@ -170,12 +170,12 @@ footer a:hover {
 
     .menu-bar{
     pointer-events: auto;
-    display: inline-block;
 }
-
     .d-sidebar{
         display: none;
     }
+
+    
 
     
 }

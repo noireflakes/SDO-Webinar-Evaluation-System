@@ -122,7 +122,7 @@ button{
 }
 
 
-@media screen and (max-width:600px){
+@media screen and (max-width:1000px){
         .hamburg{
         opacity: 1;
         display: flex;
@@ -130,7 +130,7 @@ button{
     }
         .nav-menu-bar{
         display: block;
-        background-color: red;
+     
     }
 
     

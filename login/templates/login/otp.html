@@ -34,23 +34,28 @@
 <div><a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' %}">Send OTP again?</a></div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const timerElement = document.getElementById("timer");
-        const otpSendButton = document.getElementById("otp_send_button");
-       
+document.addEventListener("DOMContentLoaded", function() {
+    const timerElement = document.getElementById("timer");
+    const otpSendButton = document.getElementById("otp_send_button");
 
-        let timeLeft = 300;
+    let timeLeft = 300; 
 
-        const counter = setInterval(function() {
-            if (timeLeft > 0) {
-                timerElement.textContent = `Time left: ${timeLeft}s`;
-                timeLeft--;
-            } else {
-                clearInterval(counter);
-                otpSendButton.style.display = "block"; 
-            }
-        }, 1000);
-    });
+    const counter = setInterval(function() {
+        if (timeLeft > 0) {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerElement.textContent = `Time left: ${minutes}:${seconds}`;
+            timeLeft--;
+        } else {
+            clearInterval(counter);
+            timerElement.textContent = "Time left: 0:00"; 
+            otpSendButton.style.display = "block"; 
+        }
+    }, 1000);
+});
 </script>
 
 {% endblock %}

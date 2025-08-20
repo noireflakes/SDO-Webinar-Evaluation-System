@@ -12,11 +12,18 @@ class TestResult(models.Model):
     score=models.IntegerField()
 
 
+    def __str__(self):
+        return self.test
+
+
 class TestQR(models.Model):
     test=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="test_qr")
     type=models.CharField(max_length=40, null=True, blank=True)
     name=models.CharField(max_length=50)
     img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='test_qr/')
+
+    def __str__(self):
+        return f"{self.type} -{self.test}"
     
 
 class EvalQR(models.Model):
@@ -24,6 +31,9 @@ class EvalQR(models.Model):
     type=models.CharField(max_length=40, null=True, blank=True)
     name=models.CharField(max_length=50)
     img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='eval_qr/')
+
+    def __str__(self):
+        return {self.name}
 
 class CertificateTemplate(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name='certificate')
@@ -35,5 +45,8 @@ class CertificateTemplate(models.Model):
     subject=models.TextField( blank=True, null=True)
     address=models.TextField( blank=True, null=True)
     date=models.TextField( blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.title} -{self.webinar}"
 
 

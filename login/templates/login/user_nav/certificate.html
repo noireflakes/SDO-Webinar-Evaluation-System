@@ -172,48 +172,53 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+    async function downloadCertificate(webinarId) {
+        const canvas = document.getElementById('certificateCanvas');
+        const ctx = canvas.getContext('2d');
+        let saveState;
 
-async function downloadCertificate(webinarId) {
-    const canvas = document.getElementById('certificateCanvas');
-    const ctx = canvas.getContext('2d');
+        const response = await fetch(`/certificate_data/${webinarId}/`);
+        const data = await response.json();
+            console.log(data);
 
-    const response = await fetch(`/certificate_data/${webinarId}/`);
-    const data = await response.json();
-    const fields = data[0].fields;
 
-    function drawCertificate(fields) {
-        const img = new Image();
-        img.src = `/media/${fields.img}`;
-        img.onload = () => {
-            const scaleFactor = 2;
+        const certData = Array.isArray(data) ? data[0] : data;
 
-            const displayWidth = img.width > 900 ? img.width / 2 : img.width;
-            const displayHeight = img.height > 900 ? img.height / 2 : img.height;
+        function drawCertificate(data) {
+    
+            const img = new Image();
+            img.src = data.img;
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                const scaleFactor = 2;
 
-            canvas.width = displayWidth * scaleFactor;
-            canvas.height = displayHeight * scaleFactor;
+                const displayWidth = img.width > 900 ? img.width / 2 : img.width;
+                const displayHeight = img.height > 900 ? img.height / 2 : img.height;
 
-            canvas.style.width = `${displayWidth}px`;
-            canvas.style.height = `${displayHeight}px`;
+                canvas.width = displayWidth * scaleFactor;
+                canvas.height = displayHeight * scaleFactor;
 
-            ctx.scale(scaleFactor, scaleFactor);
+                canvas.style.width = `${displayWidth}px`;
+                canvas.style.height = `${displayHeight}px`;
 
-            ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
-            saveState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            drawTxt();
-            downloadPDF()
-        };
-    }
+                ctx.scale(scaleFactor, scaleFactor);
+
+                ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+                saveState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                drawTxt();
+                downloadPDF();
+            };
+        }
 
     function drawTxt() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (!saveState) return;
         ctx.putImageData(saveState, 0, 0);
 
-        const title = fields.title;
-        const subtitle = fields.subtitle;
+        const title = certData.title;
+        const subtitle = certData.subtitle;
         const name = "{{ user.first_name }} {{ user.last_name }}";
-        const host = fields.host;
+        const host = certData.host;
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
@@ -240,13 +245,12 @@ async function downloadCertificate(webinarId) {
         y += littespace;
 
         drawAllParagraphs(650, y);
-       
     }
 
     function drawAllParagraphs(maxWidth, y) {
-        const subject = fields.subject;
-        const address = fields.address;
-        const date = fields.date;
+        const subject = certData.subject;
+        const address = certData.address;
+        const date = certData.date;
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
@@ -271,7 +275,7 @@ async function downloadCertificate(webinarId) {
                 }
             }
             ctx.fillText(line, x, y);
-            y += lineHeight+10;
+            y += lineHeight + 10;
         }
 
         drawParagraphBlock(subject, "");
@@ -279,28 +283,25 @@ async function downloadCertificate(webinarId) {
         drawParagraphBlock(date, "italic");
     }
 
-    drawCertificate(fields);
-    console.log(fields);
-    console.log("{{ user.first_name }} {{ user.last_name }} {{ user.username }}")
-  async function downloadPDF() {
-    const { jsPDF } = window.jspdf;
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
 
-    const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+        const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
 
-    const pdf = new jsPDF({
-        orientation: orientation,
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-    });
+        const pdf = new jsPDF({
+            orientation: orientation,
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
 
-    pdf.addImage(dataUrl, 'JPEG', 0, 0, canvas.width, canvas.height);
-    pdf.save("certificate.pdf");
+        pdf.addImage(dataUrl, 'JPEG', 0, 0, canvas.width, canvas.height);
+        pdf.save("certificate.pdf");
+    }
+
+    drawCertificate(certData);
 }
-
-}
-
 
 
 

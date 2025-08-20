@@ -9,6 +9,8 @@
 {% block body %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 
 
 
@@ -117,47 +119,62 @@
 
 <script>
     
-    async function DownloadExcel() {
-        const id = parseInt("{{ webinar.id }}");
-        const response = await fetch(`/exam_portal/result_data/${id}`);
-        const data = await response.json();
+   async function DownloadExcel() {
+    const id = parseInt("{{ webinar.id }}");
+    const response = await fetch(`/exam_portal/result_data/${id}`);
+    const data = await response.json();
 
-        console.log("Data fetched:", data);
+    console.log("Data fetched:", data);
 
-        let csv = "Category,5 (Excellent),4 (Good),3 (Average),2 (Poor),1 (Very Poor)\n";
-        csv += `Speaker,${data.speaker.join(",")}\n`;
-        csv += `Venue,${data.venue.join(",")}\n`;
-        csv += `Meal,${data.meal.join(",")}\n`;
-        csv += `Manage,${data.manage.join(",")}\n`;
+    
+    let csv = "Email,School ID,Speaker S,Venue ,Meal ,Manage \n";
 
-        if (data.overall) {
-            csv += `Overall,${data.overall.join(",")}\n`;
-        }
+ 
+    for (let i = 0; i < data.email.length; i++) {
+        const email = data.email[i] ?? "";
+        const schoolId = data.school_id[i] ?? "";
+        const speaker = data.speaker[i] ?? "";
+        const venue = data.venue[i] ?? "";
+        const meal = data.meal[i] ?? "";
+        const manage = data.manage[i] ?? "";
 
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `evaluation_data_${id}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        console.log("Download triggered!");
+        csv += `${email},${schoolId},${speaker},${venue},${meal},${manage}\n`;
     }
-    async function downloadTestData(){
-            console.log("hello")
 
-            const url = await fetch("{% url 'test_data' webinar.id %}");
-            const data= await url.json();
+  
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
 
-            const workbook=XLSX.utils.book_new();
-            const worksheet=XLSX.utils.json_to_sheet(data.test_result);
-            XLSX.utils.book_append_sheet(workbook, worksheet, "test_data");
-            XLSX.writeFile(workbook, "Test_result.xlsx");
-    }
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `evaluation_data_${id}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log("Download triggered!");
+}
+
+ async function downloadTestData() {
+    console.log("hello");
+
+    // Fetch the JSON response
+    const response = await fetch("{% url 'test_data' webinar.id %}");
+    const data = await response.json();
+
+    console.log("Fetched test data:", data);
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    // Convert JSON to worksheet (using the array in data.test_result)
+    const worksheet = XLSX.utils.json_to_sheet(data.test_result);
+
+    // Append worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, "test_data");
+
+    // Export workbook as Excel file
+    XLSX.writeFile(workbook, "Test_result.xlsx");}
 
     
   document.addEventListener('DOMContentLoaded', function() {
@@ -165,7 +182,6 @@
         const id = parseInt("{{ webinar.id }}");
         const evaluation = await fetch(`/exam_portal/rounded_data/${id}`);
         const data = await evaluation.json();
-        console.log(data);
                 
         const chartData = {
             speaker: data.speaker,
