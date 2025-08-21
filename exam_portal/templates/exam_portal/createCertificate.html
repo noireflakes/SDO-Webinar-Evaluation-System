@@ -231,56 +231,67 @@
         }
 
      
-        function drawTxt() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!saveState) return;
-            ctx.putImageData(saveState, 0, 0);
+function safeValue(val) {
+    if (!val || val.toLowerCase() === "none") {
+        return "";
+    }
+    return val;
+}
 
-            const title = document.getElementById("certificate-title").value;
-            const subtitle = document.getElementById("certificate-subtitle").value;
-            const name = document.getElementById("certificate-name").value;
-            const host = document.getElementById("certificate-host").value;
+function drawTxt() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!saveState) return;
+    ctx.putImageData(saveState, 0, 0);
 
-            ctx.textAlign = "center";
-            ctx.fillStyle = "black";
+    const title = safeValue(document.getElementById("certificate-title").value);
+    const subtitle = safeValue(document.getElementById("certificate-subtitle").value);
+    const name = safeValue(document.getElementById("certificate-name").value);
+    const host = safeValue(document.getElementById("certificate-host").value);
 
-            const x = canvas.width/2/2 ;
-            let y = 240; 
-            const spacing = 40;
-            const littespace=20;
-            const bigspace=50
+    ctx.textAlign = "center";
+    ctx.fillStyle = "black";
 
-            ctx.font = "50px Old English Text MT";
-            ctx.fillText(title, x, y);
-             y += spacing;
+    const x = canvas.width / 2 / 2;
+    let y = 240; 
+    const spacing = 40;
+    const littespace = 20;
 
-            ctx.font = "14px 'Bookman Old Style'";
-            ctx.fillText(subtitle, x, y); y +=spacing;
+    ctx.font = "50px Old English Text MT";
+    if (title) ctx.fillText(title, x, y);
+    y += spacing;
 
-            ctx.font = "Bold 29px 'Bookman Old Style'";
-            ctx.fillText(name, x, y); y += littespace;
+    ctx.font = "14px 'Bookman Old Style'";
+    if (subtitle) ctx.fillText(subtitle, x, y);
+    y += spacing;
 
-            ctx.font = "15px 'Bookman Old Style'";
-            ctx.fillText(host, x, y); y += littespace;
+    ctx.font = "Bold 29px 'Bookman Old Style'";
+    if (name) ctx.fillText(name, x, y);
+    y += littespace;
 
-            drawAllParagraphs(650,y);
-            flip();
-        }
+    ctx.font = "15px 'Bookman Old Style'";
+    if (host) ctx.fillText(host, x, y);
+    y += littespace;
+
+    drawAllParagraphs(650, y);
+    flip();
+}
 
 function drawAllParagraphs(maxWidth, y) {
-    const subject = document.getElementById("certificate-subject").value;
-    const address = document.getElementById("certificate-address").value;
-    const date = document.getElementById("certificate-date").value;
+    const subject = safeValue(document.getElementById("certificate-subject").value);
+    const address = safeValue(document.getElementById("certificate-address").value);
+    const date = safeValue(document.getElementById("certificate-date").value);
 
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
     const fontSize = 15;
     const lineHeight = 25;
     const fontFamily = "'Bookman Old Style'";
-    const x = canvas.width / 2/2;
+    const x = canvas.width / 2 / 2;
     y += 10;
 
     function drawParagraphBlock(paragraph, fontWeight) {
+        if (!paragraph) return; 
+
         ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
         const words = paragraph.split(" ");
         let line = "";
@@ -296,13 +307,14 @@ function drawAllParagraphs(maxWidth, y) {
             }
         }
         ctx.fillText(line.trim(), x, y);
-        y += lineHeight+ 10;
+        y += lineHeight + 10;
     }
 
-            drawParagraphBlock(subject, "");
-            drawParagraphBlock(address, "italic");
-            drawParagraphBlock(date, 'italic');
-        }
+    drawParagraphBlock(subject, "");
+    drawParagraphBlock(address, "italic");
+    drawParagraphBlock(date, "italic");
+}
+
     
         async function downloadPDF() {
             const { jsPDF } = window.jspdf;

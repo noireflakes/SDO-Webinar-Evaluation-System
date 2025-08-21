@@ -64,42 +64,25 @@
         <p>Views Events and details</p>
 
       </section>
-      <section class="total-section">
-        <div class="cert-container container">
-            <div class="total-card">
-                <div class="total">5</div>
-                <h2>Certificate</h2>
 
-            </div>
-        </div>
-        <div class="atten-container container">
-
-            <div class="total-card">
-              <div class="total">5</div>
-              <h2> Attendance</h2>
-            </div>
-        </div>
-    </section>
     <section class="events-section">
         <h2>Your Events</h2>
         <div class="events-container" >
           {% if  upcoming_webinars %}
             
             {% for up_webinar in upcoming_webinars   %}
-              <div class="webinar-card">
-                <img class="webinar-banner" src="{{ up_webinar.webinar.banner.url }}" alt="">
-                <div class="webinar-contents" >
-                  <h4> {{ up_webinar.webinar.title }}</h4>
-                 
-                  <p class="webinar-time"><i class="fa-solid fa-clock"></i> {{ up_webinar.webinar.time|time:"h:i A" }}</p>
-                  <p style="color:rgb(89, 187, 89); font-weight: 600; ">Upcoming</p>
-                  
-                  <p class="webinar-descrtiption" >{{ up_webinar.webinar.description|truncatewords:16  }}</p>
-                  <div class="webinar-btn-container"> 
-                  <a href="{% url 'webinar_detail' up_webinar.webinar.id  %}" class="webinar-btn"> Views details </a>
-                  </div>
-                </div>
-              </div>
+                  <div class="webinar-card" >
+                      <div class="img-container">
+                          <img class="webinar-img" src="{{ up_webinar.webinar.banner.url }}" alt="">
+                      </div>
+                      <div class="webinar-contents">
+                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ up_webinar.webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ up_webinar.webinar.time|time:"h:i A" }}  </p></div>
+                          <h2 class="webinar-title">{{ up_webinar.webinar.title }}</h2>
+                          <p>{{ up_webinar.webinar.description|truncatewords:16  }}</p>
+                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' up_webinar.webinar.id %}">View Details</a></div>
+                      </div>
+                    </div>
+
             {% endfor %}
 
           {% else %}
@@ -122,21 +105,22 @@
           {% if  past_webinars %}
             
             {% for pt_webinar in past_webinars   %}
-              <div class="webinar-card">
-                <img class="webinar-banner" src="{{ pt_webinar.webinar.banner.url }}" alt="">
-                <div class="webinar-contents" >
-                  <h4> {{ pt_webinar.webinar.title }}</h4>
-                 
-                  <p class="webinar-time"><i class="fa-solid fa-clock"></i> {{ pt_webinar.webinar.time|time:"h:i A" }}</p>
-                  <p style="color:rgb(179, 38, 33); font-weight: 600; ">Competed</p>
-                  
-                  <p class="webinar-descrtiption" >{{ pt_webinar.webinar.description|truncatewords:16  }}</p>
-                  <div class="webinar-btn-container"> 
-  
-                  <a class="webinar-btn" href="{% url 'webinar_detail' pt_webinar.webinar.id %}"> Views details </a>
-                  </div>
-                </div>
-              </div>
+                  <div class="webinar-card" >
+                      <div class="img-container">
+                          <img class="webinar-img" src="{{ pt_webinar.webinar.banner.url }}" alt="">
+                      </div>
+                      <div class="webinar-contents">
+                        
+                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ pt_webinar.webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ pt_webinar.time|time:"h:i A" }}  </p></div>
+                        <p style="color: red; text-align: left; width: 100%; margin-top: 5px;">Completed</p>
+                        <h2 class="webinar-title">{{ pt_webinar.webinar.title }}</h2>
+                        
+                          
+                          <p>{{ pt_webinar.webinar.description|truncatewords:16  }}</p>
+                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' pt_webinar.webinar.id %}">View Details</a></div>
+                      </div>
+                    </div>
+
             {% endfor %}
 
           {% else %}

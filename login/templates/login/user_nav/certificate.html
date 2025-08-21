@@ -172,53 +172,64 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-    async function downloadCertificate(webinarId) {
-        const canvas = document.getElementById('certificateCanvas');
-        const ctx = canvas.getContext('2d');
-        let saveState;
+async function downloadCertificate(webinarId) {
+    const canvas = document.getElementById('certificateCanvas');
+    const ctx = canvas.getContext('2d');
+    let saveState;
 
-        const response = await fetch(`/certificate_data/${webinarId}/`);
-        const data = await response.json();
-            console.log(data);
+    const response = await fetch(`/certificate_data/${webinarId}/`);
+    const data = await response.json();
+    console.log(data);
+
+    const certData = Array.isArray(data) ? data[0] : data;
+
+    function drawCertificate(data) {
+        const img = new Image();
+        img.src = data.img;
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const scaleFactor = 2;
+
+            const displayWidth = img.width > 900 ? img.width / 2 : img.width;
+            const displayHeight = img.height > 900 ? img.height / 2 : img.height;
+
+            canvas.width = displayWidth * scaleFactor;
+            canvas.height = displayHeight * scaleFactor;
+
+            canvas.style.width = `${displayWidth}px`;
+            canvas.style.height = `${displayHeight}px`;
+
+            ctx.scale(scaleFactor, scaleFactor);
+
+            ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+            saveState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            drawTxt();
+            downloadPDF();
+        };
+    }
 
 
-        const certData = Array.isArray(data) ? data[0] : data;
-
-        function drawCertificate(data) {
-    
-            const img = new Image();
-            img.src = data.img;
-            img.crossOrigin = "anonymous";
-            img.onload = () => {
-                const scaleFactor = 2;
-
-                const displayWidth = img.width > 900 ? img.width / 2 : img.width;
-                const displayHeight = img.height > 900 ? img.height / 2 : img.height;
-
-                canvas.width = displayWidth * scaleFactor;
-                canvas.height = displayHeight * scaleFactor;
-
-                canvas.style.width = `${displayWidth}px`;
-                canvas.style.height = `${displayHeight}px`;
-
-                ctx.scale(scaleFactor, scaleFactor);
-
-                ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
-                saveState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                drawTxt();
-                downloadPDF();
-            };
+    function safeValueById(id) {
+        const el = document.getElementById(id);
+        if (!el) return ""; 
+        const val = el.value;
+        if (!val || val.toLowerCase() === "none") {
+            return "";
         }
+        return val;
+    }
 
     function drawTxt() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (!saveState) return;
         ctx.putImageData(saveState, 0, 0);
 
-        const title = certData.title;
-        const subtitle = certData.subtitle;
+        const title = safeValueById("certificate-title");
+        const subtitle = safeValueById("certificate-subtitle");
         const name = "{{ user.first_name }} {{ user.last_name }}";
-        const host = certData.host;
+        const host = safeValueById("certificate-host");
+        console.log("change");
+        
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
@@ -229,52 +240,56 @@
         const littespace = 20;
 
         ctx.font = "50px Old English Text MT";
-        ctx.fillText(title, x, y);
+        if (title) ctx.fillText(title, x, y);
         y += spacing;
 
         ctx.font = "14px 'Bookman Old Style'";
-        ctx.fillText(subtitle, x, y);
+        if (subtitle) ctx.fillText(subtitle, x, y);
         y += spacing;
 
         ctx.font = "Bold 29px 'Bookman Old Style'";
-        ctx.fillText(name, x, y);
+        if (name) ctx.fillText(name, x, y);
         y += littespace;
 
         ctx.font = "15px 'Bookman Old Style'";
-        ctx.fillText(host, x, y);
+        if (host) ctx.fillText(host, x, y);
         y += littespace;
 
         drawAllParagraphs(650, y);
+
     }
 
     function drawAllParagraphs(maxWidth, y) {
-        const subject = certData.subject;
-        const address = certData.address;
-        const date = certData.date;
+        const subject = safeValueById("certificate-subject");
+        const address = safeValueById("certificate-address");
+        const date = safeValueById("certificate-date");
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
-        ctx.font = "16px 'Bookman Old Style'";
-        y += 10;
-        const x = canvas.width / 2 / 2;
+        const fontSize = 15;
         const lineHeight = 25;
+        const fontFamily = "'Bookman Old Style'";
+        const x = canvas.width / 2 / 2;
+        y += 10;
 
-        function drawParagraphBlock(paragraph, font) {
-            paragraph = paragraph || "";
+        function drawParagraphBlock(paragraph, fontWeight) {
+            if (!paragraph) return;
+
+            ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
             const words = paragraph.split(" ");
             let line = "";
+
             for (let i = 0; i < words.length; i++) {
                 const testLine = line + words[i] + " ";
                 if (ctx.measureText(testLine).width > maxWidth && i > 0) {
-                    ctx.font = `${font} 16px 'Bookman Old Style'`;
-                    ctx.fillText(line, x, y);
+                    ctx.fillText(line.trim(), x, y);
                     line = words[i] + " ";
                     y += lineHeight;
                 } else {
                     line = testLine;
                 }
             }
-            ctx.fillText(line, x, y);
+            ctx.fillText(line.trim(), x, y);
             y += lineHeight + 10;
         }
 
