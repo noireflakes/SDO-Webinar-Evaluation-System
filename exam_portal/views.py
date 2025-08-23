@@ -179,7 +179,7 @@ def test_score(request, id, type):
     
 
 def generate_qr(request, id, type):
-    url = 'https://sdo-webinar-evaluation-system.onrender.com/'
+    url = 'https://sdo-webinar-evaluation-system-production.up.railway.app/'
     
     qr=TestQR.objects.filter(test__id=id, type=type)
 
@@ -211,7 +211,7 @@ def qr_evalution(request, id):
     type=webinar.event_type
     qr=EvalQR.objects.filter(test__id=id, type=type)
     
-    url=f"https://sdo-webinar-evaluation-system.onrender.com/webinar/questionaire/{webinar.id}/"
+    url=f"https://sdo-webinar-evaluation-system-production.up.railway.app/webinar/questionaire/{webinar.id}/"
 
     if not qr:
         
