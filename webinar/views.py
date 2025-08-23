@@ -235,7 +235,7 @@ def questionaire(request, id):
                     )
 
                 for key, value in request.POST.items():
-
+                    
                     if key.startswith('speaker'):
                         speaker.append(value)
                     elif key.startswith('venue'):
@@ -258,10 +258,10 @@ def questionaire(request, id):
                             q3=response[2],
                             q4=response[3],
                             q5=response[4],
+                            sex=sex
                         )
                     
-            
-
+        
                 attendee.attendance=1
                 attendee.save()
 

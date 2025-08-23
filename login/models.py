@@ -10,5 +10,5 @@ class UserProfile(models.Model):
     school=models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.user
+        return self.user.first_name
 

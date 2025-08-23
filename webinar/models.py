@@ -54,6 +54,7 @@ class ResponseQuestionaire(models.Model):
     q4=models.IntegerField(null=True)
     q5=models.IntegerField(null=True)
     q6=models.IntegerField(null=True)
+    timestamp=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user}-{self.type}"

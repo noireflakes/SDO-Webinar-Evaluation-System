@@ -17,13 +17,19 @@ from . import file
 import environ
 import dj_database_url
 
+#env
+env = environ.Env()
+environ.Env.read_env()
+import sys
+
+
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c&m-p5g#p1c=rxm7pqey33o*euwq&6o+&+!(9c(p!$e%9h!_$)'
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -54,10 +60,6 @@ INSTALLED_APPS = [
     'cloudinary',
 ]
 
-#env
-env = environ.Env()
-environ.Env.read_env()
-import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

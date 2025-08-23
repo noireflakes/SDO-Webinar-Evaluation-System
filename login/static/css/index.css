@@ -173,10 +173,11 @@ a{
     font-weight: 400;
     color: white;
     height: 45px;
-    z-index: 2;
+    z-index: 1;
     width: 100%;
     border-radius: 0%;
-    margin-bottom: 10px;
+    top:2.5em;
+
 }
 
 .header-contents h2{

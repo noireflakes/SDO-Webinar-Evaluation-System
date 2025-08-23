@@ -37,6 +37,10 @@ def index(request):
 def login_view(request):
     credential_error=""
     if request.method=="POST":
+
+        if request.user.is_authenticated:
+            return render(request, 'login/login.html',{"credential_error":"Sign out your other account before signing in"})
+
         username=request.POST.get("username")
         password=request.POST.get("password")
 
@@ -169,12 +173,15 @@ def certificate(request):
         until_date__lt=today,
         attendees__user=request.user
     )
-    print(ongoing_webinars)
-    print(completed_webinars)
+
+
+
+
     
     return render(request, 'login/user_nav/certificate.html', {
         'ongoing_webinars':ongoing_webinars,
-        'completed_webinars': completed_webinars
+        'completed_webinars': completed_webinars,
+
     })
 
 

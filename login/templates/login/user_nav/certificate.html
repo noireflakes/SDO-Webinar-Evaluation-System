@@ -89,12 +89,8 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <button onclick="downloadCertificate('{{ on_webinar.id }}')" class="btn-download">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                        <a href="{% url 'cert_preview' on_webinar.id %}" class="btn-preview">
-                            <i class="fas fa-eye"></i> Preview
-                        </a>
+
+        
                     </div>
                 </div>
                 {% endfor %}
@@ -132,12 +128,10 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download">
+                    <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download" {% if com_webinar.attendees.attendance < 1 %} disabled {% endif %} >
                         <i class="fas fa-download"></i> Download
                     </button>
-                    <a href="{%  url 'cert_preview' com_webinar.id %}" class="btn-preview">
-                        <i class="fas fa-eye"></i> Preview
-                    </a>
+
                 </div>
             </div>
             {% endfor %}

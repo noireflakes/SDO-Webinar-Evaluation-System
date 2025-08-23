@@ -103,20 +103,23 @@ def rounded_data(request, id):
 
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
-    email=[]
-    school_id=[]
+    email = []
+    school_id = []
+    sex = []
+    timestamps = []
     speaker = []
     venue = []
     meal = []
     manage = []
 
     for evaluation in webinar.evaluation.all():
+        # User details
         email.append(evaluation.user.email)
         school_id.append(evaluation.user.user_profile.school_id)
-        print(evaluation.user.email)
-
-
-
+        sex.append(evaluation.user.user_profile.sex)  
+        timestamps.append(evaluation.timestamp)     
+        
+        # Average per evaluation type
         total = [evaluation.q1, evaluation.q2, evaluation.q3, evaluation.q4, evaluation.q5, evaluation.q6]
         valid_number = [s for s in total if s is not None]
         average = sum(valid_number) / len(valid_number) if valid_number else 0
@@ -130,18 +133,21 @@ def result_data(request, id):
         elif evaluation.type == 'manage':
             manage.append(average)
 
-
     overall = speaker + venue + meal + manage
 
     evaluations = {
-        "email":email,
-        "school_id":school_id,
+        "email": email,
+        "school_id": school_id,
+        "sex": sex,                 
+        "timestamp": timestamps,    
         "speaker": speaker,
         "venue": venue,
         "meal": meal,
         "manage": manage,
-        "overall": overall
+        "overall": overall,
     }
+
+ 
 
     return JsonResponse(evaluations)
 

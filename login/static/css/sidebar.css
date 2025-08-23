@@ -41,6 +41,7 @@ button{
     max-width: 80%;
     min-height:50vh;
     margin-top: 5em;
+    
 
 }
 
@@ -105,9 +106,17 @@ button{
     color: black;
     transition:  padding-left .3s ease-in, border-left .2s ease-in-out;
     max-width: 100%;
-  
+
     
 }
+
+nav .nav-item{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+}
+
 
 .sb-nav-item:hover{
     border-left: 5px solid black;
