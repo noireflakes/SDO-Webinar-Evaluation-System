@@ -28,10 +28,10 @@ SECRET_KEY = 'django-insecure-c&m-p5g#p1c=rxm7pqey33o*euwq&6o+&+!(9c(p!$e%9h!_$)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost',".up.railway.app"]
 
 CSRF_TRUSTED_ORIGIN=[
-    'https://*.onrender.com','127.0.0.1', 'localhost',
+    'https://*.onrender.com','127.0.0.1', 'localhost',"https://*.up.railway.app"
 ]
 
 

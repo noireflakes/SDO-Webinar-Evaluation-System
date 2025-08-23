@@ -100,8 +100,6 @@ def webinar_detail(request, id):
 
 def edit_events(request, id):
     webinar=get_object_or_404(Webinar, id=id)
-
-    
     return render(request, "webinar/makewebinar.html",{
         'webinar':webinar
     })
@@ -225,49 +223,73 @@ def questionaire(request, id):
         school_id=request.POST.get('school_id')
         try:
             userprofile=UserProfile.objects.get(school_id=school_id)
+            attendee=get_object_or_404(WebinarAttendees, user=userprofile.user, webinar=webinar)
 
-            if request.POST.get('comment'):
-                Comment.objects.create(
-                    webinar=webinar,
-                    user=userprofile.user,
-                    text= request.POST.get('comment')
-                )
-
-            
-
-            for key, value in request.POST.items():
-
-                if key.startswith('speaker'):
-                    speaker.append(value)
-                elif key.startswith('venue'):
-                    venue.append(value)
-                elif key.startswith('meals'):
-                    meals.append(value)
-                elif key.startswith("manage"):
-                    manage.append(value)
-                
-            for catergory , response in all_responses.items():
-                if len(response) <5:
-                    response.append(None)
-
-                ResponseQuestionaire.objects.create(
+            if attendee.attendance<1:
+      
+                if request.POST.get('comment'):
+                    Comment.objects.create(
                         webinar=webinar,
                         user=userprofile.user,
-                        type=catergory,
-                        q1=response[0],
-                        q2=response[1],
-                        q3=response[2],
-                        q4=response[3],
-                        q5=response[4],
-
+                        text= request.POST.get('comment')
                     )
-          
-            attendee=get_object_or_404(WebinarAttendees, user=userprofile.user, webinar=webinar)
-            attendee.attendance=1
-            attendee.save()
+
+                for key, value in request.POST.items():
+
+                    if key.startswith('speaker'):
+                        speaker.append(value)
+                    elif key.startswith('venue'):
+                        venue.append(value)
+                    elif key.startswith('meals'):
+                        meals.append(value)
+                    elif key.startswith("manage"):
+                        manage.append(value)
+                    
+                for catergory , response in all_responses.items():
+                    if len(response) <5:
+                        response.append(None)
+
+                    ResponseQuestionaire.objects.create(
+                            webinar=webinar,
+                            user=userprofile.user,
+                            type=catergory,
+                            q1=response[0],
+                            q2=response[1],
+                            q3=response[2],
+                            q4=response[3],
+                            q5=response[4],
+                        )
+                    
+            
+
+                attendee.attendance=1
+                attendee.save()
 
 
-            return redirect("index")
+                return redirect("index")
+            
+
+            else:
+                error_message="You already answered"
+                if webinar.event_type == 'recognition':
+                    return render(request,'webinar/evaluation/recognition.html',{
+                    'webinar':webinar,
+                    'error_message':error_message
+                })
+
+                elif webinar.event_type == 'seminar':
+                    return render(request,'webinar/evaluation/seminar.html',{
+                    'webinar':webinar,
+                    'error_message':error_message
+
+                })
+
+                return render(request,'webinar/evaluation/workshop.html',{
+                    'webinar':webinar,
+                    'error_message':error_message
+                })
+            
+
 
         except UserProfile.DoesNotExist:
             error_message="Invalid id please recheck your Deped id"
