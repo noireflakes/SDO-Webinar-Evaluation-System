@@ -271,23 +271,8 @@ def questionaire(request, id):
 
             else:
                 error_message="You already answered"
-                if webinar.event_type == 'recognition':
-                    return render(request,'webinar/evaluation/recognition.html',{
-                    'webinar':webinar,
-                    'error_message':error_message
-                })
-
-                elif webinar.event_type == 'seminar':
-                    return render(request,'webinar/evaluation/seminar.html',{
-                    'webinar':webinar,
-                    'error_message':error_message
-
-                })
-
-                return render(request,'webinar/evaluation/workshop.html',{
-                    'webinar':webinar,
-                    'error_message':error_message
-                })
+                messages.error(request, "You already answered")
+                return redirect("index")
             
 
 
