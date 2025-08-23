@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost',".up.railway.app"]
 
-CSRF_TRUSTED_ORIGIN=[
+CSRF_TRUSTED_ORIGINS=[
     'https://*.onrender.com','127.0.0.1', 'localhost',"https://*.up.railway.app","https://sdo-webinar-evaluation-system-production.up.railway.app"
 ]
 
