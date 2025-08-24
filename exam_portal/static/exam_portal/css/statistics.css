@@ -15,6 +15,32 @@ html, body{
    
 
 }
+
+.btn-download{
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 2em;
+}
+
+.btn-download {
+    border: 2px solid #4f46e5;
+    background-color: rgb(58, 57, 57);
+    color: white;
+}
+
+.btn-download:hover {
+    background-color: #4338ca;
+}
 .main-content{
      width: 100%;
      margin-left: 20%;
@@ -39,7 +65,7 @@ html, body{
     background-color: rgb(44, 44, 44);
     color:white;
     width: 20%;
-    height: 100%;
+    min-height: 100%;
     position: fixed;
 }
 .sidebar h2{

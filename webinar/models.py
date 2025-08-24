@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from cloudinary_storage.storage import MediaCloudinaryStorage
 # Create your models here.
@@ -45,7 +46,7 @@ class WebinarAttendees(models.Model):
 
 class ResponseQuestionaire(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="evaluation")
-    user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="response")
     type=models.CharField(max_length=100, null=True, blank=True)
     sex=models.CharField(max_length=50, null=True, blank=True)
     q1=models.IntegerField(null=True)

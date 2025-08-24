@@ -1,0 +1,207 @@
+{% extends "login/layout.html" %}
+
+{% load static %}
+
+{% block title %}<title>Calendar</title>{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+
+<style>
+ 
+.log-history-container {
+    padding: 1.5rem;
+    background: #f9f9fc;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.log-history-container h2 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.log-table th, .log-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.log-table th {
+    background-color: #eef1f5;
+    color: #555;
+}
+
+.log-row:hover {
+    background-color: #f0f8ff;
+}
+
+.type.admin {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.type.staff {
+    color: #f0ad4e;
+    font-weight: bold;
+}
+
+.type.user {
+    color: #5bc0de;
+    font-weight: bold;
+}
+
+.action.add {
+    color: #5cb85c;
+}
+
+.action.change {
+    color: #0275d8;
+}
+
+.action.delete {
+    color: #d9534f;
+}
+
+.no-logs {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+    </style>
+
+
+
+
+{% endblock %}
+{% block js %}  
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
+<script src="{% static 'js/sidebar.js' %}"></script>
+{% endblock %}
+
+{% block body%}
+
+  <div class="topbar">
+    
+        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+        <div class="credential-cont">        
+          <span class="username fw-semibold">{{ user.username }}</span>
+          <a class="profile">
+            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
+          </a>
+        </div>
+   
+  </div>
+
+
+  <div class="app-container">
+
+     <div class="sidebar nav-sb">
+    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
+
+    <ul class="sidebar-nav">
+        <a href="{% url 'admin_events' %}" class="sb-nav-item">Event</a>
+        <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Calendar</a>
+        <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
+        <a href="{% url 'admin_users' %}" class="sb-nav-item">Users</a>
+        <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settting</a>
+        <a href="{% url 'admin_log' %}" class="sb-nav-item sb-active">Log Entries</a>
+        <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+    </ul>
+
+    </div>
+    <aside class="d-sidebar">
+      <div class="logo">
+        <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+        <h2>SDO Baliwag</h2>
+      </div>
+      <nav class="nav">
+        <a href="{% url 'admin_events' %}" class="nav-item">Event</a>
+        <a href="{% url 'admin_calendar' %}" class="nav-item">Calendar</a>
+        <a href="{% url 'admin_certificate' %}" class="nav-item">Certificate</a>
+        <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
+        <a href="{% url 'admin_setting' %}" class="nav-item">Settting</a>
+        <a href="{% url 'admin_log' %}" class="nav-item active">Log Entries</a>
+        <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
+      </nav>
+    </aside>
+
+    <div class="main-content">
+    
+    <div class="log-history-container">
+    <h2> Admin Log History</h2>
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Action</th>
+                <th>Object</th>
+                <th>Message</th>
+              
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr class="log-row">
+                <td>{{ log.action_time|date:"Y-m-d H:i:s" }}</td>
+                <td>{{ log.user.username }}</td>
+                <td class="type {% if log.user.is_superuser %}admin{% elif log.user.is_staff %}staff{% else %}user{% endif %}">
+                    {% if log.user.is_superuser %}Admin{% elif log.user.is_staff %}Staff{% else %}User{% endif %}
+                </td>
+                <td class="action {% if log.action_flag == 1 %}add{% elif log.action_flag == 2 %}change{% elif log.action_flag == 3 %}delete{% endif %}">
+                    {% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}
+                </td>
+                <td>{{ log.object_repr }}</td>
+                <td>{{ log.change_message }}</td>
+                
+                
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="no-logs">No logs available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+      
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container d-flex justify-content-between flex-wrap">
+      <div>
+          <p>Empowering organizations through effective performance evaluation</p>
+      </div>
+      <div>
+          <h6>Contact Us</h6>
+          <p>Baliwag City North Central School, Lopez Jaena St.</p>
+          <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+{% endblock %}

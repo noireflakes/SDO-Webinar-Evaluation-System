@@ -3,7 +3,9 @@
 {% load static %}
 {% block css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
+<link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -50,7 +52,7 @@
                     <canvas id="overall" class="chart"></canvas>
                 </div>
             </div>
-            <button onclick="DownloadExcel()">Download Evaluation Data</button>
+            <button class="btn-download" onclick="DownloadExcel()"> <i class="fas fa-download"></i> Download Evaluation Data</button>
 
         </section>
         <section class="test-section">
@@ -74,18 +76,45 @@
 
                 
             </div>
-            <button onclick="downloadTestData()">Download Test</button>
-
-
+    
+            <button class="btn-download" onclick="downloadTestData()"> <i class="fas fa-download"></i> Download Test</button>
 
         </section>
 
 
 
 
+   <footer class="footer">
+  <div class="footer-container">
+    
+    
+    <div class="footer-left">
+        <img  class="logo" src="{% static 'asset/logo1.png' %}" alt="">
+    
+      <p>School Division Office Of The City Of BALIWAG</p>
+    </div>
+
+    <div class="footer-links">
+      <h4></h4>
+      <div class="link-columns">
    
+      </div>
+    </div>
+
+    <div class="footer-contact">
+      <h4>Contact Us</h4>
+      <p> Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
+      <p> +63912376421</p>
+      <p> sdo@deped.com</p>
+    </div>
+
+  </div>
+</footer>
 </div>
+
 </div>
+
+
 
 <script>
     
@@ -160,7 +189,7 @@
         const chartData = {
             speaker: data.speaker,
             venue: data.venue,
-            food: data.meal,
+            food: data.meals,
             manage: data.manage,
             overall: data.overall
         };

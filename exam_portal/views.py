@@ -63,7 +63,7 @@ def rounded_data(request, id):
 
     speaker = []
     venue = []
-    meal = []
+    meals = []
     manage = []
 
     for evaluation in webinar.evaluation.all():
@@ -77,29 +77,31 @@ def rounded_data(request, id):
         elif evaluation.type == 'venue':
             venue.append(average)
         elif evaluation.type == 'meals': 
-            meal.append(average)
+            meals.append(average)
         elif evaluation.type == 'manage':
             manage.append(average)
 
   
     speaker_counter = Counter(speaker)
     venue_counter = Counter(venue)
-    meal_counter = Counter(meal)
+    meal_counter = Counter(meals)
     manage_counter = Counter(manage)
 
  
-    overall = speaker + venue + meal + manage
+    overall = speaker + venue + meals + manage
     overall_counter = Counter(overall)
 
     evaluations = {
         "speaker": [speaker_counter.get(5,0), speaker_counter.get(4,0), speaker_counter.get(3,0), speaker_counter.get(2,0), speaker_counter.get(1,0)],
         "venue":   [venue_counter.get(5,0), venue_counter.get(4,0), venue_counter.get(3,0), venue_counter.get(2,0), venue_counter.get(1,0)],
-        "meal":    [meal_counter.get(5,0), meal_counter.get(4,0), meal_counter.get(3,0), meal_counter.get(2,0), meal_counter.get(1,0)],
+        "meals":    [meal_counter.get(5,0), meal_counter.get(4,0), meal_counter.get(3,0), meal_counter.get(2,0), meal_counter.get(1,0)],
         "manage":  [manage_counter.get(5,0), manage_counter.get(4,0), manage_counter.get(3,0), manage_counter.get(2,0), manage_counter.get(1,0)],
         "overall": [overall_counter.get(5,0), overall_counter.get(4,0), overall_counter.get(3,0), overall_counter.get(2,0), overall_counter.get(1,0)]
     }
+    print(evaluations)
 
     return JsonResponse(evaluations)
+
 
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
@@ -116,7 +118,7 @@ def result_data(request, id):
         # User details
         email.append(evaluation.user.email)
         school_id.append(evaluation.user.user_profile.school_id)
-        sex.append(evaluation.user.user_profile.sex)  
+        sex.append(evaluation.sex)  
         timestamps.append(evaluation.timestamp)     
         
         # Average per evaluation type

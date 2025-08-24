@@ -7,19 +7,14 @@
 {% endblock %}
 
 {% block body %}
-    <div class="top-bar">
-        <h4>you found a secret</h4>
-    </div>
-    {% if webinar %}
-  
-    
-        
-    
-    <div class="breadcrumbs" ><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Create/Edit</a></div>
-    {% else %}
-        <div class="breadcrumbs"><a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a href="" id="direct" class="bc-a">Create Event</a></div>
 
-    {% endif %}
+    <div class="top-bar">
+        <div class="breadcrumbs" >
+            <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Create/Edit</a>
+        </div>
+        <h2>{{ webinar.title }}</h2>
+    </div>
+    
     <div class="main-content">
         
             {% if webinar %}
@@ -29,9 +24,9 @@
                 {% endif %}" alt="banner" ></div>
             <div class="d-t-cont">
                 <p id="dp-event-t"> {{ webinar.time }} </p>
-                <p id="dp-event-d"> {{ webinar.start_date }} -{{ webinar.until_date }}  </p>
+                <p id="dp-event-d"> {{ webinar.start_date }} - {{ webinar.until_date }}  </p>
             </div>
-            <h4 id="dp-event-tl">{{ webinar.title  }}</h4>
+            <h4 id="dp-event-tl">{{ webinar.title }}</h4>
 
             <div class="overview-cont">
                 <h4>Overview</h4>

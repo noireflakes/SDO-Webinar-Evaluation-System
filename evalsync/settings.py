@@ -83,7 +83,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 #EMAIL
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND 
+EMAIL_BACKEND="login.backends.email_backend.EmailBackend"
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_USE_TLS = env("EMAIL_USE_TLS")
@@ -93,8 +94,6 @@ ADMIN_EMAIL= env("ADMIN_EMAIL")
 
 
 #DATBASE
-
-
 
 DATABASES = {
         'default': dj_database_url.config(conn_max_age=600, ssl_require=True)

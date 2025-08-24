@@ -14,6 +14,7 @@ urlpatterns=[
     path("admin_certificate",views.admin_certificate, name="admin_certificate"),
     path("admin_setting",views.admin_setting, name="admin_setting"),
     path("admin_users",views.admin_users, name="admin_users"),
+    path("admin_log", views.log_list, name="admin_log" ),
 
     #user path
     path("user_dashboard", views.user_dashboard, name="user_dashboard"),

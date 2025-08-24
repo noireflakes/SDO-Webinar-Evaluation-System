@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail,EmailMessage
 from django.contrib import messages
 import pyotp
 from django.http import JsonResponse,HttpResponse
@@ -14,6 +14,8 @@ from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
 from exam_portal.serializer import CertificateSerilize
 import json
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 # Create your views here.
 
 #login handler
@@ -91,13 +93,18 @@ def generate_otp(request):
                 'error': 'Invalid or expired OTP.'
             })
 
-    send_mail(
+    email=EmailMessage(
         f'OTP Code {otp_code}',
         f'Your OTP code is: {otp_code} Description description description',
         settings.EMAIL_HOST_USER,
         [user.email],
-        fail_silently=False
+        
     )
+    email.fail_silently=False
+
+    
+
+    email.send()
 
     return render(request, 'login/otp.html', {'otp': otp_code})
 
@@ -426,6 +433,11 @@ def change_password(request):
                     'error_password': 'Current password is incorrect.'
                 })
 
+
+
+def log_list(request):
+    logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
+    return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
 
 
 
