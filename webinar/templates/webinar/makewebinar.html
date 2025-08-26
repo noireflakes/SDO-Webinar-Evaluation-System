@@ -8,12 +8,24 @@
 
 {% block body %}
 
-    <div class="top-bar">
+    {% if webinar  %}
+           <div class="top-bar">
         <div class="breadcrumbs" >
             <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Create/Edit</a>
         </div>
         <h2>{{ webinar.title }}</h2>
     </div>
+    {% else %}
+               <div class="top-bar">
+        <div class="breadcrumbs" >
+            <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  ›  <a id="direct" class="bc-a">  Create/Edit</a>
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
     
     <div class="main-content">
         

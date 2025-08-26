@@ -22,14 +22,14 @@ body{
     color: white;
     border-top: 3px solid;
     border-image: linear-gradient(to right, rgb(177, 94, 176), rgb(70, 82, 185)) 1;
-    width: 50%;
+    width: 90%;
     margin-left: 1em;
     margin-bottom: .5em;
     border-bottom: none;
+  
  
 }
 a{
-    
     text-decoration: none;
     margin: 0;
     padding: 0;
@@ -41,11 +41,10 @@ a:hover{
 }
 .breadcrumbs{
     width: 100%;
-
     display: flex;
     color:white;
      font-size: 15px;
-     margin-bottom: 10em;
+     margin-bottom: 5em;
     
 
 }
