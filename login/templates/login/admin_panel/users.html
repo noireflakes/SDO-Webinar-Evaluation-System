@@ -146,10 +146,10 @@
         {% for user in users  %}
 
             <div class="table-row">
-                <div class="col-name">{{user.username}}</div>
-                <div class="col-email">{{user.email}}</div>
-                <div class="col-status"><span class="status-badge status-active">Active</span></div>
-            <div class="col-actions">
+                <div class="col col-name">{{user.username}}</div>
+                <div class=" col col-email">{{user.email}}</div>
+                <div class="col col-status"><span class="status-badge status-active">Active</span></div>
+            <div class="col col-actions">
                 
                 <a  href="{%  url 'delete_user' user.id %}" class="btn btn-sm btn-danger">Delete</a>
             </div>

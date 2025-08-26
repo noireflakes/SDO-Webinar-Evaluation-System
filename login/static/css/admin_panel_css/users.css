@@ -1,7 +1,17 @@
+    body, html{
+        height: 100%;
+        width: 100%;
+
+    }
+    
     .main-content {
         flex: 1;
-        padding: 24px;
+        padding-left:1em;
+        padding-right: 1em;
+        
         background-color: #f5f7fa;
+        width: 100%;
+  
     }
     
     .page-header {
@@ -12,7 +22,7 @@
     }
     
     .page-title {
-        font-size: 24px;
+        font-size: clamp(16px, 4vw, 24px);
         font-weight: 600;
         color: #2d3748;
     }
@@ -20,7 +30,10 @@
     .registration-section {
         display: flex;
         gap: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 5em;
+   
+        width: 100%;
+  
     }
     
     .registration-form {
@@ -32,7 +45,7 @@
     }
     
     .form-title {
-        font-size: 18px;
+        font-size: clamp(14px, 3vw , 18px);
         font-weight: 600;
         margin-bottom: 16px;
         color: #2d3748;
@@ -113,6 +126,10 @@
         display: flex;
         gap: 8px;
         justify-content: flex-end;
+    }
+
+    .col{
+        max-width: 100%;
     }
     
     .status-badge {
@@ -195,7 +212,19 @@
         .registration-section{
             display: flex;
             flex-direction: column;
+            width: 95%;
+            padding: 0;
            
         }
+        .col-actions {
+        display: none;
+    }
+    .users-table .table-row > div {
+    white-space: nowrap;   
+    overflow: hidden;      
+    text-overflow: ellipsis;  
+}
+
+
         
     }

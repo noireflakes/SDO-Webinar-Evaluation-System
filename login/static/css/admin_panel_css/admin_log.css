@@ -1,0 +1,81 @@
+.log-history-container {
+    padding: 1.5rem;
+    background: #f9f9fc;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.log-history-container h2 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.log-table th, .log-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.log-table th {
+    background-color: #eef1f5;
+    color: #555;
+}
+
+.log-row:hover {
+    background-color: #f0f8ff;
+}
+
+.type.admin {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.type.staff {
+    color: #f0ad4e;
+    font-weight: bold;
+}
+
+.type.user {
+    color: #5bc0de;
+    font-weight: bold;
+}
+
+.action.add {
+    color: #5cb85c;
+}
+
+.action.change {
+    color: #0275d8;
+}
+
+.action.delete {
+    color: #d9534f;
+}
+
+.no-logs {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;   
+}
+
+.log-table th,
+.log-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    white-space: nowrap;      
+    overflow: hidden;          
+    text-overflow: ellipsis;   
+}
