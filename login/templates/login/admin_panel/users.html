@@ -150,8 +150,14 @@
                 <div class=" col col-email">{{user.email}}</div>
                 <div class="col col-status"><span class="status-badge status-active">Active</span></div>
             <div class="col col-actions">
+                {% if not user.is_superuser or not user.is_staff %}
+                    <a  href="{%  url 'delete_user' user.id %}" class="btn btn-sm btn-danger">Delete</a>
+                {% else %}
+                    <div>{% if user.is_superuser %}Admin
+                        {% elif user.is_staff %}Staff{% endif %}
+                    </div>
+                {% endif %}
                 
-                <a  href="{%  url 'delete_user' user.id %}" class="btn btn-sm btn-danger">Delete</a>
             </div>
             </div>        
         

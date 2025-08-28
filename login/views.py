@@ -17,7 +17,15 @@ import ssl, certifi
 import json
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.decorators import user_passes_test
+
 # Create your views here.
+#decorator
+def admin_required(view_func):
+    return user_passes_test(lambda u: u.is_staff, login_url="login")(view_func)
+
+def user_required(view_func):
+    return user_passes_test(lambda u: u.is_authenticated and not u.is_staff)(view_func)
 
 #login handler
 def index(request):
@@ -105,15 +113,15 @@ def generate_otp(request):
         port=settings.EMAIL_PORT,
         username=settings.EMAIL_HOST_USER,
         password=settings.EMAIL_HOST_PASSWORD,
-        use_tls=True,         # use_tls, not keyfile/certfile
-        ssl_context=context   # pass context here
+        use_tls=True,         
+        ssl_context=context   
     )
 
     send_mail(
-        'Test Email',
-        'This is a test email.',
+        'OTP code From SDO',
+        f'Enter this to confirm your Login: {otp_code}',
         settings.EMAIL_HOST_USER,
-        ['recipient@example.com'],
+        [user.email],
         connection=connection,
         fail_silently=False
     )
@@ -122,10 +130,8 @@ def generate_otp(request):
     return render(request, 'login/otp.html', {'otp': otp_code})
 
 
-
-
-
 #user views
+@user_required
 def user_dashboard(request):
 
     today = timezone.localtime().date()
@@ -153,9 +159,8 @@ def user_dashboard(request):
         "past_message":history_messages
     })
 
-
+@user_required
 def calendar(request):
-    
     today=timezone.now().date()
     upcoming_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__gte=today ) 
     
@@ -168,7 +173,6 @@ def calendar(request):
 def event_data(request):
     data=[]
     webinars=Webinar.objects.all()
-    
     for webinar in webinars:
         data.append({
             "title":webinar.title,
@@ -177,11 +181,11 @@ def event_data(request):
 
     return JsonResponse(data, safe=False)
 
-
+@user_required
 def user_setting(request):
     return render(request, "login/user_nav/user_setting.html")
 
-
+@user_required
 def certificate(request):
     today = timezone.now().date()
 
@@ -211,7 +215,9 @@ def certificate_data(request, id):
     data = CertificateSerilize(certificate, many=True).data
     return JsonResponse(data, safe=False)
 
+
 #admin views
+@admin_required
 def admin_calendar(request):
     today=timezone.now().date()
     upcoming_webinars=Webinar.objects.filter(start_date__gte=today ) 
@@ -221,7 +227,7 @@ def admin_calendar(request):
         "upcoming_webinars":upcoming_webinars
     })
 
-
+@admin_required
 def admin_certificate(request):
     webinars=Webinar.objects.all()
     today=timezone.now().date()
@@ -231,7 +237,7 @@ def admin_certificate(request):
         'today':today
     })
 
-
+@admin_required
 def admin_events(request):
     webinar=Webinar.objects.all()
     return render(request, "login/admin_panel/events.html",{
@@ -239,11 +245,11 @@ def admin_events(request):
       
     })
 
-
+@admin_required
 def admin_setting(request):
     return render(request, "login/admin_panel/setting.html")
 
-
+@admin_required
 def admin_users(request):
     users=User.objects.all()
     return render(request, "login/admin_panel/users.html",{
@@ -252,6 +258,7 @@ def admin_users(request):
 
 
 #create user and edit credential
+@admin_required
 def register_user(request):
     if request.method=="POST":
         full_name=request.POST.get('user_fullname',' ').strip()
@@ -283,7 +290,7 @@ def register_user(request):
             profile=UserProfile.objects.create(user=user, school_id=school_id)
     return redirect('admin_users')
 
-
+@admin_required
 def generete_authorization_key(request):
    
     otp=pyotp.random_base32()
@@ -301,7 +308,7 @@ def generete_authorization_key(request):
         [f'{settings.ADMIN_EMAIL}'], )
     return redirect('admin_users')
             
-
+@admin_required
 def create_admin(request):
     if request.method == 'POST':
         if 'authorization_key' not in request.session:
@@ -339,14 +346,14 @@ def create_admin(request):
 
     return redirect('admin_users')
 
-
+@admin_required
 def delete_user(request, id):
     user=User.objects.filter(id=id)
     user.delete()
 
     return redirect("admin_users")
 
-
+@admin_required
 def edit_user(request):
     user = User.objects.get(id=request.user.id)
     profile = UserProfile.objects.get(user=user)
@@ -428,7 +435,6 @@ def change_password(request):
                 user.set_password(new_password)
                 user.save()
 
-            
                 update_session_auth_hash(request, user)
 
                 if user.is_superuser or user.is_staff:
@@ -437,7 +443,7 @@ def change_password(request):
                 else:
                     return redirect("user_setting")
             else:
-                if request.user.is_staff or request.user.is_admin:
+                if request.user.is_staff or request.user.is_superuser:
                     redirected=redirection[0]
                 else:
                     redirected=redirection[1]
@@ -446,7 +452,7 @@ def change_password(request):
                     'error_password': 'Current password is incorrect.'
                 })
 
-
+@admin_required
 def log_list(request):
     logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
     return render(request, "login/admin_panel/admin_log.html", {"logs": logs})

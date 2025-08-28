@@ -87,11 +87,11 @@
         </div>
         <div class="form-group">
           <label for="school">School Insitution</label>
-          <input type="text" name="school" id="school"  placeholder="Btech" />
+          <input type="text" name="school" id="school"  placeholder="{{ user.user_profile.school }}" />
         </div>
         <div class="form-group">
           <label>Change Profile</label>
-          <input type="file" name="img" id="img" />
+          <input type="file" name="img" id="img" accept=".png, .jpg, .jpeg" />
         </div>
       </div>
       <input type="submit" value="Save Changes">
