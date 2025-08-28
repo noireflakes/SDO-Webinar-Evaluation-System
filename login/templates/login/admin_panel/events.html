@@ -58,6 +58,7 @@
       <div class="logo">
         <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
         <h2>SDO Baliwag</h2>
+        
       </div>
 
       <nav class="nav">
@@ -76,7 +77,15 @@
 
         <div style="flex:1;" class="title-container">
             <h1>Events Management</h1>
+ 
+    
         </div>
+        {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger" style="color:red;">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
 
         <div class="btn-container">
         <a class="create-btn" href="{% url 'make_webinar' %}">
@@ -154,6 +163,14 @@ document.querySelectorAll('a').forEach(link => {
     });
   }
 });
+
+
+  setTimeout(function () {
+    document.querySelectorAll('.alert').forEach(function(el) {
+      el.style.display = 'none';
+    });
+  }, 15000); 
+
 </script>
 
 

@@ -10,6 +10,14 @@ import qrcode
 from collections import Counter
 from io import BytesIO
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import user_passes_test
+
+#decorator
+def admin_required(view_func):
+    return user_passes_test(lambda u: u.is_staff, login_url="login")(view_func)
+
+def user_required(view_func):
+    return user_passes_test(lambda u: u.is_authenticated and not u.is_staff)(view_func)
 
 
 def test_result(request, web_id, type, id):
@@ -42,7 +50,7 @@ def test_result(request, web_id, type, id):
     )
     return redirect("index")
 
-
+@admin_required
 def display_result(request, id):
     webinar=Webinar.objects.get(id=id)
     test_results=TestResult.objects.filter(webinar=webinar)
@@ -214,6 +222,7 @@ def generate_qr(request, id, type):
         
     return redirect('display_qr', id, type)
 
+@admin_required
 def qr_evalution(request, id):
     webinar=get_object_or_404(Webinar, id=id)
     type=webinar.event_type
@@ -244,7 +253,7 @@ def qr_evalution(request, id):
     return redirect('display_qr', id, type)
 
 
-
+@admin_required
 def display_qr(request, id, type):
     try:
         qr=TestQR.objects.get(test__id=id, type=type)
@@ -253,6 +262,7 @@ def display_qr(request, id, type):
     return render(request, 'exam_portal/display_qr.html',{
         'qr':qr
     })
+        
         
 def display_test(request, id, type):
     webinar=Webinar.objects.get(id=id)
@@ -266,6 +276,7 @@ def display_test(request, id, type):
     })
 
 
+@admin_required
 def create_certificate(request,id):
     webinar=Webinar.objects.get(id=id)
     try:
@@ -280,6 +291,8 @@ def create_certificate(request,id):
             "webinar":webinar
             })
 
+
+@admin_required
 def redirect_certificate(request, id):
     img=CertificateTemplate.objects.get(id=id)
     messages=""
@@ -299,6 +312,7 @@ def upload_img(request, id):
     if request.method=='POST':
         webinar=Webinar.objects.get(id=id)
         img=request.FILES["img"]
+
         try:
             img_save=CertificateTemplate.objects.get(webinar=webinar)
             img_save.img=img
@@ -308,7 +322,6 @@ def upload_img(request, id):
             img_save=CertificateTemplate.objects.create(
                 webinar=webinar,
                 img=img,
-                
             )
         
         return redirect("redirect_certificate", img_save.id)

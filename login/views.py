@@ -20,6 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
 
 # Create your views here.
+
 #decorator
 def admin_required(view_func):
     return user_passes_test(lambda u: u.is_staff, login_url="login")(view_func)
@@ -133,7 +134,6 @@ def generate_otp(request):
 #user views
 @user_required
 def user_dashboard(request):
-
     today = timezone.localtime().date()
     upcoming_webinar=WebinarAttendees.objects.filter(user=request.user  , webinar__start_date__gte=today)   
     past_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__lt=today )
@@ -158,6 +158,7 @@ def user_dashboard(request):
         "upcoming_message":upcoming_messages,
         "past_message":history_messages
     })
+
 
 @user_required
 def calendar(request):
@@ -457,3 +458,16 @@ def log_list(request):
     logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
     return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
 
+#redirect upon errors
+def csrf_failure(request, reason=""):
+    messages.error(request, "Your session expired. Please log in again.")
+    return redirect("login") 
+
+def custom_page_not_found(request, exception):
+    messages.error(request, "The page you were looking for was not found.You will redirected to this page.")
+    return redirect("index") 
+
+
+def handle_error(request, exception=None):
+    messages.warning(request, "Something went wrong. Redirected to homepage.")
+    return redirect("index")

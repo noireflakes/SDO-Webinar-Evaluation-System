@@ -72,8 +72,7 @@
     {% if messages %}
       {% for message in messages %}
         <div class="error-message alert alert-{{ message.tags }}">
-          <strong>Login</strong>
-           First to access the events
+            {{ message }}
         </div>
       {% endfor %}
     {% endif %}
@@ -154,7 +153,7 @@
 
       <!-- Background  --> 
       <svg class="guideline-curve" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#b89ff1" fill-opacity="1" d="M0,160L120,133.3C240,107,480,53,720,58.7C960,64,1200,128,1320,160L1440,192L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z"></path></svg>
-      <div class="guideline-bg"></div>
+      <div class="guideline-bg" ></div>
 
     </section>
 
@@ -231,4 +230,14 @@
   </div>
 
 </footer>
+
+
+<script>
+  
+  setTimeout(function () {
+    document.querySelectorAll('.alert').forEach(function(el) {
+      el.style.display = 'none';
+    });
+  }, 10000); 
+</script>
 {% endblock %}

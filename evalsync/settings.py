@@ -23,7 +23,7 @@ environ.Env.read_env()
 import sys
 
 
-
+CSRF_FAILURE_VIEW = "login.views.csrf_failure"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -73,6 +73,7 @@ CLOUDINARY_STORAGE = {
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 
 

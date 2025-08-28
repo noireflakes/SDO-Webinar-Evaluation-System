@@ -62,6 +62,11 @@
       <section class="title-container">
         <h2>Dashboard</h2>
         <p>Views Events and details</p>
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-danger" style="color:red;">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
 
       </section>
 
@@ -155,6 +160,16 @@
         </div>
     </div>
 </footer>
+
+<script>
+  
+  setTimeout(function () {
+    document.querySelectorAll('.alert').forEach(function(el) {
+      el.style.display = 'none';
+    });
+  }, 15000); 
+</script>
+
 
 
 

@@ -13,10 +13,7 @@ from login.models import UserProfile
 
 #create events
 def make_webinar(request):
-
-
     if request.method=='POST':
-        #get event info
         title=request.POST.get('title')
         description=request.POST.get('description')
         number_of_speaker=int(request.POST.get('number_of_speaker'))
