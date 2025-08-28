@@ -18,7 +18,7 @@ class Webinar(models.Model):
     venue=models.CharField(max_length=500)
 
     def __str__(self):
-        return self.title
+        return f" {str(self.id)} -{self.title}"
     
 
 

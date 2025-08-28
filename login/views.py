@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.core.mail import send_mail,EmailMessage
+from django.core.mail import send_mail,get_connection
 from django.contrib import messages
 import pyotp
 from django.http import JsonResponse,HttpResponse
@@ -13,6 +13,7 @@ from django.core import serializers
 from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
 from exam_portal.serializer import CertificateSerilize
+import ssl, certifi
 import json
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
@@ -68,43 +69,55 @@ def generate_otp(request):
 
     user = get_object_or_404(User, username=username)
 
+    # Generate a secret key if not already in session
     if 'otp_secret_key' not in request.session:
         request.session['otp_secret_key'] = pyotp.random_base32()
 
     otp_secret_key = request.session['otp_secret_key']
-
-   
-    totp = pyotp.TOTP(otp_secret_key, interval=300)
+    totp = pyotp.TOTP(otp_secret_key, interval=300) 
     otp_code = totp.now()
 
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
 
-       
-        if totp.verify(user_otp, valid_window=0):
+        # verify 
+        if totp.verify(user_otp, valid_window=1):
             login(request, user)
             request.session.modified = True
-            del request.session['otp_secret_key']
-            del request.session['username']
+            request.session.pop('otp_secret_key', None)
+            request.session.pop('username', None)
             return redirect('index')
         else:
             return render(request, 'login/otp.html', {
-                'otp': otp_code,
                 'error': 'Invalid or expired OTP.'
             })
 
-    email=EmailMessage(
-        f'OTP Code {otp_code}',
-        f'Your OTP code is: {otp_code} Description description description',
-        settings.EMAIL_HOST_USER,
-        [user.email],
-        
+    # Email setup
+
+
+    # Send OTP email
+
+    # Create SSL context
+    context = ssl.create_default_context(cafile=certifi.where())
+
+    connection = get_connection(
+        host=settings.EMAIL_HOST,
+        port=settings.EMAIL_PORT,
+        username=settings.EMAIL_HOST_USER,
+        password=settings.EMAIL_HOST_PASSWORD,
+        use_tls=True,         # use_tls, not keyfile/certfile
+        ssl_context=context   # pass context here
     )
-    email.fail_silently=False
 
-    
+    send_mail(
+        'Test Email',
+        'This is a test email.',
+        settings.EMAIL_HOST_USER,
+        ['recipient@example.com'],
+        connection=connection,
+        fail_silently=False
+    )
 
-    email.send()
 
     return render(request, 'login/otp.html', {'otp': otp_code})
 
@@ -434,10 +447,7 @@ def change_password(request):
                 })
 
 
-
 def log_list(request):
     logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
     return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
-
-
 
