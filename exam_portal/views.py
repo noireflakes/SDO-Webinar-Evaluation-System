@@ -203,7 +203,7 @@ def generate_qr(request, id, type):
     if not qr:
         
         webinar=Webinar.objects.get(id=id)
-        url_path=f'{url}/exam_portal/display_test/{id}/{type}'
+        url_path=f'{url}/exam_portal/display_test/{id}/{type}/'
         qr = qrcode.make(url_path)
         
         # Save to database
