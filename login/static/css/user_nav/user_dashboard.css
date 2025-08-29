@@ -246,6 +246,10 @@ p{
     .webinar-card{
         width: 80%;
     }
+    .events-container, .past-container{
+        flex-direction: column;
+
+    }
 
 
 

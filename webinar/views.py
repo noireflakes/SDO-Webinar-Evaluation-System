@@ -133,7 +133,6 @@ def user_events_data(request):
 def register(request, id):
     webinar = get_object_or_404(Webinar, id=id)
 
-
     attendees = WebinarAttendees.objects.filter(webinar=webinar)
 
     if request.method == 'POST':
