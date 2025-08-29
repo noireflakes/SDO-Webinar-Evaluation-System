@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from .models import Webinar,WebinarAttendees,ResponseQuestionaire,Speaker,Test_Question,TestResponse,Choice, Comment
 from django.db.models import Avg,F
-from django.core.mail import send_mail
+
 from django.conf import settings
 from django.core import serializers
 from django.http import JsonResponse,HttpResponse
@@ -9,7 +9,7 @@ import qrcode
 from django.contrib import messages 
 import re
 from login.models import UserProfile
-
+from login.email_service import send_email
 
 #create events
 def make_webinar(request):
@@ -166,13 +166,13 @@ def register(request, id):
             f"The Webinar Team"
         )
 
-        send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False,
-        )
+
+
+        send_email(
+        to_email=email,
+        subject=subject,
+        body= message
+    )
 
         messages.success(request, "Registration successful!")
         return redirect('register', id=webinar.id)

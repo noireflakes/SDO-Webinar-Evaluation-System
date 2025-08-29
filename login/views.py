@@ -292,15 +292,11 @@ def generete_authorization_key(request):
     code=pyotp.TOTP(otp).now()
     request.session['authorization_key']=code
 
-    send_mail(
-    'Request for Admin Authorization Code',
-    f'''User {request.user} has requested to create an admin account.
-    If you approve this request, please share the following authorization code:
-
-    {code}
-    ''',
-        f'{settings.EMAIL_HOST_USER}',  
-        [f'{settings.ADMIN_EMAIL}'], )
+    send_email(
+        to_email=f'{settings.EMAIL_HOST_USER}',
+        subject="Request for Admin Authorization Code",
+        body= f'Staff {request.user} has requested to create an admin account. If you approve this request, please share the following authorization code: {code}'
+    )
     return redirect('admin_users')
             
 @admin_required
