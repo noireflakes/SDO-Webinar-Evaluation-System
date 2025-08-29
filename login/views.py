@@ -18,7 +18,7 @@ import json
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
-from django_q.tasks import async_task
+
 
 # Create your views here.
 
@@ -84,12 +84,13 @@ def generate_otp(request):
         request.session['otp_secret_key'] = pyotp.random_base32()
 
     otp_secret_key = request.session['otp_secret_key']
-    totp = pyotp.TOTP(otp_secret_key, interval=300)
+    totp = pyotp.TOTP(otp_secret_key, interval=300) 
     otp_code = totp.now()
 
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
 
+        # verify 
         if totp.verify(user_otp, valid_window=1):
             login(request, user)
             request.session.modified = True
@@ -101,9 +102,21 @@ def generate_otp(request):
                 'error': 'Invalid or expired OTP.'
             })
 
-    async_task('login.tasks.send_otp_email', user.email, otp_code)
+  
+    # Create SSL context
+
+
+    send_mail(
+        'OTP code From SDO',
+        f'Enter this to confirm your Login: {otp_code}',
+        settings.EMAIL_HOST_USER,
+        [user.email],
+        fail_silently=False
+    )
+
 
     return render(request, 'login/otp.html', {'otp': otp_code})
+
 
 #user views
 @user_required

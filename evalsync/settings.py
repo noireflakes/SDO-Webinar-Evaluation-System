@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'login',
     'webinar',
     'exam_portal',
-    'django_q',
+
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -60,15 +60,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
 ]
-Q_CLUSTER = {
-    'name': 'otp-tasks',
-    'workers': 2,
-    'timeout': 60,
-    'retry': 120,
-    'queue_limit': 50,
-    'bulk': 10,
-    'orm': 'default',
-}
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
