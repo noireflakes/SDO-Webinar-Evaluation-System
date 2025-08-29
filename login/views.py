@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.core.mail import send_mail,get_connection
+
 from django.contrib import messages
 import pyotp
 from django.http import JsonResponse,HttpResponse
@@ -18,6 +18,7 @@ import json
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
+from .email_service import send_email
 
 
 # Create your views here.
@@ -35,6 +36,9 @@ def index(request):
     upcoming_webinars = Webinar.objects.filter(
         start_date__gte=timezone.now()  
     ).order_by('start_date')[:3]
+
+    print(settings.EMAIL_HOST_USER)
+    print(settings.EMAIL_HOST)
 
     if request.user.is_authenticated:
         
@@ -106,13 +110,16 @@ def generate_otp(request):
     # Create SSL context
 
 
-    send_mail(
-        'OTP code From SDO',
-        f'Enter this to confirm your Login: {otp_code}',
-        settings.EMAIL_HOST_USER,
-        [user.email],
-        fail_silently=False
+
+    result = send_email(
+        to_email=user.email,
+        subject="OTP code From SDO",
+        body= f'Enter this to confirm your Login: {otp_code}'
     )
+
+   
+
+
 
 
     return render(request, 'login/otp.html', {'otp': otp_code})
