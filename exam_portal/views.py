@@ -228,7 +228,7 @@ def qr_evalution(request, id):
     type=webinar.event_type
     qr=EvalQR.objects.filter(test__id=id, type=type)
     
-    url=f"https://sdo-webinar-evaluation-system-production.up.railway.app/webinar/questionaire/{webinar.id}/"
+    url=f"https://sdo-webinar-evaluation-system-production.up.railway.app/exam_portal/questionaire/{webinar.id}/"
 
     if not qr:
         
