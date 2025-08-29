@@ -28,6 +28,6 @@ urlpatterns = [
     path('exam_portal/', include('exam_portal.urls'))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-#handler404 = custom_page_not_found
-#handler403= handle_error
-#handler500= handle_error
+handler404 = custom_page_not_found
+handler403= handle_error
+handler500= handle_error
