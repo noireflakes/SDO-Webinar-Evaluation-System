@@ -18,6 +18,7 @@ import json
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
+from django_q.tasks import async_task
 
 # Create your views here.
 
@@ -78,18 +79,17 @@ def generate_otp(request):
 
     user = get_object_or_404(User, username=username)
 
-    # Create secret key if not in session
+    # Generate a secret key if not already in session
     if 'otp_secret_key' not in request.session:
         request.session['otp_secret_key'] = pyotp.random_base32()
 
     otp_secret_key = request.session['otp_secret_key']
-    totp = pyotp.TOTP(otp_secret_key, interval=300)  
+    totp = pyotp.TOTP(otp_secret_key, interval=300)
     otp_code = totp.now()
 
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
 
-        # Verify OTP
         if totp.verify(user_otp, valid_window=1):
             login(request, user)
             request.session.modified = True
@@ -101,33 +101,9 @@ def generate_otp(request):
                 'error': 'Invalid or expired OTP.'
             })
 
- 
-    try:
-        context = ssl.create_default_context(cafile=certifi.where())
-        connection = get_connection(
-            host=settings.EMAIL_HOST,
-            port=settings.EMAIL_PORT,
-            username=settings.EMAIL_HOST_USER,
-            password=settings.EMAIL_HOST_PASSWORD,
-            use_tls=True,      
-            ssl_context=context
-        )
+    async_task('login.tasks.send_otp_email', user.email, otp_code)
 
-        send_mail(
-            'OTP Code From SDO',
-            f'Enter this to confirm your login: {otp_code}',
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            connection=connection,
-            fail_silently=False
-        )
-    except Exception as e:
-        print("Email sending error:", e)
-
-   
-    return render(request, 'login/otp.html')
-
-
+    return render(request, 'login/otp.html', {'otp': otp_code})
 
 #user views
 @user_required
