@@ -344,7 +344,7 @@ def delete_user(request, id):
 
     return redirect("admin_users")
 
-@admin_required
+@login_required
 def edit_user(request):
     user = User.objects.get(id=request.user.id)
     profile = UserProfile.objects.get(user=user)

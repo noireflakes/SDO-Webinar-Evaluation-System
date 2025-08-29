@@ -32,7 +32,7 @@ CSRF_FAILURE_VIEW = "login.views.csrf_failure"
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost',".up.railway.app"]
 
@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'login',
     'webinar',
     'exam_portal',
-
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
