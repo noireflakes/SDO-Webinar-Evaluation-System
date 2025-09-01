@@ -35,7 +35,7 @@
         {% if error %}
             <div class="alert alert-error">
                 {{ error }}
-                {% if error|contains:"attempts remaining" %}
+                {% if "attempts remaining" in error %}
                     <div class="attempts-warning">
                         ⚠️ Be careful! Too many wrong attempts will lock your account for 30 minutes.
                     </div>

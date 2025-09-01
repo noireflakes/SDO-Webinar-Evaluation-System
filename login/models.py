@@ -25,7 +25,7 @@ class TrustedDevice(models.Model):
 class Otp(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     otp = models.CharField(max_length=6)
-    secret_key=models.CharField(max_length=20)
+    secret_key=models.CharField(max_length=40)
     
     created_at = models.DateTimeField(auto_now_add=True)
     retry = models.IntegerField(default=0)
