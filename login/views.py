@@ -112,7 +112,7 @@ def login_view(request):
 
             hash=create_device_hash(request)
 
-            device=TrustedDevice.objects.filter(hash=hash)
+            device=TrustedDevice.objects.filter(user=user,hash=hash)
 
             if device:
                 login(request, user)
