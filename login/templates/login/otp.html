@@ -5,56 +5,126 @@
 {% block css %}
  <link rel="stylesheet" href="{% static 'css/otp.css' %}">
  <link rel="stylesheet" href="{% static 'css/blob.css' %}">
- 
 {% endblock %}
 
 {% block body %}
-
-
-{% if otp %}
-    <div>{{ otp }}</div>
-
-{% endif %}
-
-
 
 <div class="blob one blob-yellow"><p></p></div>
 <div class="blob two blob-yellow"><p></p></div>
 <div class="blob three blob-yellow"><p></p></div>
 
-<div>{{ otp_code }}</div>
-<form action="{% url 'otp' %}" method="post" id="form">
-    {% csrf_token %}
-    <h2>Enter OTP</h2>
-    <input id="otp" name="otp" type="text" required placeholder="Enter OTP" maxlength="6">
-    <input type="submit" value="Submit">
-    <div id="timer" class="timer"></div>
-</form>
+{% if locked_out %}
+    <!-- Lockout State -->
+    <div class="lockout-container">
+        <div class="alert alert-warning lockout-alert">
+            <h2>🔒 Account Temporarily Locked</h2>
+            <p>{{ error }}</p>
+            <div id="lockout-timer" class="lockout-timer"></div>
+            <p class="lockout-info">For security reasons, you've been temporarily locked out after too many failed attempts.</p>
+        </div>
+        <div class="lockout-actions">
+            <a href="{% url 'login' %}" class="back-to-login">← Back to Login</a>
+        </div>
+    </div>
+{% else %}
+    <!-- Normal OTP Form -->
+    <form action="{% url 'otp' %}" method="post" id="form">
+        {% csrf_token %}
+        <h2>Enter OTP</h2>
+        
+        {% if error %}
+            <div class="alert alert-error">
+                {{ error }}
+                {% if error|contains:"attempts remaining" %}
+                    <div class="attempts-warning">
+                        ⚠️ Be careful! Too many wrong attempts will lock your account for 30 minutes.
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <input id="otp" name="otp" type="text" required placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+        <input type="submit" value="Verify OTP" id="submit-btn">
+        <div id="timer" class="timer"></div>
+    </form>
 
-<div><a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' %}">Send OTP again?</a></div>
+    <div class="otp-actions">
+        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' %}">Send OTP again?</a>
+        <a href="{% url 'login' %}" class="back-to-login">← Back to Login</a>
+    </div>
+{% endif %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const timerElement = document.getElementById("timer");
-    const otpSendButton = document.getElementById("otp_send_button");
-
-    let timeLeft = 300; 
-
-    const counter = setInterval(function() {
-        if (timeLeft > 0) {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            timerElement.textContent = `Time left: ${minutes}:${seconds}`;
-            timeLeft--;
-        } else {
-            clearInterval(counter);
-            timerElement.textContent = "Time left: 0:00"; 
-            otpSendButton.style.display = "block"; 
+    {% if locked_out %}
+        // Lockout countdown timer
+        const lockoutTimerElement = document.getElementById("lockout-timer");
+        const errorText = "{{ error }}";
+        
+        // Extract minutes from error message
+        const minutesMatch = errorText.match(/(\d+) minutes/);
+        let lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
+        
+        if (lockoutTimeLeft > 0) {
+            const lockoutCounter = setInterval(function() {
+                if (lockoutTimeLeft > 0) {
+                    let minutes = Math.floor(lockoutTimeLeft / 60);
+                    let seconds = lockoutTimeLeft % 60;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+                    
+                    lockoutTimerElement.innerHTML = `<strong>Time remaining: ${minutes}:${seconds}</strong>`;
+                    lockoutTimeLeft--;
+                } else {
+                    clearInterval(lockoutCounter);
+                    lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
+                    
+                    // Auto-refresh after lockout expires
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 2000);
+                }
+            }, 1000);
         }
-    }, 1000);
+    {% else %}
+        // Normal OTP timer 
+        const timerElement = document.getElementById("timer");
+        const otpSendButton = document.getElementById("otp_send_button");
+        const submitButton = document.getElementById("submit-btn");
+        let timeLeft = 300;
+
+        const counter = setInterval(function() {
+            if (timeLeft > 0) {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                timerElement.textContent = `OTP expires in: ${minutes}:${seconds}`;
+                timeLeft--;
+            } else {
+                clearInterval(counter);
+                timerElement.innerHTML = '<span style="color: red;">⚠️ OTP Expired</span>';
+                otpSendButton.style.display = "block";
+                submitButton.disabled = true;
+                submitButton.value = "OTP Expired";
+                
+        
+            }
+        }, 1000);
+
+      
+        const otpInput = document.getElementById("otp");
+        otpInput.addEventListener("input", function() {
+          
+            this.value = this.value.replace(/[^0-9]/g, '');
+           
+            if (this.value.length === 6) {
+                document.getElementById("form").submit();
+            }
+        });
+
+        // Focus on OTP input when page loads
+        otpInput.focus();
+    {% endif %}
 });
 </script>
 

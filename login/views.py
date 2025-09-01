@@ -1,27 +1,33 @@
-from django.shortcuts import render,redirect,get_object_or_404
-from .models import UserProfile
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.conf import settings
 
+import pyotp, ssl, certifi,json,hashlib
+
+#django library
+from django.shortcuts import render,redirect,get_object_or_404
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.conf import settings
 from django.contrib import messages
-import pyotp
 from django.http import JsonResponse,HttpResponse
 from django.utils import timezone
 from django.core import serializers
+from django.contrib.contenttypes.models import ContentType
+
+#imports models
+from django.contrib.admin.models import LogEntry
 from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
 from exam_portal.serializer import CertificateSerilize
-import ssl, certifi
-import json
-from django.contrib.admin.models import LogEntry
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
+from .models import UserProfile, TrustedDevice,Otp
+
+#decorator
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 from .email_service import send_email
 
 
+
 # Create your views here.
+
 
 #decorator
 def admin_required(view_func):
@@ -29,6 +35,44 @@ def admin_required(view_func):
 
 def user_required(view_func):
     return user_passes_test(lambda u: u.is_authenticated and not u.is_staff)(view_func)
+
+
+
+#redirect upon errors
+def csrf_failure(request, reason=""):
+    messages.error(request, "Your session expired. Please log in again.")
+    return redirect("login") 
+
+
+def custom_page_not_found(request, exception):
+    messages.error(request, "The page you were looking for was not found.You will redirected to this page.")
+    return redirect("index") 
+
+
+def handle_error(request, exception=None):
+    messages.warning(request, "Something went wrong. Redirected to homepage.")
+    return redirect("index")
+
+
+
+#hash
+def create_device_hash(request):
+    x_forward=request.META.get("HTTP_X_FORWARDED_FOR")
+
+    if x_forward:
+        user_ip = x_forward.split(',')[0].strip()
+    else:
+        user_ip=request.META.get("REMOTE_ADDR")
+
+    user_agent=request.META.get("HTTP_USER_AGENT")
+
+    combined=f"{user_ip}_{user_agent}"
+    binary_combined=combined.encode()
+    hash=hashlib.sha256(binary_combined).hexdigest()
+
+    return hash
+
+
 
 #login handler
 def index(request):
@@ -51,12 +95,12 @@ def index(request):
         'webinars':upcoming_webinars
     })
 
+
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("index")
     credential_error=""
     if request.method=="POST":
-
-        if request.user.is_authenticated:
-            return render(request, 'login/login.html',{"credential_error":"Sign out your other account before signing in"})
 
         username=request.POST.get("username")
         password=request.POST.get("password")
@@ -65,64 +109,102 @@ def login_view(request):
 
         if user is not None:
             request.session['username']=username
-        
-            return redirect(generate_otp)
+
+            hash=create_device_hash(request)
+
+            device=TrustedDevice.objects.filter(hash=hash)
+
+            if device:
+                login(request, user)
+                return redirect("index")
+                
+            else:
+                request.session['hash']=hash
+                return redirect(generate_otp)
+                
         else:
             credential_error="Invalid Username or Password"
         
     return render(request, 'login/login.html',{"credential_error":credential_error})
 
+
 def logout_view(request):
     logout(request)
     return redirect("index")
+
 
 def generate_otp(request):
     username = request.session.get('username')
     if not username:
         return redirect('login')
-
+    
     user = get_object_or_404(User, username=username)
+    existing_otp = Otp.objects.filter(user=user).first()
+    
+    if existing_otp:
+     
+        otp_secret_key = existing_otp.secret_key  
+        totp = pyotp.TOTP(otp_secret_key, interval=300)
+        otp_code = totp.now()
+   
+        existing_otp.otp = otp_code
+        existing_otp.save()
+    else:
 
-    # Generate a secret key if not already in session
-    if 'otp_secret_key' not in request.session:
-        request.session['otp_secret_key'] = pyotp.random_base32()
-
-    otp_secret_key = request.session['otp_secret_key']
-    totp = pyotp.TOTP(otp_secret_key, interval=300) 
-    otp_code = totp.now()
+        otp_secret_key = pyotp.random_base32()
+        totp = pyotp.TOTP(otp_secret_key, interval=300) 
+        otp_code = totp.now()
+       
+        otp = Otp.objects.create(
+            user=user, 
+            otp=otp_code,
+            secret_key=otp_secret_key  
+        )
 
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
-
-        # verify 
-        if totp.verify(user_otp, valid_window=1):
-            login(request, user)
-            request.session.modified = True
-            request.session.pop('otp_secret_key', None)
-            request.session.pop('username', None)
-            return redirect('index')
+    
+        current_otp = Otp.objects.filter(user=user).first()
+        if current_otp:
+     
+            totp = pyotp.TOTP(current_otp.secret_key, interval=300)
+            
+            if totp.verify(user_otp, valid_window=1):
+                login(request, user)
+                request.session.modified = True
+                request.session.pop('username', None)
+                
+         
+                device_hash = request.session.get('hash')
+                if device_hash:
+                    TrustedDevice.objects.get_or_create(
+                        user=user, 
+                        hash=device_hash
+                    )
+                    request.session.pop('hash', None)
+                
+            
+                current_otp.delete()
+                
+                return redirect('index')
+            else:
+                return render(request, 'login/otp.html', {
+                    'error': 'Invalid or expired OTP.'
+                })
         else:
             return render(request, 'login/otp.html', {
-                'error': 'Invalid or expired OTP.'
+                'error': 'OTP not found. Please try again.'
             })
 
-  
-    # Create SSL context
-
-
-
+   
     result = send_email(
         to_email=user.email,
         subject="OTP code From SDO",
-        body= f'Enter this to confirm your Login: {otp_code}'
+        body=f'Enter this to confirm your Login: {otp_code}'
     )
+    
 
-   
-
-
-
-
-    return render(request, 'login/otp.html', {'otp': otp_code})
+    return render(request, 'login/otp.html')
 
 
 #user views
@@ -153,7 +235,6 @@ def user_dashboard(request):
         "past_message":history_messages
     })
 
-
 @user_required
 def calendar(request):
     today=timezone.now().date()
@@ -163,7 +244,6 @@ def calendar(request):
     return render(request,"login/user_nav/calendar.html",{
         'upcoming_webinars':upcoming_webinar
     })
-
 
 def event_data(request):
     data=[]
@@ -202,7 +282,6 @@ def certificate(request):
         'completed_webinars': completed_webinars,
 
     })
-
 
 def certificate_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
@@ -293,6 +372,7 @@ def generete_authorization_key(request):
     request.session['authorization_key']=code
 
     send_email(
+        #check -problem
         to_email=f'{settings.EMAIL_HOST_USER}',
         subject="Request for Admin Authorization Code",
         body= f'Staff {request.user} has requested to create an admin account. If you approve this request, please share the following authorization code: {code}'
@@ -443,21 +523,11 @@ def change_password(request):
                     'error_password': 'Current password is incorrect.'
                 })
 
+
 @admin_required
 def log_list(request):
     logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
     return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
 
-#redirect upon errors
-def csrf_failure(request, reason=""):
-    messages.error(request, "Your session expired. Please log in again.")
-    return redirect("login") 
-
-def custom_page_not_found(request, exception):
-    messages.error(request, "The page you were looking for was not found.You will redirected to this page.")
-    return redirect("index") 
 
 
-def handle_error(request, exception=None):
-    messages.warning(request, "Something went wrong. Redirected to homepage.")
-    return redirect("index")

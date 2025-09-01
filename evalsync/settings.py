@@ -32,7 +32,7 @@ CSRF_FAILURE_VIEW = "login.views.csrf_failure"
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost',".up.railway.app"]
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'webinar',
     'exam_portal',
     'rest_framework',
+    'auditlog',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -110,6 +111,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'auditlog.middleware.AuditlogMiddleware'
 ]
 
 ROOT_URLCONF = 'evalsync.urls'
