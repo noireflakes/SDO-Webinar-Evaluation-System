@@ -34,10 +34,22 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.onrender.com','127.0.0.1', 'localhost',".up.railway.app"]
+ALLOWED_HOSTS = ['.onrender.com',
+                 '127.0.0.1',
+                  'localhost',
+                  ".up.railway.app"
+                  ,"sdo-webinar-evaluation-system.xyz",
+                  'www.sdo-webinar-evaluation-system.xyz'
+                  ]
 
 CSRF_TRUSTED_ORIGINS=[
-    'https://*.onrender.com',"http://127.0.0.1",  "http://localhost","https://*.up.railway.app","https://sdo-webinar-evaluation-system-production.up.railway.app"
+    'https://*.onrender.com',
+    "http://127.0.0.1", 
+    "http://localhost",
+    "https://*.up.railway.app",
+    "https://sdo-webinar-evaluation-system-production.up.railway.app",
+    "https://sdo-webinar-evaluation-system.xyz",
+    "https://www.sdo-webinar-evaluation-system.xyz"
 ]
 
 
