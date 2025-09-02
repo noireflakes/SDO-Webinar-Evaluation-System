@@ -95,116 +95,119 @@ def index(request):
         'webinars':upcoming_webinars
     })
 
-
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect("index")
-    credential_error=""
-    if request.method=="POST":
-
-        username=request.POST.get("username")
-        password=request.POST.get("password")
-
-        user=authenticate(username=username,password=password)
-
-        if user is not None:
-            request.session['username']=username
-
-            hash=create_device_hash(request)
-
-            device=TrustedDevice.objects.filter(user=user,hash=hash)
-
-            if device:
-                login(request, user)
-                return redirect("index")
-                
-            else:
-                request.session['hash']=hash
-                return redirect(generate_otp)
-                
-        else:
-            credential_error="Invalid Username or Password"
-        
-    return render(request, 'login/login.html',{"credential_error":credential_error})
-
-
 def logout_view(request):
     logout(request)
     return redirect("index")
 
 
-def generate_otp(request):
-    username = request.session.get('username')
-    if not username:
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("index")
+    
+    credential_error = ""
+    
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            request.session['user_id'] = user.id
+            print(f"This username on login view {username}")
+            
+            hash = create_device_hash(request)
+            device = TrustedDevice.objects.filter(user=user, hash=hash).first()
+            
+            if device:
+                login(request, user)
+                return redirect("index")
+            else:
+                request.session['hash'] = hash
+                return redirect('otp', user_id=user.id)
+        else:
+            credential_error = "Invalid Username or Password"
+    
+    return render(request, 'login/login.html', {"credential_error": credential_error})
+
+
+def generate_otp(request, user_id=None):
+    # Check if user_id is provided, if not redirect to login
+    if not user_id:
         return redirect('login')
     
-    user = get_object_or_404(User, username=username)
+    print(f"This is user from generate: {user_id}")
+    
+    user = get_object_or_404(User, id=user_id)
     existing_otp = Otp.objects.filter(user=user).first()
     
     if existing_otp:
-     
-        otp_secret_key = existing_otp.secret_key  
+        otp_secret_key = existing_otp.secret_key
         totp = pyotp.TOTP(otp_secret_key, interval=300)
         otp_code = totp.now()
-   
+        
         existing_otp.otp = otp_code
         existing_otp.save()
     else:
-
         otp_secret_key = pyotp.random_base32()
-        totp = pyotp.TOTP(otp_secret_key, interval=300) 
+        totp = pyotp.TOTP(otp_secret_key, interval=300)
         otp_code = totp.now()
-       
+        
         otp = Otp.objects.create(
-            user=user, 
+            user=user,
             otp=otp_code,
-            secret_key=otp_secret_key  
+            secret_key=otp_secret_key
         )
-
-    if request.method == 'POST':
-        user_otp = request.POST.get('otp')
     
+    if request.method == 'POST':
+        user_otp = (request.POST.get('otp') or '').strip()
+        
         current_otp = Otp.objects.filter(user=user).first()
         if current_otp:
-     
             totp = pyotp.TOTP(current_otp.secret_key, interval=300)
             
-            if totp.verify(user_otp, valid_window=1):
+            if totp.verify(user_otp):
                 login(request, user)
                 request.session.modified = True
                 request.session.pop('username', None)
                 
-         
+                # Save device as trusted after successful OTP verification
                 device_hash = request.session.get('hash')
+                print("verify bitch")
                 if device_hash:
                     TrustedDevice.objects.get_or_create(
-                        user=user, 
+                        user=user,
                         hash=device_hash
                     )
                     request.session.pop('hash', None)
                 
-            
-                current_otp.delete()
-                
                 return redirect('index')
+                
+               
             else:
+                current_otp.delete()
                 return render(request, 'login/otp.html', {
-                    'error': 'Invalid or expired OTP.'
+                    'error': 'Invalid or expired OTP.',
+                    'user_id': user_id  # Pass user_id to template
                 })
         else:
             return render(request, 'login/otp.html', {
-                'error': 'OTP not found. Please try again.'
+                'error': 'OTP not found. Please try again.',
+                'user_id': user_id  # Pass user_id to template
             })
-
-   
+    
+    # Send OTP email
     result = send_email(
-        to_email="johnphilipbaylon17@gmail.com",
+        to_email=f"{user.email}",
         subject="OTP code From SDO",
         body=f'Enter this to confirm your Login: {otp_code}'
     )
-    
 
-    return render(request, 'login/otp.html')
+    print(f"this is otp code {otp_code}")
+    
+    return render(request, 'login/otp.html', {
+        'user_id': user_id  # Pass user_id to template
+    })
 
 
 #user views

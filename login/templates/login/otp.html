@@ -14,7 +14,7 @@
 <div class="blob three blob-yellow"><p></p></div>
 
 {% if locked_out %}
-    <!-- Lockout State -->
+    
     <div class="lockout-container">
         <div class="alert alert-warning lockout-alert">
             <h2>🔒 Account Temporarily Locked</h2>
@@ -28,13 +28,16 @@
     </div>
 {% else %}
     <!-- Normal OTP Form -->
-    <form action="{% url 'otp' %}" method="post" id="form">
+    <form action="" method="post" id="form">
         {% csrf_token %}
         <h2>Enter OTP</h2>
         
         {% if error %}
             <div class="alert alert-error">
                 {{ error }}
+                    <div class="otp-actions">
+        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' user_id %}">Send OTP again?</a>
+    </div>
                 {% if "attempts remaining" in error %}
                     <div class="attempts-warning">
                          Be careful! Too many wrong attempts will lock your account for 30 minutes.
@@ -43,13 +46,13 @@
             </div>
         {% endif %}
         
-        <input id="otp" name="otp" type="text" required placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+        <input id="otp" name="otp" type="text" required placeholder="Enter 6-digit OTP" maxlength="6">
         <input type="submit" value="Verify OTP" id="submit-btn">
         <div id="timer" class="timer"></div>
     </form>
 
     <div class="otp-actions">
-        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' %}">Send OTP again?</a>
+        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' user_id %}">Send OTP again?</a>
     </div>
 {% endif %}
 

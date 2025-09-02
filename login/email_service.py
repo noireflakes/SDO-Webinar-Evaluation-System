@@ -10,7 +10,7 @@ def send_email(to_email, subject, body):
     print("send mail it being called")
     try:
         params = {
-            "from": "sandbox@resend.dev",  
+            "from": "noreply@sdo-webinar-evaluation-system.xyz",  
             "to": [to_email],
             "subject": subject,
             "html": f"<p>{body}</p>",

@@ -6,7 +6,9 @@ urlpatterns=[
     path("", views.index, name="index"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
-    path("verification", views.generate_otp, name="otp"),
+    path("verification/<int:user_id>/", views.generate_otp, name="otp"),
+
+
   
     #admin path
     path("admin_events",views.admin_events, name="admin_events"),
