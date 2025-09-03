@@ -10,8 +10,10 @@ from django.http import JsonResponse,HttpResponse
 from django.utils import timezone
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
 
 #imports models
+
 from django.contrib.admin.models import LogEntry
 from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
@@ -32,6 +34,7 @@ from .email_service import send_email
 #decorator
 def admin_required(view_func):
     return user_passes_test(lambda u: u.is_staff, login_url="login")(view_func)
+
 
 def user_required(view_func):
     return user_passes_test(lambda u: u.is_authenticated and not u.is_staff)(view_func)
@@ -73,7 +76,6 @@ def create_device_hash(request):
     return hash
 
 
-
 #login handler
 def index(request):
     webinar=Webinar.objects.all()
@@ -94,6 +96,7 @@ def index(request):
     return render(request, 'login/index.html',{
         'webinars':upcoming_webinars
     })
+
 
 def logout_view(request):
     logout(request)
@@ -132,7 +135,6 @@ def login_view(request):
 
 
 def generate_otp(request, user_id=None):
-    # Check if user_id is provided, if not redirect to login
     if not user_id:
         return redirect('login')
     
@@ -170,8 +172,6 @@ def generate_otp(request, user_id=None):
                 login(request, user)
                 request.session.modified = True
                 request.session.pop('username', None)
-                
-                # Save device as trusted after successful OTP verification
                 device_hash = request.session.get('hash')
                 print("verify bitch")
                 if device_hash:
@@ -182,18 +182,25 @@ def generate_otp(request, user_id=None):
                     request.session.pop('hash', None)
                 
                 return redirect('index')
+            
                 
                
             else:
-                current_otp.delete()
+                current_otp.retry+=1
+                current_otp.save()
+                if request.user.is_authenticated:
+                    return redirect('index')
+                    
+                
+                print("this is what being redirected")
                 return render(request, 'login/otp.html', {
                     'error': 'Invalid or expired OTP.',
-                    'user_id': user_id  # Pass user_id to template
+                    'user_id': user_id  
                 })
         else:
             return render(request, 'login/otp.html', {
                 'error': 'OTP not found. Please try again.',
-                'user_id': user_id  # Pass user_id to template
+                'user_id': user_id 
             })
     
     # Send OTP email
@@ -206,7 +213,7 @@ def generate_otp(request, user_id=None):
     print(f"this is otp code {otp_code}")
     
     return render(request, 'login/otp.html', {
-        'user_id': user_id  # Pass user_id to template
+        'user_id': user_id  
     })
 
 
@@ -328,32 +335,24 @@ def admin_setting(request):
 
 @admin_required
 def admin_users(request):
-    users=User.objects.all()
-    return render(request, "login/admin_panel/users.html",{
-        'users':users
+    users = User.objects.all()  # Get all users
+    return render(request, 'login/admin_panel/users.html', {
+        'all_users': users  
     })
-
 
 #create user and edit credential
 @admin_required
 def register_user(request):
     if request.method=="POST":
-        full_name=request.POST.get('user_fullname',' ').strip()
-        name=full_name.split(" ")
-        if not name:
-            first_name = ''
-            last_name = ''
-        elif len(name) == 1:
-            first_name = name[0]
-            last_name = ''
-        else:
-            first_name = name[0]
-            last_name = ' '.join(name[1:])
+
+        first_name=request.POST.get("user_firstname")
+        last_name=request.POST.get("user_lastname")
+
 
         email=request.POST.get("user_email")
         password=request.POST.get("user_password")
-        school_id=request.POST.get("school_id")
-        username=full_name
+        deped_id=request.POST.get("deped_id")
+        username=deped_id
 
         if User.objects.filter(username=username).exists():
             messages.error(request,"username Already Exist")
@@ -364,7 +363,34 @@ def register_user(request):
             return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
-            profile=UserProfile.objects.create(user=user, school_id=school_id)
+            profile=UserProfile.objects.create(user=user, deped_id=deped_id)
+
+
+        result = send_email(
+        to_email=f"{user.email}",
+        subject="Welcome! Your Account Has Been Created",
+        body=f"""
+            Hi {user.first_name},
+
+            We're happy to let you know that your account has been successfully created by our team.
+
+            You can now log in and start exploring the system:
+            🔐 Email: {user.email}
+                username:{user.username}
+                first name: {user.first_name}
+                last name: {user.last_name}
+                deped id:{profile.deped_id}
+            🔑 Temporary Password: {user.password}
+
+            If have any questions, feel free to contact us.
+
+            Welcome aboard!
+
+            Best regards,  
+            The A"""
+        )
+        messages.success(request,"Successfully registered")
+        return redirect('admin_users')
     return redirect('admin_users')
 
 @admin_required
@@ -525,7 +551,6 @@ def change_password(request):
                 return render(request, f'login/{redirected}', {
                     'error_password': 'Current password is incorrect.'
                 })
-
 
 @admin_required
 def log_list(request):

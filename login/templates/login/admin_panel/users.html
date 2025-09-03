@@ -6,169 +6,243 @@
 
 {% block css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/users.css' %}">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
 
+<style>
+
+</style>
 {% endblock %}
+
 {% block js %}
-  <script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
 
-{% block body%}
+{% block body %}
 
-  <div class="topbar">
-        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
-        <div class="credential-cont">        
-          <span class="username fw-semibold">{{ user.username }}</span>
-          <a class="profile">
+<div class="topbar">
+    <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;"><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+    <div class="credential-cont">        
+        <span class="username fw-semibold">{{ user.username }}</span>
+        <a class="profile">
             <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-          </a>
-        </div>
-   
-  </div>
+        </a>
+    </div>
+</div>
 
 <div class="app-container">
 
-
     <div class="sidebar nav-sb">
-    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
+        <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
 
-    <ul class="sidebar-nav">
-       <a href="{% url 'admin_events' %}" class="sb-nav-item ">Event</a>
-        <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="sb-nav-item ">Certificate</a>
-        <a href="{% url 'admin_users' %}" class="sb-nav-item sb-active">Users</a>
-        <a href="{% url 'admin_setting' %}" class="sb-nav-item ">Settting</a>
-        <a href="{% url 'admin_log' %}" class="sb-nav-item">Log Entries</a>
-        <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-    </ul>
-  </div>
-
-
-
-  <aside class="d-sidebar">
-    <div class="logo">
-      <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-      <h2>SDO Baliwag</h2>
+        <ul class="sidebar-nav">
+            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event</a>
+            <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
+            <a href="{% url 'admin_users' %}" class="sb-nav-item sb-active">Users</a>
+            <a href="{% url 'admin_setting' %}" class="sb-nav-item">Setting</a>
+            <a href="{% url 'admin_log' %}" class="sb-nav-item">Log Entries</a>
+            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+        </ul>
     </div>
-    <nav class="nav">
-      <a href="{% url 'admin_events' %}" class="nav-item">Events</a>
-      <a href="{% url 'admin_calendar' %}" class="nav-item">Calendar</a>
-      <a href="{% url 'admin_certificate' %}" class="nav-item">Certificate</a>
-      <a href="{% url 'admin_users' %}" class="nav-item active">Users</a>
-      <a href="{% url 'admin_setting' %}" class="nav-item">Setting</a>
-      <a href="{% url 'admin_log' %}" class="nav-item">Log Entries</a>
-      <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
-    </nav>
-  </aside>
 
-  <main class="main-content">
-    <div class="page-header">
-        <h1 class="page-title">User Management</h1>
- 
-    </div>
-    
-    <div class="registration-section">
-        <div class="registration-form">
-            <h3 class="form-title">User Registration</h3>
-            <form  action="{% url 'register_user' %}" method="POST" >
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="user_fullname">Full Name: </label>
-                    <input type="text" id="user_fullname" name="user_fullname" class="form-control" placeholder="Enter full name">
-                </div>
-                <div class="form-group">
-                    <label for="user_email">Email: </label>
-                    <input type="email" id="user_email" name="user_email" class="form-control" placeholder="Enter email">
-                </div>
-                <div class="form-group">
-                    <label for="username">School Id:</label>
-                    <input type="text" id="school_id" name="school_id"class="form-control" placeholder="Enter User Username">
-                </div>
-                <div class="form-group">
-                    <label for="user_password">Password</label>
-                    <input type="password" id="user_password" name="user_password" class="form-control" placeholder="Enter password">
-                </div>
-                <button type="submit" class="btn btn-primary">Register User</button>
-                {% if messages %}
-                    <div class="message-container">
-                        {% for message in messages %}
-                        {% if "error" in message.tags %}
-                            <div class="alert alert-{{ message.tags }}" style="color: red;">
-                            {{ message }}
-                            </div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </form>
+    <aside class="d-sidebar">
+        <div class="logo">
+            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+            <h2>SDO Baliwag</h2>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'admin_events' %}" class="nav-item">Events</a>
+            <a href="{% url 'admin_calendar' %}" class="nav-item">Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="nav-item">Certificate</a>
+            <a href="{% url 'admin_users' %}" class="nav-item active">Users</a>
+            <a href="{% url 'admin_setting' %}" class="nav-item">Setting</a>
+            <a href="{% url 'admin_log' %}" class="nav-item">Log Entries</a>
+            <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">User Management</h1>
         </div>
         
-        <div class="registration-form">
-            <h3 class="form-title">Staff Registration</h3>
-            <form  action="{% url 'create_admin' %}" method="POST" >
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="admin_fullname">Full Name</label>
-                    <input type="text" id="admin_fullname" name="admin_fullname" class="form-control" placeholder="Enter full name">
-                </div>
-                <div class="form-group">
-                    <label for="admin_email">Email</label>
-                    <input type="email" id="admin_email" name="admin_email"class="form-control" placeholder="Enter email">
-                </div>
-                <div class="form-group">
-                    <label for="admin_password">Password</label>
-                    <input type="password" id="admin_password" name="admin_password" class="form-control" placeholder="Enter password">
-                </div>
-                <div class="form-group">
-                    <label for="admin_code">Admin Code</label>
-                    <input type="password" id="admin_code" name="admin_code" class="form-control" placeholder="Enter admin code">
-                </div>
-                <button type="submit" class="btn btn-primary">Register Admin</button>
+        <div class="registration-section">
+            <div class="registration-form">
+                <h3 class="form-title">User Registration</h3>
+                <form action="{% url 'register_user' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="user_firstname">First name: </label>
+                        <input type="text" id="user_firstname" name="user_firstname" class="form-control" placeholder="Enter First Name">
 
-                
-            </form>
-            <a href="{% url 'generete_authorization_key' %}" style="margin-top: 20px;" class="btn btn-primary">Request Admin Authorization Code</a>
-            
-        </div>
-    </div>
-    
-    <div class="users-table">
-        <div class="table-header">
-            <div class="col-name">Name</div>
-            <div class="col-email">Email</div>
-            <div class="col-status">Status</div>
-            <div class="col-actions">Actions</div>
-        </div>
-
-
-        {% for user in users  %}
-
-            <div class="table-row">
-                <div class="col col-name">{{user.username}}</div>
-                <div class=" col col-email">{{user.email}}</div>
-                <div class="col col-status"><span class="status-badge status-active">Active</span></div>
-            <div class="col col-actions">
-                {% if not user.is_superuser or not user.is_staff %}
-                    <a  href="{%  url 'delete_user' user.id %}" class="btn btn-sm btn-danger">Delete</a>
-                {% else %}
-                    <div>{% if user.is_superuser %}Admin
-                        {% elif user.is_staff %}Staff{% endif %}
+                        <label for="user_lastname">Last name: </label>
+                        <input type="text" id="user_lastname" name="user_lastname" class="form-control" placeholder="Enter Last name">
                     </div>
-                {% endif %}
-                
+
+                    <div class="form-group">
+                        <label for="user_email">Email: </label>
+                        <input type="email" id="user_email" name="user_email" class="form-control" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="deped_id">Deped ID:</label>
+                        <input type="text" id="deped_id" name="deped_id" class="form-control" placeholder="Enter User Username">
+                    </div>
+                    <div class="form-group">
+                        <label for="user_password">Password</label>
+                        <div class="input-group">
+                            <input type="password" id="user_password" name="user_password" class="form-control" placeholder="Enter password">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fa fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register User</button>
+                    {% if messages %}
+                        <div class="message-container">
+                            {% for message in messages %}
+                            {% if "error" in message.tags %}
+                                <div class="alert alert-{{ message.tags }}" style="color: red;">
+                                {{ message }}
+                                </div>
+                            {% elif "success" in message.tags %}
+                                <div class="alert alert-{{ message.tags }}" style="color: green;">
+                                {{ message }}
+                                </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </form>
             </div>
-            </div>        
-        
-        {% endfor %}
-     
-   
+            
+{% if user.is_superuser %}
+                        <div class="registration-form">
+                <h3 class="form-title">Staff Registration</h3>
+                <form action="{% url 'create_admin' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="staff_firstname">First name: </label>
+                        <input type="text" id="staff_firstname" name="staff_firstname" class="form-control" placeholder="Enter First Name">
+
+                        <label for="staff_lastname">Last name: </label>
+                        <input type="text" id="staff_lastname" name="staff_lastname" class="form-control" placeholder="Enter Last Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin_email">Email</label>
+                        <input type="email" id="admin_email" name="admin_email" class="form-control" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin_password">Password</label>
+                        <input type="password" id="admin_password" name="admin_password" class="form-control" placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin_code">Admin Code</label>
+                        <input type="password" id="admin_code" name="admin_code" class="form-control" placeholder="Enter admin code">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register Admin</button>
+                </form>
+                <a href="{% url 'generete_authorization_key' %}" style="margin-top: 20px;" class="btn btn-primary">Request Admin Authorization Code</a>
+            </div>
+        </div>
+{% endif %}
+
+        <div class="search-section mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" 
+                       id="searchInput" 
+                       class="form-control" 
+                       placeholder="Search users by name, email, or role...">
+                <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <select id="roleFilter" class="form-select">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+                <option value="user">User</option>
+            </select>
+        </div>
     </div>
-    
- 
-  </main>
+</div>
+
+        <div class="users-table">
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Rows will be inserted dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Info and Controls -->
+            <div class="pagination-container">
+                <div class="pagination-info" id="pagination-info">
+                    <!-- Info will be updated dynamically -->
+                </div>
+                
+                <nav>
+                    <ul class="pagination justify-content-center mb-0" id="pagination">
+                        <!-- Pagination items will be inserted dynamically -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm User Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-user-times text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <h6>Are you sure you want to delete this user?</h6>
+                    <p class="text-muted">
+                        User: <strong id="deleteUserName"></strong><br>
+                        This action cannot be undone.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-1"></i>Delete User
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer>
@@ -183,5 +257,344 @@
         </div>
     </div>
 </footer>
+
+
+<script>
+// User data from Django template
+const userData = [
+    {% for user in all_users %}
+    {
+        id: {{ user.id }},
+        username: "{{ user.username|escapejs }}",
+        email: "{{ user.email|escapejs }}",
+        is_superuser: {% if user.is_superuser %}true{% else %}false{% endif %},
+        is_staff: {% if user.is_staff %}true{% else %}false{% endif %},
+        delete_url: "{% url 'delete_user' user.id %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Pagination settings
+const rowsPerPage = 5;
+let currentPage = 1;
+
+function getPositionBadge(user) {
+    if (user.is_superuser) {
+        return '<span class="badge bg-danger">Admin</span>';
+    } else if (user.is_staff) {
+        return '<span class="badge bg-warning text-dark">Staff</span>';
+    } else {
+        return '<span class="badge bg-primary">User</span>';
+    }
+}
+
+function getActionButtons(user) {
+    if (!user.is_superuser && !user.is_staff) {
+        return `<button type="button" class="btn btn-sm btn-danger" 
+                        onclick="confirmDelete('${user.username}', '${user.id}', '${user.delete_url}')">
+                    Delete
+                </button>`;
+    } else {
+        let role = user.is_superuser ? 'Admin' : 'Staff';
+        return `<span class="badge bg-secondary">${role}</span>`;
+    }
+}
+
+function displayTable(page) {
+    const tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+
+    let start = (page - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    let paginatedData = userData.slice(start, end);
+
+    paginatedData.forEach((user, index) => {
+        let rowNumber = start + index + 1;
+        let tr = `<tr>
+                    <td>${rowNumber}</td>
+                    <td>${getPositionBadge(user)}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td>${getActionButtons(user)}</td>
+                  </tr>`;
+        tableBody.innerHTML += tr;
+    });
+
+    // Update pagination info
+    updatePaginationInfo(start + 1, Math.min(end, userData.length), userData.length);
+}
+
+function updatePaginationInfo(startIndex, endIndex, total) {
+    const paginationInfo = document.getElementById("pagination-info");
+    if (total > 0) {
+        paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${total} entries`;
+    } else {
+        paginationInfo.textContent = "No entries found";
+    }
+}
+
+function setupPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    let pageCount = Math.ceil(userData.length / rowsPerPage);
+
+    if (pageCount <= 1) return;
+
+    // Previous button
+    let prevLi = document.createElement("li");
+    prevLi.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+    prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>`;
+    if (currentPage > 1) {
+        prevLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage--;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= pageCount; i++) {
+        let li = document.createElement("li");
+        li.className = "page-item " + (i === currentPage ? "active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+        li.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = i;
+            displayTable(currentPage);
+            setupPagination();
+        });
+
+        pagination.appendChild(li);
+    }
+
+    // Next button
+    let nextLi = document.createElement("li");
+    nextLi.className = "page-item " + (currentPage === pageCount ? "disabled" : "");
+    nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>`;
+    if (currentPage < pageCount) {
+        nextLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage++;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(nextLi);
+}
+
+// Delete confirmation function
+function confirmDelete(userName, userId, deleteUrl) {
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        window.location.href = deleteUrl;
+    };
+    
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    deleteModal.show();
+}
+
+// Initialize pagination when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Display initial table
+    displayTable(currentPage);
+    setupPagination();
+
+    // Other existing scripts
+    const deped_id = document.getElementById("deped_id");
+    if (deped_id) {
+        deped_id.addEventListener("change", () => {
+            console.log("being called");
+            const pass = document.getElementById("user_password");
+            pass.value = deped_id.value;
+        });
+    }
+
+    // Auto-hide messages
+    setTimeout(() => {
+        const msgContainer = document.querySelector('.message-container');
+        if (msgContainer) {
+            msgContainer.style.transition = "opacity 0.5s ease";
+            msgContainer.style.opacity = "0";
+            setTimeout(() => msgContainer.remove(), 300); 
+        }
+    }, 5000);
+
+    // Password toggle
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordInput = document.getElementById("user_password");
+    const toggleIcon = document.getElementById("togglePasswordIcon");
+
+    if (togglePassword && passwordInput && toggleIcon) {
+        togglePassword.addEventListener("click", () => {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            toggleIcon.classList.toggle("fa-eye");
+            toggleIcon.classList.toggle("fa-eye-slash");
+        });
+    }
+});
+
+// Add these variables to your existing JavaScript (at the top with other variables)
+let filteredUserData = [...userData]; // Copy of userData for filtering
+let currentSearchTerm = '';
+let currentRoleFilter = '';
+
+// Replace your existing displayTable function with this enhanced version
+function displayTable(page) {
+    const tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+
+    if (filteredUserData.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No users found.</td></tr>`;
+        updatePaginationInfo(0, 0, 0);
+        return;
+    }
+
+    let start = (page - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    let paginatedData = filteredUserData.slice(start, end);
+
+    paginatedData.forEach((user, index) => {
+        let rowNumber = start + index + 1;
+        let tr = `<tr>
+                    <td>${rowNumber}</td>
+                    <td>${getPositionBadge(user)}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td>${getActionButtons(user)}</td>
+                  </tr>`;
+        tableBody.innerHTML += tr;
+    });
+
+    updatePaginationInfo(start + 1, Math.min(end, filteredUserData.length), filteredUserData.length);
+}
+
+// Update your setupPagination function to use filteredUserData
+function setupPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    let pageCount = Math.ceil(filteredUserData.length / rowsPerPage);
+
+    if (pageCount <= 1) return;
+
+    // Previous button
+    let prevLi = document.createElement("li");
+    prevLi.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+    prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>`;
+    if (currentPage > 1) {
+        prevLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage--;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= pageCount; i++) {
+        let li = document.createElement("li");
+        li.className = "page-item " + (i === currentPage ? "active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+        li.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = i;
+            displayTable(currentPage);
+            setupPagination();
+        });
+
+        pagination.appendChild(li);
+    }
+
+    // Next button
+    let nextLi = document.createElement("li");
+    nextLi.className = "page-item " + (currentPage === pageCount ? "disabled" : "");
+    nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>`;
+    if (currentPage < pageCount) {
+        nextLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage++;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(nextLi);
+}
+
+// Add these new functions for search and filter functionality
+function filterUsers() {
+    filteredUserData = userData.filter(user => {
+        // Text search
+        const matchesSearch = currentSearchTerm === '' || 
+            user.username.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(currentSearchTerm.toLowerCase());
+        
+        // Role filter
+        let matchesRole = true;
+        if (currentRoleFilter !== '') {
+            if (currentRoleFilter === 'admin' && !user.is_superuser) matchesRole = false;
+            if (currentRoleFilter === 'staff' && (!user.is_staff || user.is_superuser)) matchesRole = false;
+            if (currentRoleFilter === 'user' && (user.is_staff || user.is_superuser)) matchesRole = false;
+        }
+        
+        return matchesSearch && matchesRole;
+    });
+    
+    // Reset to first page after filtering
+    currentPage = 1;
+    displayTable(currentPage);
+    setupPagination();
+}
+
+// Add this to your DOMContentLoaded event listener (inside the existing one)
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing DOMContentLoaded code ...
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const roleFilter = document.getElementById('roleFilter');
+    const clearSearch = document.getElementById('clearSearch');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            currentSearchTerm = this.value;
+            filterUsers();
+        });
+    }
+    
+    if (roleFilter) {
+        roleFilter.addEventListener('change', function() {
+            currentRoleFilter = this.value;
+            filterUsers();
+        });
+    }
+    
+    if (clearSearch) {
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            roleFilter.value = '';
+            currentSearchTerm = '';
+            currentRoleFilter = '';
+            filterUsers();
+        });
+    }
+});
+</script>
 
 {% endblock %}

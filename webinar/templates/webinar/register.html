@@ -22,8 +22,8 @@
         <h2 class="form-title">Register Attendees</h2>
 
         <div class="form-group">
-            <label for="school_id">School ID:</label>
-            <input type="text" name="school_id" id="school_id" required>
+            <label for="deped_id">Deped ID:</label>
+            <input type="text" name="deped_id" id="deped_id" required>
         </div>
 
         <div class="form-group">
@@ -59,7 +59,7 @@
                     {% endif %}
                     <div class="attendee-info">
                         <div class="attendee-name">{{ attendee.user.username }}</div>
-                        <div class="attendee-id">{{ attendee.user.user_profile.school_id }}</div>
+                        <div class="attendee-id">{{ attendee.user.user_profile.deped_id }}</div>
                     </div>
                 </div>
                 {% endfor %}

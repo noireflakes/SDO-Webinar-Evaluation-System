@@ -36,7 +36,7 @@ class Speaker(models.Model):
 class WebinarAttendees(models.Model):
     webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="attendees")
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendees", null=True, blank=True)
-    school_id=models.CharField(max_length=80, null=True)
+    deped_id=models.CharField(max_length=80, null=True)
     email=models.EmailField()
     attendance=models.IntegerField(default=0)  
 

@@ -114,7 +114,7 @@ def rounded_data(request, id):
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     email = []
-    school_id = []
+    deped_id = []
     sex = []
     timestamps = []
     speaker = []
@@ -125,7 +125,7 @@ def result_data(request, id):
     for evaluation in webinar.evaluation.all():
         # User details
         email.append(evaluation.user.email)
-        school_id.append(evaluation.user.user_profile.school_id)
+        deped_id.append(evaluation.user.user_profile.deped_id)
         sex.append(evaluation.sex)  
         timestamps.append(evaluation.timestamp)     
         
@@ -147,7 +147,7 @@ def result_data(request, id):
 
     evaluations = {
         "email": email,
-        "school_id": school_id,
+        "deped_id": deped_id,
         "sex": sex,                 
         "timestamp": timestamps,    
         "speaker": speaker,
@@ -170,7 +170,7 @@ def test_data(request, id):
     for result in results:
         test_result.append({
             "user":result.user.email,
-            "school_id":result.user.user_profile.school_id,
+            "deped_id":result.user.user_profile.deped_id,
             "test_type":result.test,
             "score":result.score
         })

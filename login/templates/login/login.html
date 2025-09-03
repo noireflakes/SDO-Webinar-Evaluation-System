@@ -19,7 +19,9 @@
 
 
 <div class="login">    
+    <img src="{% static  %}" alt="">
     <h1 class="login-text">Log in</h1>
+    
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
 
