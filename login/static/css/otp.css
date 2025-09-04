@@ -37,6 +37,27 @@ form {
     position: relative;
     overflow: hidden;
 }
+.bg-login {
+    position: absolute;
+
+
+    width: 40%;
+    height: auto;
+    left: 7rem;
+}
+
+
+@keyframes egg-roll {
+    0%   { transform: translateX(0) rotate(0deg); }
+    25%  { transform: translateX(-10px) rotate(-8deg); }
+    50%  { transform: translateX(10px) rotate(8deg); }
+    75%  { transform: translateX(-6px) rotate(-5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+.bg-login:hover {
+    animation: egg-roll 2s ease-in-out;
+}
 
 form::before {
     content: '';

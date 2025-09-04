@@ -124,6 +124,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'auditlog.middleware.AuditlogMiddleware'
+
 ]
 
 ROOT_URLCONF = 'evalsync.urls'

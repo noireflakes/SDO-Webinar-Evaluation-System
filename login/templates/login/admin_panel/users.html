@@ -92,6 +92,10 @@
                         <input type="text" id="deped_id" name="deped_id" class="form-control" placeholder="Enter User Username">
                     </div>
                     <div class="form-group">
+                        <label for="birth_date">Birth Date:</label>
+                        <input type="date" id="birth_date" name="birth_date" class="form-control">
+                    </div>
+                    <div class="form-group">
                         <label for="user_password">Password</label>
                         <div class="input-group">
                             <input type="password" id="user_password" name="user_password" class="form-control" placeholder="Enter password">
@@ -132,20 +136,27 @@
                         <input type="text" id="staff_lastname" name="staff_lastname" class="form-control" placeholder="Enter Last Name">
                     </div>
                     <div class="form-group">
-                        <label for="admin_email">Email</label>
-                        <input type="email" id="admin_email" name="admin_email" class="form-control" placeholder="Enter email">
+                        <label for="staff_email">Email</label>
+                        <input type="email" id="staff_email" name="staff_email" class="form-control" placeholder="Enter email">
                     </div>
                     <div class="form-group">
-                        <label for="admin_password">Password</label>
-                        <input type="password" id="admin_password" name="admin_password" class="form-control" placeholder="Enter password">
+                        <label for="staff_deped_id">Deped ID:</label>
+                        <input type="text" id="staff_deped_id" name="staff_deped_id" class="form-control" placeholder="Enter User Username">
                     </div>
                     <div class="form-group">
-                        <label for="admin_code">Admin Code</label>
-                        <input type="password" id="admin_code" name="admin_code" class="form-control" placeholder="Enter admin code">
+                        <label for="staff_birth_date">Birth Date:</label>
+                        <input type="date" id="staff_birth_date" name="staff_birth_date" class="form-control">
                     </div>
+                    <label for="staff_password">Password</label>
+                    <div class="input-group" style="margin-bottom:1.2em;" >
+                        <input type="password" id="staff_password" name="staff_password" class="form-control" placeholder="Enter password">
+                        <button type="button" class="btn btn-outline-secondary" id="toggleStaffPassword">
+                            <i class="fa fa-eye" id="toggleStaffPasswordIcon"></i>
+                        </button>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Register Admin</button>
                 </form>
-                <a href="{% url 'generete_authorization_key' %}" style="margin-top: 20px;" class="btn btn-primary">Request Admin Authorization Code</a>
             </div>
         </div>
 {% endif %}
@@ -197,15 +208,15 @@
                 </table>
             </div>
 
-            <!-- Pagination Info and Controls -->
+            
             <div class="pagination-container">
                 <div class="pagination-info" id="pagination-info">
-                    <!-- Info will be updated dynamically -->
+                  
                 </div>
                 
                 <nav>
                     <ul class="pagination justify-content-center mb-0" id="pagination">
-                        <!-- Pagination items will be inserted dynamically -->
+              
                     </ul>
                 </nav>
             </div>
@@ -410,6 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Other existing scripts
     const deped_id = document.getElementById("deped_id");
+    const staff_deped_id=document.getElementById("staff_deped_id");
     if (deped_id) {
         deped_id.addEventListener("change", () => {
             console.log("being called");
@@ -417,6 +429,15 @@ document.addEventListener('DOMContentLoaded', function() {
             pass.value = deped_id.value;
         });
     }
+    if (staff_deped_id) {
+        staff_deped_id.addEventListener("change", () => {
+            console.log("staff deped_id being called");
+            const pass = document.getElementById("staff_password");
+            pass.value = staff_deped_id.value;
+        });
+    }
+        
+
 
     // Auto-hide messages
     setTimeout(() => {
@@ -441,6 +462,19 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleIcon.classList.toggle("fa-eye-slash");
         });
     }
+
+    const toggleStaffPassword = document.getElementById("toggleStaffPassword");
+    const staffPasswordInput = document.getElementById("staff_password");
+    const toggleStaffIcon = document.getElementById("toggleStaffPasswordIcon");
+
+    if (toggleStaffPassword && staffPasswordInput && toggleStaffIcon) {
+        toggleStaffPassword.addEventListener("click", () => {
+            const isPassword = staffPasswordInput.type === "password";
+            staffPasswordInput.type = isPassword ? "text" : "password";
+            toggleStaffIcon.classList.toggle("fa-eye");
+            toggleStaffIcon.classList.toggle("fa-eye-slash");
+        });
+}
 });
 
 // Add these variables to your existing JavaScript (at the top with other variables)

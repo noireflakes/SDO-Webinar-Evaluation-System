@@ -11,6 +11,9 @@ from django.utils import timezone
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
+from django.urls import reverse
+import uuid
+
 
 #imports models
 
@@ -19,7 +22,7 @@ from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
 from exam_portal.serializer import CertificateSerilize
 from django.contrib.auth.models import User
-from .models import UserProfile, TrustedDevice,Otp
+from .models import UserProfile, TrustedDevice,Otp,PasswordReset
 
 #decorator
 from django.contrib.auth.decorators import user_passes_test
@@ -55,7 +58,6 @@ def custom_page_not_found(request, exception):
 def handle_error(request, exception=None):
     messages.warning(request, "Something went wrong. Redirected to homepage.")
     return redirect("index")
-
 
 
 #hash
@@ -138,83 +140,184 @@ def generate_otp(request, user_id=None):
     if not user_id:
         return redirect('login')
     
-    print(f"This is user from generate: {user_id}")
-    
     user = get_object_or_404(User, id=user_id)
-    existing_otp = Otp.objects.filter(user=user).first()
+    otp_code = None 
     
-    if existing_otp:
-        otp_secret_key = existing_otp.secret_key
-        totp = pyotp.TOTP(otp_secret_key, interval=300)
-        otp_code = totp.now()
-        
-        existing_otp.otp = otp_code
-        existing_otp.save()
-    else:
-        otp_secret_key = pyotp.random_base32()
-        totp = pyotp.TOTP(otp_secret_key, interval=300)
-        otp_code = totp.now()
-        
-        otp = Otp.objects.create(
-            user=user,
-            otp=otp_code,
-            secret_key=otp_secret_key
-        )
-    
+   
     if request.method == 'POST':
         user_otp = (request.POST.get('otp') or '').strip()
         
         current_otp = Otp.objects.filter(user=user).first()
         if current_otp:
+            time_diff = timezone.now() - current_otp.created_at
+            if time_diff.total_seconds() > 300:
+             
+                current_otp.is_valid = False
+                current_otp.save()
+                
+                return render(request, 'login/otp.html', {
+                    'error': 'OTP has expired. Please request a new one.',
+                    'user_id': user_id,
+                    'expired': True
+                })
+            
             totp = pyotp.TOTP(current_otp.secret_key, interval=300)
             
             if totp.verify(user_otp):
+                # Successful verification
                 login(request, user)
                 request.session.modified = True
                 request.session.pop('username', None)
+                request.session.pop("otp_generated", None)
+                print('the otp is correct')
+                
                 device_hash = request.session.get('hash')
-                print("verify bitch")
                 if device_hash:
                     TrustedDevice.objects.get_or_create(
                         user=user,
                         hash=device_hash
                     )
                     request.session.pop('hash', None)
-                
+
+                current_otp.delete()
                 return redirect('index')
-            
-                
-               
             else:
-                current_otp.retry+=1
+                # Wrong OTP - increment retry count and update last_attempt
+                # DO NOT set is_valid=False here - keep existing OTP
+                current_otp.retry += 1
+                current_otp.last_attempt = timezone.now()
                 current_otp.save()
+                
                 if request.user.is_authenticated:
                     return redirect('index')
-                    
                 
-                print("this is what being redirected")
+                if current_otp.retry >= 3:
+                    # Too many attempts - set is_valid to False and delete
+                    current_otp.is_valid = False
+                    current_otp.save()
+                    current_otp.delete()
+                    request.session.pop("otp_generated", None)
+                    return render(request, 'login/otp.html', {
+                        'error': 'Too many failed attempts. Please request a new OTP.',
+                        'user_id': user_id,
+                        'expired': True
+                    })
+                
+                # Return error but keep the same OTP (don't regenerate)
                 return render(request, 'login/otp.html', {
-                    'error': 'Invalid or expired OTP.',
-                    'user_id': user_id  
+                    'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining.',
+                    'user_id': user_id
                 })
         else:
             return render(request, 'login/otp.html', {
                 'error': 'OTP not found. Please try again.',
-                'user_id': user_id 
+                'user_id': user_id,
+                'expired': True
             })
-    
-    # Send OTP email
-    result = send_email(
-        to_email=f"{user.email}",
-        subject="OTP code From SDO",
-        body=f'Enter this to confirm your Login: {otp_code}'
-    )
 
-    print(f"this is otp code {otp_code}")
+    # Handle GET request (page load/reload) - Check if OTP should be generated
+    existing_otp = Otp.objects.filter(user=user).first()
+    should_generate_otp = False
+    
+    if existing_otp:
+        time_diff = timezone.now() - existing_otp.created_at
+        is_expired = time_diff.total_seconds() > 300
+        
+        if is_expired:
+            # OTP has expired - set is_valid to False (but don't auto-generate yet)
+            existing_otp.is_valid = False
+            existing_otp.save()
+            
+            # Don't generate new OTP automatically on page load if expired
+            # User needs to explicitly click "Resend OTP"
+            return render(request, 'login/otp.html', {
+                'error': 'OTP has expired. Please request a new one.',
+                'user_id': user_id,
+                'expired': True
+            })
+        elif existing_otp.is_valid:
+            # Valid OTP exists with is_valid=True - don't generate new OTP
+            should_generate_otp = False
+        else:
+            # is_valid=False means user explicitly requested new OTP
+            should_generate_otp = True
+    else:
+        # No existing OTP - generate new one (first time)
+        should_generate_otp = True
+    
+    # Generate OTP only if needed and not already generated in this session
+    if should_generate_otp:
+        # Check session to prevent multiple generation on reload
+        session_key = f"otp_generated_{user_id}"
+        
+        # Only generate if not already generated in this session for this user
+        if not request.session.get(session_key):
+            if existing_otp:
+                # Update existing OTP record
+                otp_secret_key = pyotp.random_base32()
+                totp = pyotp.TOTP(otp_secret_key, interval=300)
+                otp_code = totp.now()
+                
+                existing_otp.otp = otp_code
+                existing_otp.secret_key = otp_secret_key
+                existing_otp.created_at = timezone.now()
+                existing_otp.retry = 0
+                existing_otp.is_valid = True  # Set is_valid to True when generating new OTP
+                existing_otp.last_attempt = None  # Reset last attempt
+                existing_otp.save()
+            else:
+                # Create new OTP record
+                otp_secret_key = pyotp.random_base32()
+                totp = pyotp.TOTP(otp_secret_key, interval=300)
+                otp_code = totp.now()
+                
+                otp = Otp.objects.create(
+                    user=user,
+                    otp=otp_code,
+                    secret_key=otp_secret_key,
+                    created_at=timezone.now(),
+                    retry=0,
+                    is_valid=True  # Set is_valid to True when creating new OTP
+                )
+
+    # Send OTP email if new OTP was generated
+    if otp_code:
+        print(f"this is the otp code: {otp_code}")
+        result = send_email(
+            to_email=f"{user.email}",
+            subject="OTP code From SDO",
+            body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
+        )
+        # Use user-specific session key
+        session_key = f"otp_generated_{user_id}"
+        request.session[session_key] = True
     
     return render(request, 'login/otp.html', {
-        'user_id': user_id  
+        'user_id': user_id
     })
+
+
+def resend_otp(request, user_id):
+    """
+    Handle explicit resend OTP requests
+    Sets check=False to trigger new OTP generation
+    """
+    if not user_id:
+        return redirect('login')
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    # Find existing OTP and set check to False to trigger new OTP
+    existing_otp = Otp.objects.filter(user=user).first()
+    if existing_otp:
+        existing_otp.check = False
+        existing_otp.save()
+    
+    # Clear the session flag to allow new OTP generation
+    request.session.pop("otp_generated", None)
+    
+    # Redirect to generate_otp which will create a new OTP because check=False
+    return redirect('otp', user_id=user_id)
 
 
 #user views
@@ -347,6 +450,7 @@ def register_user(request):
 
         first_name=request.POST.get("user_firstname")
         last_name=request.POST.get("user_lastname")
+        birth_date=request.POST.get("birth_date")
 
 
         email=request.POST.get("user_email")
@@ -363,7 +467,7 @@ def register_user(request):
             return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
-            profile=UserProfile.objects.create(user=user, deped_id=deped_id)
+            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birth_date=birth_date)
 
 
         result = send_email(
@@ -411,38 +515,30 @@ def generete_authorization_key(request):
 @admin_required
 def create_admin(request):
     if request.method == 'POST':
-        if 'authorization_key' not in request.session:
-            messages.error(request, 'Please request an Authorization Key before proceeding.')
-            return redirect('admin_users')
+ 
+        first_name=request.POST.get("staff_firstname")
+        last_name=request.POST.get("staff_lastname")
+        deped_id=request.POST.get("staff_deped_id")
+        email = request.POST.get("staff_email")
+        password = request.POST.get("admin_password")
+        birthday= request.POST.get("staff_birth_date")
+        username = deped_id
 
-        if request.POST.get('admin_code') == request.session.get('authorization_key'):
-            del request.session['authorization_key']
-            full_name = request.POST.get('admin_fullname', '').strip()
-            name = full_name.split(" ")
-            first_name = name[0] 
-            last_name = ' '.join(name[1:])
-
-            email = request.POST.get("admin_email")
-            password = request.POST.get("admin_password")
-            username = full_name
-
-            if User.objects.filter(username=username).exists():
-                messages.error(request, "Username already exists.")
-            elif User.objects.filter(email=email).exists():
-                messages.error(request, "Email already exists.")
-            else:
-                user = User.objects.create_user(
-                    username=username,
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    password=password
-                )
-                user.is_staff = True
-                user.save()
-                messages.success(request, "Admin account created successfully.")
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
         else:
-            messages.error(request, "Invalid authorization code.")
+            user = User.objects.create_user(
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=password)
+            user.is_staff = True
+            user.save()
+            UserProfile.objects.create(user=user,deped_id=deped_id, birthday=birthday)
+            messages.success(request, "Admin account created successfully.")
 
     return redirect('admin_users')
 
@@ -558,4 +654,86 @@ def log_list(request):
     return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
 
 
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        
+        try:
+            user = User.objects.get(email=email)
+            
+           
+            PasswordReset.objects.filter(user=user, used=False).delete()
+            
+        
+            reset_token = PasswordReset.objects.create(user=user)
+            
+        
+            reset_link = request.build_absolute_uri(
+                reverse('reset_password', args=[reset_token.token])
+            )
+            
+         
+            send_email(
+                to_email=email,
+                subject="Password Reset - SDO",
+                body=f"""
+                Hello {user.first_name or user.username},
+                
+                You requested a password reset. Click the link below to reset your password:
+        
+                {reset_link}
+    
+                This link will expire in 1 hour.
+
+                If you didn't request this, ignore this email.
+                """
+            )
+            
+            messages.success(request, 'Password reset link sent to your email!')
+            return redirect('login')
+            
+        except User.DoesNotExist:
+            messages.success(request, 'If that email exists, a reset link has been sent.')
+            return redirect('login')
+    
+    return render(request, 'login/forgot_password.html')
+
+
+def reset_password(request, token):
+    try:
+        reset_obj = PasswordReset.objects.get(token=token, used=False)
+        
+        if reset_obj.is_expired():
+            messages.error(request, 'Reset link has expired. Please request a new one.')
+            return redirect('forgot_password')
+        
+        if request.method == 'POST':
+            new_password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+            
+            if not new_password or len(new_password) < 6:
+                messages.error(request, 'Password must be at least 6 characters long.')
+                return render(request, 'login/reset_password.html', {'token': token})
+            
+            if new_password != confirm_password:
+                messages.error(request, 'Passwords do not match.')
+                return render(request, 'login/reset_password.html', {'token': token})
+            
+            # Reset password
+            user = reset_obj.user
+            user.set_password(new_password)
+            user.save()
+            
+            # Mark token as used
+            reset_obj.used = True
+            reset_obj.save()
+            
+            messages.success(request, 'Password reset successfully! You can now login.')
+            return redirect('login')
+        
+        return render(request, 'login/reset_password.html', {'token': token})
+        
+    except PasswordReset.DoesNotExist:
+        messages.error(request, 'Invalid or expired reset link.')
+        return redirect('forgot_password')
 

@@ -81,11 +81,12 @@
     
         </div>
         {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-danger" style="color:red;">{{ message }}</div>
-        {% endfor %}
+          {% for message in messages %}
+            {% if "expired" not in message|stringformat:"s" %}
+              <div class="alert alert-danger">{{ message }}</div>
+            {% endif %}
+          {% endfor %}
         {% endif %}
-
 
         <div class="btn-container">
         <a class="create-btn" href="{% url 'make_webinar' %}">

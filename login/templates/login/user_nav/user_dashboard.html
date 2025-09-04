@@ -42,7 +42,6 @@
 
 
 
-
     <aside class="d-sidebar">
       <div class="logo">
         <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
@@ -64,7 +63,9 @@
         <p>Views Events and details</p>
         {% if messages %}
           {% for message in messages %}
-            <div class="alert alert-danger" style="color:red;">{{ message }}</div>
+            {% if "expired" not in message|stringformat:"s" %}
+              <div class="alert alert-danger">{{ message }}</div>
+            {% endif %}
           {% endfor %}
         {% endif %}
 

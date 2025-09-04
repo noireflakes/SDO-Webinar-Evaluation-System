@@ -16,11 +16,20 @@
 <div class="blob one blob-yellow"></div>
 <div class="blob two blob-yellow"></div>
 <div class="blob three blob-yellow"></div>
+<img class="bg-login" src="{% static 'asset/logbg.png' %}" alt="login-bg">
 
+       {% if messages %}
+          {% for message in messages %}
+            {% if "expired" not in message|stringformat:"s" %}
+              <div class="alert alert-danger">{{ message }}</div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
 
 <div class="login">    
-    <img src="{% static  %}" alt="">
-    <h1 class="login-text">Log in</h1>
+    <img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 4rem; height: auto; margin-bottom: 5px;">
+
+    <div class="login-text">Login</div>
     
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
@@ -40,10 +49,21 @@
                 type="submit" 
                 value="Log in">
         <div style="color: red;">{{ credential_error }}</div>
+
+        <div><a class="forgot-pass" href="{% url 'forgot_password' %}" style="color:rgb(38, 38, 129); font-weight: 500; text-decoration: none;">Forgot Password ?</a></div>
     </form>
 
 
 </div>
+
+
+<script>
+      setTimeout(function () {
+    document.querySelectorAll('.alert').forEach(function(el) {
+      el.style.display = 'none';
+    });
+  }, 15000); 
+</script>
 
 
 {% endblock %}

@@ -7,6 +7,7 @@ urlpatterns=[
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("verification/<int:user_id>/", views.generate_otp, name="otp"),
+    path('resend-otp/<int:user_id>/', views.resend_otp, name='resend_otp'),
 
 
   
@@ -32,6 +33,10 @@ urlpatterns=[
     path("generete_authorization_key", views.generete_authorization_key, name="generete_authorization_key"),
     path("edit_user", views.edit_user, name="edit_user"),
     path("Change_password", views.change_password, name="change_password"),
+
+    #new_password
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/<uuid:token>/', views.reset_password, name='reset_password'),
 
 
 

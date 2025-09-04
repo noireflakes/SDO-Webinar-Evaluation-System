@@ -9,13 +9,12 @@
     --light_gray: #f5f5f5;
     --medium_gray: #e0e0e0;
     --dark_gray: #757575;
-
 }
+
 html, body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    
 }
 
 body {
@@ -25,8 +24,7 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0;
-   padding: 0;
-    
+    padding: 0;
 }
 
 .login {
@@ -34,11 +32,11 @@ body {
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);
     padding: 40px;
-    min-width: 22em;
+    min-width: 23em;
     text-align: center;
     position: relative;
     overflow: hidden;
-  
+
 }
 
 .login::before {
@@ -54,27 +52,48 @@ body {
 /* Header */
 .login-text {
     color: var(--black);
-    font-size: 28px;
+    font-size: 25px;
     font-weight: 600;
     margin-bottom: 30px;
     position: relative;
 }
 
-.login-text::after {
+.login-text::before {
     content: '';
     display: block;
-    width: 60px;
+    width: 4em;
     height: 4px;
     background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
-    margin: 10px auto 0;
+    margin: 0px auto 4px;
     border-radius: 2px;
+}
+
+.bg-login {
+    position: absolute;
+    opacity: 0.5;
+    width: 40%;
+    height: auto;
+    left: 7rem;
+}
+
+@keyframes egg-roll {
+    0%   { transform: translateX(0) rotate(0deg); }
+    25%  { transform: translateX(-10px) rotate(-8deg); }
+    50%  { transform: translateX(10px) rotate(8deg); }
+    75%  { transform: translateX(-6px) rotate(-5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+.bg-login:hover {
+    animation: egg-roll 2s ease-in-out;
 }
 
 /* Form Elements */
 form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 5px;
+   
 }
 
 label {
@@ -82,11 +101,12 @@ label {
     text-align: left;
     color: var(--black);
     font-weight: 500;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="email"] {
     width: 100%;
     padding: 14px 16px;
     border: 2px solid var(--medium_gray);
@@ -97,7 +117,8 @@ input[type="password"] {
 }
 
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="email"]:focus {
     border-color: var(--bright_purple);
     outline: none;
     box-shadow: 0 0 0 3px rgba(76, 67, 206, 0.2);
@@ -132,6 +153,34 @@ input::placeholder {
     transform: translateY(0);
 }
 
+/* Alert Messages */
+.alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 300px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
     .login {
@@ -144,6 +193,7 @@ input::placeholder {
     
     input[type="text"],
     input[type="password"],
+    input[type="email"],
     .submit-button {
         padding: 12px 14px;
     }
@@ -157,21 +207,25 @@ input::placeholder {
     border-radius: 4px;
     margin-bottom: 20px;
     font-size: 14px;
-    display: none; /* Hidden by default, show with JavaScript when needed */
+    display: none; 
 }
 
-.one{
-    top:10%;
+.one {
+    top: 10%;
     left: 5%;
-    
 }
-.two{
-    top:60%;
+
+.two {
+    top: 60%;
     left: 30%;
 }
 
-
-.three{
-    top:10%;
+.three {
+    top: 10%;
     left: 80%;
+}
+
+.forgot-pass:hover {
+    text-decoration: underline;
+    border-bottom: 1px solid black;
 }

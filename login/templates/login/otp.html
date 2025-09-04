@@ -14,7 +14,6 @@
 <div class="blob three blob-yellow"><p></p></div>
 
 {% if locked_out %}
-    
     <div class="lockout-container">
         <div class="alert alert-warning lockout-alert">
             <h2>🔒 Account Temporarily Locked</h2>
@@ -27,17 +26,15 @@
         </div>
     </div>
 {% else %}
-    <!-- Normal OTP Form -->
     <form action="" method="post" id="form">
+        <img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 4rem; height: auto; margin-bottom: 5px;">
+
         {% csrf_token %}
         <h2>Enter OTP</h2>
         
         {% if error %}
             <div class="alert alert-error">
                 {{ error }}
-                    <div class="otp-actions">
-        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' user_id %}">Send OTP again?</a>
-    </div>
                 {% if "attempts remaining" in error %}
                     <div class="attempts-warning">
                          Be careful! Too many wrong attempts will lock your account for 30 minutes.
@@ -49,23 +46,46 @@
         <input id="otp" name="otp" type="text" required placeholder="Enter 6-digit OTP" maxlength="6">
         <input type="submit" value="Verify OTP" id="submit-btn">
         <div id="timer" class="timer"></div>
+            <div class="otp-actions">
+<a id="otp_send_button" class="otp-send-link" href="{% url 'resend_otp' user_id %}">Send OTP again?</a>    </div>
     </form>
 
-    <div class="otp-actions">
-        <a id="otp_send_button" class="otp-send-link" style="display: none;" href="{% url 'otp' user_id %}">Send OTP again?</a>
-    </div>
+
 {% endif %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     {% if locked_out %}
-        // Lockout countdown timer
+        // Lockout countdown timer with persistence
         const lockoutTimerElement = document.getElementById("lockout-timer");
         const errorText = "{{ error }}";
+        const userId = "{{ user.id }}";
+        const lockoutStorageKey = `lockout_timer_${userId}`;
         
         // Extract minutes from error message
         const minutesMatch = errorText.match(/(\d+) minutes/);
-        let lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
+        let lockoutTimeLeft = 0;
+        
+        // Check if we have a stored lockout time
+        const storedLockoutData = localStorage.getItem(lockoutStorageKey);
+        if (storedLockoutData) {
+            const lockoutData = JSON.parse(storedLockoutData);
+            const currentTime = Date.now();
+            const timeElapsed = Math.floor((currentTime - lockoutData.startTime) / 1000);
+            lockoutTimeLeft = Math.max(0, lockoutData.totalTime - timeElapsed);
+        } else {
+            // First time or no stored data - use the time from server
+            lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
+            
+            // Store the lockout start time and total duration
+            if (lockoutTimeLeft > 0) {
+                const lockoutData = {
+                    startTime: Date.now(),
+                    totalTime: lockoutTimeLeft
+                };
+                localStorage.setItem(lockoutStorageKey, JSON.stringify(lockoutData));
+            }
+        }
         
         if (lockoutTimeLeft > 0) {
             const lockoutCounter = setInterval(function() {
@@ -80,19 +100,54 @@ document.addEventListener("DOMContentLoaded", function() {
                     clearInterval(lockoutCounter);
                     lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
                     
-                    // Auto-refresh after lockout expires
+                  
+                    localStorage.removeItem(lockoutStorageKey);
+                    
+                  
                     setTimeout(function() {
                         window.location.reload();
                     }, 2000);
                 }
             }, 1000);
+        } else {
+            // Lockout has already expired
+            lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
+            localStorage.removeItem(lockoutStorageKey);
+            setTimeout(function() {
+                window.location.reload();
+            }, 2000);
         }
     {% else %}
-        // Normal OTP timer 
+        // Normal OTP timer with persistence
         const timerElement = document.getElementById("timer");
         const otpSendButton = document.getElementById("otp_send_button");
         const submitButton = document.getElementById("submit-btn");
-        let timeLeft = 300;
+        const userId = "{{ user.id }}";
+        const otpStorageKey = `otp_timer_${userId}`;
+        
+        let timeLeft = 300; // Default 5 minutes
+        
+        // Check if we have a stored OTP time
+        const storedOtpData = localStorage.getItem(otpStorageKey);
+        if (storedOtpData) {
+            const otpData = JSON.parse(storedOtpData);
+            const currentTime = Date.now();
+            const timeElapsed = Math.floor((currentTime - otpData.startTime) / 1000);
+            timeLeft = Math.max(0, otpData.totalTime - timeElapsed);
+        } else {
+     
+            const otpData = {
+                startTime: Date.now(),
+                totalTime: timeLeft
+            };
+            localStorage.setItem(otpStorageKey, JSON.stringify(otpData));
+        }
+
+        // Show resend button if there's an error (wrong attempt)
+        const hasError = {% if error %}true{% else %}false{% endif %};
+        if (hasError) {
+            otpSendButton.style.display = "block";
+        }
 
         const counter = setInterval(function() {
             if (timeLeft > 0) {
@@ -109,24 +164,67 @@ document.addEventListener("DOMContentLoaded", function() {
                 submitButton.disabled = true;
                 submitButton.value = "OTP Expired";
                 
-        
+                // Clear the stored OTP data when expired
+                localStorage.removeItem(otpStorageKey);
             }
         }, 1000);
 
-      
+        // Auto-input handler for OTP
         const otpInput = document.getElementById("otp");
-        otpInput.addEventListener("input", function() {
-          
-            this.value = this.value.replace(/[^0-9]/g, '');
-           
-            if (this.value.length === 6) {
-                document.getElementById("form").submit();
+        if (otpInput) {
+            otpInput.addEventListener("input", function() {
+                // Only allow numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Auto-submit when 6 digits entered
+                if (this.value.length === 6) {
+                    // Clear timer data on successful submission attempt
+                    localStorage.removeItem(otpStorageKey);
+                    document.getElementById("form").submit();
+                }
+            });
+
+            // Focus on OTP input when page loads
+            otpInput.focus();
+        }
+
+      
+        window.addEventListener('beforeunload', function() {
+      
+            const form = document.getElementById("form");
+            if (form && document.activeElement === submitButton) {
+                localStorage.removeItem(otpStorageKey);
             }
         });
-
-        // Focus on OTP input when page loads
-        otpInput.focus();
     {% endif %}
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    
+    const now = Date.now();
+    const keysToRemove = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('lockout_timer_') || key.startsWith('otp_timer_'))) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                const timeElapsed = Math.floor((now - data.startTime) / 1000);
+                
+                
+                if (timeElapsed >= data.totalTime) {
+                    keysToRemove.push(key);
+                }
+            } catch (e) {
+             
+                keysToRemove.push(key);
+            }
+        }
+    }
+    
+
+    keysToRemove.forEach(key => localStorage.removeItem(key));
 });
 </script>
 
