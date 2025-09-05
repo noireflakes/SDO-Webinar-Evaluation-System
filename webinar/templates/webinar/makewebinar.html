@@ -8,6 +8,7 @@
 
 {% block body %}
 
+
     {% if webinar  %}
            <div class="top-bar">
         <div class="breadcrumbs" >
@@ -74,7 +75,7 @@
 
 
 
-        <form action="{% url 'make_webinar' %}" method="post" enctype="multipart/form-data" id="form">
+        <form action="{% url 'make_webinar' %}" method="post" enctype="multipart/form-data" id="form" {% if not webinar %} style="width: 80%;" {% endif %}>
             {% csrf_token %}
             
 

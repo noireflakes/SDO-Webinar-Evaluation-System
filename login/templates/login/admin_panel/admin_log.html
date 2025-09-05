@@ -2,136 +2,448 @@
 
 {% load static %}
 
-{% block title %}<title>Calendar</title>{% endblock %}
+{% block title %}<title>Admin Dashboard</title>{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
-
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_log.css' %}">
-
+<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_log.css' %}"> 
 
 
 {% endblock %}
+
 {% block js %}  
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-<script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
 <script src="{% static 'js/sidebar.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
 
 {% block body%}
 
-  <div class="topbar">
-    
-        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
-        <div class="credential-cont">        
-          <span class="username fw-semibold">{{ user.username }}</span>
-          <a class="profile">
-            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-          </a>
-        </div>
-   
-  </div>
-
-
-  <div class="app-container">
-
-     <div class="sidebar nav-sb">
-    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
-
-    <ul class="sidebar-nav">
-        <a href="{% url 'admin_events' %}" class="sb-nav-item">Event</a>
-        <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
-        <a href="{% url 'admin_users' %}" class="sb-nav-item">Users</a>
-        <a href="{% url 'admin_setting' %}" class="sb-nav-item">Setting</a>
-        <a href="{% url 'admin_log' %}" class="sb-nav-item sb-active">Log Entries</a>
-        <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-    </ul>
-
+<div class="topbar">
+    <div class="menu-cont">
+        <button class="nav-menu-bar" style="color:white; background: none;">
+            <i class="fas fa-bars" style="font-size: 1.5em;"></i>
+        </button>
     </div>
-    <aside class="d-sidebar">
-      <div class="logo">
-        <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-        <h2>SDO Baliwag</h2>
-      </div>
+    <div class="credential-cont">        
+        <span class="username fw-semibold">{{ user.username }}</span>
+        <a class="profile">
+            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
+        </a>
+    </div>
+</div>
 
-      <nav class="nav">
-        <a href="{% url 'admin_events' %}" class="nav-item">Event</a>
-        <a href="{% url 'admin_calendar' %}" class="nav-item">Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="nav-item">Certificate</a>
-        <a href="{% url 'admin_users' %}" class="nav-item">Users</a>
-        <a href="{% url 'admin_setting' %}" class="nav-item">Settting</a>
-        <a href="{% url 'admin_log' %}" class="nav-item active">Log Entries</a>
-        <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
-      </nav>
+<div class="app-container">
+    <div class="sidebar nav-sb">
+        <div class="close-cont">
+            <button class="close-sb">
+                <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
+            </button>
+        </div>
+        <ul class="sidebar-nav">
+            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
+            <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settings</a>
+            <a href="{% url 'admin_log' %}" class="sb-nav-item sb-active">Activity Logs</a>
+            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+        </ul>
+    </div>
+
+    <aside class="d-sidebar">
+        <div class="logo">
+            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+            <h2>SDO Baliwag</h2>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'admin_events' %}" class="nav-item">Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="nav-item">Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="nav-item"> Certificates</a>
+            <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
+            <a href="{% url 'admin_log' %}" class="nav-item active">Activity Logs</a>
+            <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
+        </nav>
     </aside>
 
     <div class="main-content">
-    
-    <div class="log-history-container">
-    <h2> Admin Log History</h2>
-    <table class="log-table">
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>User</th>
-                <th>Type</th>
-                <th>Action</th>
-                <th>Object</th>
-                <th>Message</th>
-              
-                
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in logs %}
-            <tr class="log-row">
-                <td>{{ log.action_time|date:"Y-m-d H:i:s" }}</td>
-                <td>{{ log.user.username }}</td>
-                <td class="type {% if log.user.is_superuser %}admin{% elif log.user.is_staff %}staff{% else %}user{% endif %}">
-                    {% if log.user.is_superuser %}Admin{% elif log.user.is_staff %}Staff{% else %}User{% endif %}
-                </td>
-                <td class="action {% if log.action_flag == 1 %}add{% elif log.action_flag == 2 %}change{% elif log.action_flag == 3 %}delete{% endif %}">
-                    {% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}
-                </td>
-                <td>{{ log.object_repr }}</td>
-                <td>{{ log.change_message }}</td>
-                
-                
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="no-logs">No logs available</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <h4 style="font-size:2rem;margin-bottom:0.3rem">Activity Logs</h4>
+<p style="color:#6c757d; margin-bottom:2rem; font-size:1rem;">
+    A record of all user and admin actions in the system.
+</p>
+        <div class="table-container">
+            <div class="table-header">
+                <h3><i class="fas fa-database me-2"></i>Log Audits</h3>
+                <div class="table-tabs">
+                    <button class="tab-btn active" onclick="switchTab('logs', this)">
+                        <i class="fas fa-history me-1"></i>Admin Logs
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('users', this)">
+                        <i class="fas fa-users me-1"></i>Users
+                    </button>
+                </div>
+            </div>
 
-      
+            <!-- Admin Logs Tab -->
+            <div id="logs-tab" class="tab-content active">
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search text-muted"></i>
+                        <input type="text" id="logs-search" placeholder="Search logs..." onkeyup="searchTable('logs')">
+                    </div>
+                    <div class="rows-per-page">
+                        <span>Show:</span>
+                        <select id="logs-rows-select" onchange="changeRowsPerPage('logs')">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
+                </div>
+
+                <div class="table-content">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Timestamp</th>
+                                <th style="width: 12%;">User</th>
+                                <th style="width: 10%;">Type</th>
+                                <th style="width: 10%;">Action</th>
+                          
+                                <th style="width: 28%;">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-footer">
+                    <div class="table-info" id="logs-table-info"></div>
+                    <nav>
+                        <ul class="pagination mb-0" id="logs-pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="tab-content">
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search text-muted"></i>
+                        <input type="text" id="users-search" placeholder="Search users..." onkeyup="searchTable('users')">
+                    </div>
+                    <div class="rows-per-page">
+                        <span>Show:</span>
+                        <select id="users-rows-select" onchange="changeRowsPerPage('users')">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
+                </div>
+
+                <div class="table-content">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">ID</th>
+                                <th style="width: 20%;">User</th>
+                                <th style="width: 25%;">Email</th>
+                                <th style="width: 15%;">Status</th>
+                                <th style="width: 15%;">Joined</th>
+                                <th style="width: 20%;">Last Login</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-footer">
+                    <div class="table-info" id="users-table-info"></div>
+                    <nav>
+                        <ul class="pagination mb-0" id="users-pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <footer>
-  <div class="container d-flex justify-content-between flex-wrap">
-      <div>
-          <p>Empowering organizations through effective performance evaluation</p>
-      </div>
-      <div>
-          <h6>Contact Us</h6>
-          <p>Baliwag City North Central School, Lopez Jaena St.</p>
-          <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
-      </div>
-  </div>
+    <div class="container d-flex justify-content-between flex-wrap">
+        <div>
+            <p>Empowering organizations through effective performance evaluation</p>
+        </div>
+        <div>
+            <h6>Contact Us</h6>
+            <p>Baliwag City North Central School, Lopez Jaena St.</p>
+            <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
+        </div>
+    </div>
 </footer>
 
+<script>
+// Convert Django data to JavaScript
+const logsData = [
+    {% for log in logs %}
+    {
+        id: {{ log.id }},
+        timestamp: "{{ log.action_time|date:'Y-m-d H:i:s' }}",
+        username: "{{ log.user.username|escapejs }}",
+        userType: "{% if log.user.is_superuser %}superuser{% elif log.user.is_staff %}staff{% else %}user{% endif %}",
+        userTypeLabel: "{% if log.user.is_superuser %} Admin{% elif log.user.is_staff %}Staff{% else %}User{% endif %}",
+        action: "{% if log.action_flag == 1 %}add{% elif log.action_flag == 2 %}change{% elif log.action_flag == 3 %}delete{% endif %}",
+        actionLabel: "{% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}",
+        object: "{{ log.object_repr|escapejs }}",
+        message: "{{ log.get_change_message|escapejs }}"
+    }{% if not forloop.last %},{% endif %}
+    {% empty %}
+    {% endfor %}
+];
 
+const usersData = [
+    {% for user_item in users %}
+    {
+        id: {{ user_item.id }},
+        username: "{{ user_item.username|escapejs }}",
+        email: "{{ user_item.email|escapejs }}",
+        firstName: "{{ user_item.first_name|escapejs }}",
+        lastName: "{{ user_item.last_name|escapejs }}",
+        isActive: {{ user_item.is_active|yesno:"true,false" }},
+        isStaff: {{ user_item.is_staff|yesno:"true,false" }},
+        isSuperuser: {{ user_item.is_superuser|yesno:"true,false" }},
+        dateJoined: "{{ user_item.date_joined|date:'Y-m-d H:i:s' }}",
+        lastLogin: "{{ user_item.last_login|date:'Y-m-d H:i:s'|default:'Never' }}",
+        profileImg: "{% if user_item.user_profile.img %}{{ user_item.user_profile.img.url }}{% else %}{% static 'asset/default-avatar.png' %}{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% empty %}
+    {% endfor %}
+];
 
+// Pagination state
+const tableState = {
+    logs: {
+        data: logsData,
+        filteredData: logsData,
+        currentPage: 1,
+        rowsPerPage: 7
+    },
+    users: {
+        data: usersData,
+        filteredData: usersData,
+        currentPage: 1,
+        rowsPerPage: 7
+    }
+};
 
+function switchTab(tabName, button) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab and mark button as active
+    document.getElementById(tabName + '-tab').classList.add('active');
+    button.classList.add('active');
+    
+    // Display the table
+    displayTable(tabName);
+    setupPagination(tabName);
+}
 
+function displayTable(tableName) {
+    const state = tableState[tableName];
+    const tableBody = document.getElementById(tableName + '-table-body');
+    const tableInfo = document.getElementById(tableName + '-table-info');
+    
+    tableBody.innerHTML = "";
+    
+    if (state.filteredData.length === 0) {
+        const colSpan = tableName === 'logs' ? 6 : 6;
+        tableBody.innerHTML = `<tr><td colspan="${colSpan}" class="no-data">No ${tableName} available</td></tr>`;
+        tableInfo.innerHTML = "Showing 0 entries";
+        return;
+    }
+    
+    let start = (state.currentPage - 1) * state.rowsPerPage;
+    let end = start + state.rowsPerPage;
+    let paginatedData = state.filteredData.slice(start, end);
+    
+    if (tableName === 'logs') {
+        paginatedData.forEach(log => {
+            let tr = `<tr>
+            <td title="${new Date(log.timestamp).toLocaleString([], { 
+                year: 'numeric', 
+                month: 'short', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            })}">
+              ${new Date(log.timestamp).toLocaleString([], { 
+                year: 'numeric', 
+                month: 'short', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </td>                        
+            <td title="${log.username}">${log.username}</td>         
+            <td><span class="status-badge status-${log.userType}">${log.userTypeLabel}</span></td>                        
+            <td><span class="action-badge action-${log.action}">${log.actionLabel}</span></td>
+            <td class="text-truncate-custom" title="${log.message}">${log.message}</td>
+                      </tr>`;
+            tableBody.innerHTML += tr;
+        });
+    } else if (tableName === 'users') {
+        paginatedData.forEach(user => {
+            let statusClass = user.isSuperuser ? 'superuser' : (user.isStaff ? 'staff' : (user.isActive ? 'active' : 'inactive'));
+            let statusText = user.isSuperuser ? 'Admin' : (user.isStaff ? 'Staff' : (user.isActive ? 'Active' : 'Inactive'));
+            let fullName = `${user.firstName} ${user.lastName}`.trim() || user.username;
+            
+            let tr = `<tr>
+                        <td>${user.id}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="fw-medium">${fullName}</div>
+                                    <small class="text-muted">@${user.username}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td title="${user.email}">${user.email}</td>
+                        <td><span class="status-badge status-${statusClass}">${statusText}</span></td>
+                        <td title="${user.dateJoined}">${new Date(user.dateJoined).toLocaleDateString()}</td>
+                        <td title="${user.lastLogin}">${user.lastLogin !== 'Never' ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
+                      </tr>`;
+            tableBody.innerHTML += tr;
+        });
+    }
+    
+    // Update table info
+    let actualEnd = Math.min(end, state.filteredData.length);
+    tableInfo.innerHTML = `Showing ${start + 1} to ${actualEnd} of ${state.filteredData.length} entries`;
+}
+
+function setupPagination(tableName) {
+    const state = tableState[tableName];
+    const pagination = document.getElementById(tableName + '-pagination');
+    pagination.innerHTML = "";
+    
+    if (state.filteredData.length === 0) return;
+    
+    let pageCount = Math.ceil(state.filteredData.length / state.rowsPerPage);
+    
+    // Previous button
+    let prevLi = document.createElement("li");
+    prevLi.className = `page-item ${state.currentPage === 1 ? "disabled" : ""}`;
+    prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
+    if (state.currentPage > 1) {
+        prevLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            state.currentPage--;
+            displayTable(tableName);
+            setupPagination(tableName);
+        });
+    }
+    pagination.appendChild(prevLi);
+    
+    // Page numbers
+    let startPage = Math.max(1, state.currentPage - 2);
+    let endPage = Math.min(pageCount, state.currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        let li = document.createElement("li");
+        li.className = "page-item " + (i === state.currentPage ? "active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        
+        li.addEventListener("click", function(e) {
+            e.preventDefault();
+            state.currentPage = i;
+            displayTable(tableName);
+            setupPagination(tableName);
+        });
+        
+        pagination.appendChild(li);
+    }
+    
+    // Next button
+    let nextLi = document.createElement("li");
+    nextLi.className = `page-item ${state.currentPage === pageCount ? "disabled" : ""}`;
+    nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
+    if (state.currentPage < pageCount) {
+        nextLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            state.currentPage++;
+            displayTable(tableName);
+            setupPagination(tableName);
+        });
+    }
+    pagination.appendChild(nextLi);
+}
+
+function searchTable(tableName) {
+    const searchInput = document.getElementById(tableName + '-search');
+    const searchTerm = searchInput.value.toLowerCase();
+    const state = tableState[tableName];
+    
+    if (searchTerm === '') {
+        state.filteredData = state.data;
+    } else {
+        if (tableName === 'logs') {
+            state.filteredData = state.data.filter(item =>
+                item.username.toLowerCase().includes(searchTerm) ||
+                item.object.toLowerCase().includes(searchTerm) ||
+                item.message.toLowerCase().includes(searchTerm) ||
+                item.actionLabel.toLowerCase().includes(searchTerm)
+            );
+        } else if (tableName === 'users') {
+            state.filteredData = state.data.filter(item =>
+                item.username.toLowerCase().includes(searchTerm) ||
+                item.email.toLowerCase().includes(searchTerm) ||
+                item.firstName.toLowerCase().includes(searchTerm) ||
+                item.lastName.toLowerCase().includes(searchTerm)
+            );
+        }
+    }
+    
+    state.currentPage = 1;
+    displayTable(tableName);
+    setupPagination(tableName);
+}
+
+function changeRowsPerPage(tableName) {
+    const select = document.getElementById(tableName + '-rows-select');
+    const state = tableState[tableName];
+    
+    state.rowsPerPage = parseInt(select.value);
+    state.currentPage = 1;
+    displayTable(tableName);
+    setupPagination(tableName);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    displayTable('logs');
+    setupPagination('logs');
+    displayTable('users');
+    setupPagination('users');
+});
+</script>
 
 {% endblock %}

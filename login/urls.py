@@ -39,6 +39,17 @@ urlpatterns=[
     path('reset-password/<uuid:token>/', views.reset_password, name='reset_password'),
 
 
+    path('cal_event_data/<int:id>/', views.cal_event_data, name='cal_event_data'),
+
+    path('api/completed-events/', views.get_completed_events, name='api_completed_events'),
+    path('api/compare-events/', views.compare_events, name='api_compare_events'),
+    path('api/event-details/<int:event_id>/', views.get_event_details, name='api_event_details'),
+    path('api/event-statistics/<int:event_id>/', views.get_event_statistics, name='api_event_statistics'),
+    path('api/event-data/<int:id>/', views.cal_event_data, name='cal_event_data'),
+    
+    
+
+
 
     
 

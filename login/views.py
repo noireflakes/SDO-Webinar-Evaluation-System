@@ -143,15 +143,32 @@ def generate_otp(request, user_id=None):
     user = get_object_or_404(User, id=user_id)
     otp_code = None 
     
+    # Check for existing OTP record
+    current_otp = Otp.objects.filter(user=user).first()
+    
+    # Check if user is locked out
+    if current_otp and current_otp.is_locked_out():
+        remaining_seconds = current_otp.get_lockout_remaining_seconds()
+        remaining_minutes = remaining_seconds // 60
+        
+        return render(request, 'login/otp.html', {
+            'locked_out': True,
+            'error': f'Account locked due to too many failed attempts. Try again in {remaining_minutes} minutes.',
+            'user': user,
+            'user_id': user_id
+        })
+    
+    # Clear expired lockout
+    if current_otp and current_otp.lockout_until and not current_otp.is_locked_out():
+        current_otp.clear_lockout()
    
     if request.method == 'POST':
         user_otp = (request.POST.get('otp') or '').strip()
         
-        current_otp = Otp.objects.filter(user=user).first()
         if current_otp:
+            # Check if OTP is expired
             time_diff = timezone.now() - current_otp.created_at
             if time_diff.total_seconds() > 300:
-             
                 current_otp.is_valid = False
                 current_otp.save()
                 
@@ -164,12 +181,12 @@ def generate_otp(request, user_id=None):
             totp = pyotp.TOTP(current_otp.secret_key, interval=300)
             
             if totp.verify(user_otp):
-              
+                # Successful login - clear everything
                 login(request, user)
                 request.session.modified = True
                 request.session.pop('username', None)
                 request.session.pop("otp_generated", None)
-                print('the otp is correct')
+                print('The OTP is correct')
                 
                 device_hash = request.session.get('hash')
                 if device_hash:
@@ -182,29 +199,43 @@ def generate_otp(request, user_id=None):
                 current_otp.delete()
                 return redirect('index')
             else:
-       
+                # Wrong OTP - increment counters
                 current_otp.retry += 1
+                current_otp.total_failed_attempts += 1
                 current_otp.last_attempt = timezone.now()
                 current_otp.save()
                 
                 if request.user.is_authenticated:
                     return redirect('index')
                 
-                if current_otp.retry >= 3:
-           
+                # Check if we've reached 10 total failed attempts
+                if current_otp.total_failed_attempts >= 10:
+                    # Lock out for 10 minutes
+                    current_otp.lockout_until = timezone.now() + timedelta(minutes=10)
                     current_otp.is_valid = False
                     current_otp.save()
-                    current_otp.delete()
+                    
+                    return render(request, 'login/otp.html', {
+                        'locked_out': True,
+                        'error': 'Account locked due to too many failed attempts. Try again in 10 minutes.',
+                        'user': user,
+                        'user_id': user_id
+                    })
+                
+                # Check if current OTP has 3 attempts (generate new OTP)
+                if current_otp.retry >= 3:
+                    current_otp.is_valid = False
+                    current_otp.save()
                     request.session.pop("otp_generated", None)
                     return render(request, 'login/otp.html', {
-                        'error': 'Too many failed attempts. Please request a new OTP.',
+                        'error': f'Too many failed attempts for current OTP. Please request a new OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
                         'user_id': user_id,
                         'expired': True
                     })
                 
-             
+                # Show remaining attempts for current OTP and total attempts
                 return render(request, 'login/otp.html', {
-                    'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining.',
+                    'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
                     'user_id': user_id
                 })
         else:
@@ -222,34 +253,27 @@ def generate_otp(request, user_id=None):
         is_expired = time_diff.total_seconds() > 300
         
         if is_expired:
-
             existing_otp.is_valid = False
             existing_otp.save()
             
- 
             return render(request, 'login/otp.html', {
                 'error': 'OTP has expired. Please request a new one.',
                 'user_id': user_id,
                 'expired': True
             })
         elif existing_otp.is_valid:
-       
             should_generate_otp = False
         else:
-       
             should_generate_otp = True
     else:
-     
         should_generate_otp = True
    
     if should_generate_otp:
-    
         session_key = f"otp_generated_{user_id}"
         
-       
         if not request.session.get(session_key):
             if existing_otp:
-           
+                # Update existing OTP record but keep total_failed_attempts
                 otp_secret_key = pyotp.random_base32()
                 totp = pyotp.TOTP(otp_secret_key, interval=300)
                 otp_code = totp.now()
@@ -257,12 +281,13 @@ def generate_otp(request, user_id=None):
                 existing_otp.otp = otp_code
                 existing_otp.secret_key = otp_secret_key
                 existing_otp.created_at = timezone.now()
-                existing_otp.retry = 0
+                existing_otp.retry = 0  # Reset current OTP attempts
                 existing_otp.is_valid = True
                 existing_otp.last_attempt = None 
+                # Keep total_failed_attempts unchanged
                 existing_otp.save()
             else:
-            
+                # Create new OTP record
                 otp_secret_key = pyotp.random_base32()
                 totp = pyotp.TOTP(otp_secret_key, interval=300)
                 otp_code = totp.now()
@@ -273,12 +298,12 @@ def generate_otp(request, user_id=None):
                     secret_key=otp_secret_key,
                     created_at=timezone.now(),
                     retry=0,
-                    is_valid=True  
+                    is_valid=True,
+                    total_failed_attempts=0  # Start fresh for new users
                 )
 
-
     if otp_code:
-        print(f"this is the otp code: {otp_code}")
+        print(f"This is the OTP code: {otp_code}")
         result = send_email(
             to_email=f"{user.email}",
             subject="OTP code From SDO",
@@ -292,6 +317,7 @@ def generate_otp(request, user_id=None):
         'user_id': user_id
     })
 
+
 def resend_otp(request, user_id):
     """
     Handle explicit resend OTP requests
@@ -302,11 +328,14 @@ def resend_otp(request, user_id):
     
     user = get_object_or_404(User, id=user_id)
     
-    # Find existing OTP record
+   
     existing_otp = Otp.objects.filter(user=user).first()
     
+    if existing_otp and existing_otp.is_locked_out():
+        return redirect('otp', user_id=user_id)
+    
     if existing_otp:
-        # Update existing OTP record with new values
+    
         otp_secret_key = pyotp.random_base32()
         totp = pyotp.TOTP(otp_secret_key, interval=300)
         otp_code = totp.now()
@@ -314,9 +343,10 @@ def resend_otp(request, user_id):
         existing_otp.otp = otp_code
         existing_otp.secret_key = otp_secret_key
         existing_otp.created_at = timezone.now()
-        existing_otp.retry = 0
+        existing_otp.retry = 0  
         existing_otp.is_valid = True
         existing_otp.last_attempt = None
+    
         existing_otp.save()
     else:
         # Create new OTP record if none exists
@@ -330,7 +360,8 @@ def resend_otp(request, user_id):
             secret_key=otp_secret_key,
             created_at=timezone.now(),
             retry=0,
-            is_valid=True
+            is_valid=True,
+            total_failed_attempts=0
         )
     
     # Send OTP email
@@ -456,6 +487,7 @@ def admin_certificate(request):
 @admin_required
 def admin_events(request):
     webinar=Webinar.objects.all()
+
     return render(request, "login/admin_panel/events.html",{
         'webinars':webinar,
       
@@ -467,7 +499,8 @@ def admin_setting(request):
 
 @admin_required
 def admin_users(request):
-    users = User.objects.all()  # Get all users
+    users = User.objects.all().order_by('-date_joined')
+ 
     return render(request, 'login/admin_panel/users.html', {
         'all_users': users  
     })
@@ -479,7 +512,7 @@ def register_user(request):
 
         first_name=request.POST.get("user_firstname")
         last_name=request.POST.get("user_lastname")
-        birth_date=request.POST.get("birth_date")
+        birth_date=request.POST.get("user_birth_date")
 
 
         email=request.POST.get("user_email")
@@ -496,7 +529,7 @@ def register_user(request):
             return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
-            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birth_date=birth_date)
+            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birthday=birth_date)
 
 
         result = send_email(
@@ -588,22 +621,11 @@ def edit_user(request):
     redirected=""
 
     if request.method == 'POST':
-        full_name = request.POST.get('fullname', '').strip()
-        if full_name:
-            name = full_name.split(" ")
-            if not name:
-                first_name = ''
-                last_name = ''
-            elif len(name) == 1:
-                first_name = name[0]
-                last_name = ''
-            else:
-                first_name = name[0]
-                last_name = ' '.join(name[1:])
-
+        first_name=request.POST.get("first_name")
+        last_name=request.POST.get("last_name")
             
-            user.first_name = first_name
-            user.last_name = last_name
+        user.first_name = first_name
+        user.last_name = last_name
 
         username=request.POST.get('username')
         if username:
@@ -636,52 +658,81 @@ def edit_user(request):
             profile.school = school
         profile.save()
 
+        messages.success(request,"Profile Successfully Applied Changes")
+
     if request.user.is_superuser or request.user.is_staff:
         return redirect("admin_setting")
     else:
         return redirect("user_setting")
 
 
+
 @login_required
 def change_password(request):
-    user = request.user
-
-    redirection=["admin_panel/setting.html","user_nav/user_setting.html"]
-    redirected=""
-
     if request.method == 'POST':
-        current_password = request.POST.get("current_password")
-        new_password = request.POST.get("new_password")
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
         
-        if current_password and new_password:
+    
+        errors = []
+        
+        
+        if not authenticate(username=request.user.username, password=current_password):
+            errors.append("Current password is incorrect")
+        
 
-            if user.check_password(current_password):
-                print("that password is check")
-                user.set_password(new_password)
-                user.save()
+        if len(new_password) < 8:
+            errors.append("New password must be at least 8 characters long")
+        
+    
+        if new_password != confirm_password:
+            errors.append("New password and confirmation password do not match")
+        
 
-                update_session_auth_hash(request, user)
-
-                if user.is_superuser or user.is_staff:
-
-                    return redirect("admin_setting")
-                else:
-                    return redirect("user_setting")
-            else:
-                if request.user.is_staff or request.user.is_superuser:
-                    redirected=redirection[0]
-                else:
-                    redirected=redirection[1]
-
-                return render(request, f'login/{redirected}', {
-                    'error_password': 'Current password is incorrect.'
-                })
-
+        if authenticate(username=request.user.username, password=new_password):
+            errors.append("New password must be different from current password")
+        
+        if not errors:
+  
+            user = request.user
+            user.set_password(new_password)
+            user.save()
+            
+            update_session_auth_hash(request, user)
+            
+            messages.success(request, "Password changed successfully!")
+        else:
+            for error in errors:
+                messages.error(request, error)
+            
+        
+            redirected = "admin_panel/setting.html" if (request.user.is_superuser or request.user.is_staff) else "user_nav/user_setting.html"
+            return render(request, f"login/{redirected}", {
+                "error_password": errors[0] if errors else None
+            })
+  
+    if request.user.is_superuser or request.user.is_staff:
+        return redirect("admin_setting")
+    else:
+        return redirect("user_setting")
+    
 @admin_required
 def log_list(request):
-    logs = LogEntry.objects.filter(user__is_staff=True).order_by('-action_time')
-    return render(request, "login/admin_panel/admin_log.html", {"logs": logs})
+ 
+    logs = LogEntry.objects.filter(
+        user__is_staff=True
+    ).select_related('user').order_by('-action_time')
+    users = User.objects.select_related('user_profile').order_by('-last_login')
 
+
+    
+    context = {
+        'logs': logs,
+        'users': users,
+    }
+    
+    return render(request, "login/admin_panel/admin_log.html", context)
 
 def forgot_password(request):
     if request.method == 'POST':
@@ -766,3 +817,293 @@ def reset_password(request, token):
         messages.error(request, 'Invalid or expired reset link.')
         return redirect('forgot_password')
 
+
+def cal_event_data(request, id):
+    webinar = get_object_or_404(Webinar, id=id)
+
+    categories = {
+        "speaker": [],
+        "venue": [],
+        "meals": [],
+        "manage": []
+    }
+
+    for evaluation in webinar.evaluation.all():
+        total = [evaluation.q1, evaluation.q2, evaluation.q3, evaluation.q4, evaluation.q5, evaluation.q6]
+        valid_numbers = [s for s in total if s is not None]
+        average = sum(valid_numbers) / len(valid_numbers) if valid_numbers else 0
+        average = round(average, 2) 
+
+        if evaluation.type in categories:
+            categories[evaluation.type].append(average)
+
+    results = {}
+    for key, values in categories.items():
+        if values:
+            results[key] = round(sum(values) / len(values), 2)
+        else:
+            results[key] = 0
+
+
+    all_values = categories["speaker"] + categories["venue"] + categories["meals"] + categories["manage"]
+    results["overall"] = round(sum(all_values) / len(all_values), 2) if all_values else 0
+
+    return JsonResponse(results)
+
+
+# views.py
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Avg, Count
+
+import logging
+
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
+@login_required
+
+def get_completed_events(request):
+    """
+    Get list of completed events with basic info for comparison dropdown.
+    Only returns events that have evaluations and are past their until_date.
+    """
+    try:
+        now = timezone.now().date()  # use date since until_date is a DateField
+
+        completed_webinars = Webinar.objects.filter(
+            until_date__lt=now,          # must be completed
+            evaluation__isnull=False     # has at least one evaluation
+        ).annotate(
+            response_count=Count('evaluation', distinct=True)
+        ).filter(
+            response_count__gt=0
+        ).distinct().order_by('-start_date')
+
+        events_data = [
+            {
+                'id': webinar.id,
+                'title': webinar.title,
+                'date': webinar.start_date.strftime('%B %d, %Y') if webinar.start_date else 'No date',
+                'response_count': webinar.response_count
+            }
+            for webinar in completed_webinars
+        ]
+
+        return JsonResponse(events_data, safe=False)
+
+    except Exception as e:
+        logger.error(f"Error fetching completed events: {str(e)}")
+        return JsonResponse({'error': 'Failed to fetch completed events'}, status=500)
+
+
+                           
+
+@login_required 
+@require_http_methods(["GET"])
+
+
+def compare_events(request):
+    """
+    Compare ratings between two events and return comparison data.
+    Expected URL parameters: event1, event2
+    """
+    event1_id = request.GET.get('event1')
+    event2_id = request.GET.get('event2')
+
+    if not event1_id or not event2_id:
+        return JsonResponse({'error': 'Both event1 and event2 parameters are required'}, status=400)
+
+    if event1_id == event2_id:
+        return JsonResponse({'error': 'Cannot compare an event with itself'}, status=400)
+
+    try:
+        # Fetch webinars
+        event1 = get_object_or_404(Webinar, id=event1_id)
+        event2 = get_object_or_404(Webinar, id=event2_id)
+        print(f"hello {event1}")
+        print(f"hello {event2}")
+
+        # Get evaluation data
+        event1_data = calculate_event_ratings(event1)
+        event2_data = calculate_event_ratings(event2)
+
+        comparison_data = {
+            'event1': {
+                'id': event1.id,
+                'title': event1.title,
+                'date': event1.start_date.strftime('%B %d, %Y') if event1.start_date else 'No date',
+                'ratings': event1_data.get('question_averages', {}),
+                'categories': event1_data.get('categories', []),
+                'overall': event1_data.get('overall', 0),
+                'total_responses': event1_data.get('total_responses', 0),
+            },
+            'event2': {
+                'id': event2.id,
+                'title': event2.title,
+                'date': event2.start_date.strftime('%B %d, %Y') if event2.start_date else 'No date',
+                'ratings': event2_data.get('question_averages', {}),
+                'categories': event2_data.get('categories', []),
+                'overall': event2_data.get('overall', 0),
+                'total_responses': event2_data.get('total_responses', 0),
+            }
+        }
+
+        return JsonResponse(comparison_data, safe=False)
+
+    except Http404:
+        return JsonResponse({'error': 'One or both events not found'}, status=404)
+
+    except Exception as e:
+        logger.error(f"Error comparing events ({event1_id}, {event2_id}): {str(e)}")
+        return JsonResponse({'error': 'Failed to compare events'}, status=500)
+
+def calculate_event_ratings(webinar):
+  
+    evaluations = webinar.evaluation.all()
+    
+    if not evaluations.exists():
+        return {
+            'question_averages': [0, 0, 0, 0, 0, 0],
+            'categories': {'speaker': 0, 'venue': 0, 'meals': 0, 'manage': 0},
+            'overall': 0,
+            'total_responses': 0
+        }
+
+    # Initialize data structures
+    question_totals = {'q1': [], 'q2': [], 'q3': [], 'q4': [], 'q5': [], 'q6': []}
+    categories = {'speaker': [], 'venue': [], 'meals': [], 'manage': []}
+
+    for evaluation in evaluations:
+        # Collect question scores
+        questions = {
+            'q1': evaluation.q1, 'q2': evaluation.q2, 'q3': evaluation.q3,
+            'q4': evaluation.q4, 'q5': evaluation.q5, 'q6': evaluation.q6
+        }
+        
+        # Add valid scores to question totals
+        for question, score in questions.items():
+            if score is not None:
+                question_totals[question].append(score)
+        
+        # Calculate evaluation average for category grouping
+        valid_scores = [score for score in questions.values() if score is not None]
+        if valid_scores:
+            eval_avg = sum(valid_scores) / len(valid_scores)
+            eval_type = getattr(evaluation, 'type', None)
+            if eval_type and eval_type in categories:
+                categories[eval_type].append(eval_avg)
+
+    # Calculate question averages (for chart display)
+    question_averages = []
+    for question in ['q1', 'q2', 'q3', 'q4', 'q5', 'q6']:
+        scores = question_totals[question]
+        avg = round(sum(scores) / len(scores), 2) if scores else 0
+        question_averages.append(avg)
+
+    # Calculate category averages
+    category_averages = {}
+    for category, values in categories.items():
+        category_averages[category] = round(sum(values) / len(values), 2) if values else 0
+
+    # Calculate overall average
+    all_scores = []
+    for scores in question_totals.values():
+        all_scores.extend(scores)
+    overall_avg = round(sum(all_scores) / len(all_scores), 2) if all_scores else 0
+
+    return {
+        'question_averages': question_averages,
+        'categories': category_averages,
+        'overall': overall_avg,
+        'total_responses': evaluations.count()
+    }
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_event_details(request, event_id):
+
+    try:
+        webinar = get_object_or_404(Webinar, id=event_id)
+        evaluation_count = webinar.evaluation.count()
+        
+        event_data = {
+            'id': webinar.id,
+            'title': webinar.title,
+            'description': webinar.description,
+            'date': webinar.start_date.strftime('%B %d, %Y') if webinar.start_date else 'No date',
+            'time': webinar.time.strftime('%I:%M %p') if hasattr(webinar, 'time') and webinar.time else 'No time',
+            'response_count': evaluation_count,
+            'status': 'completed' if evaluation_count > 0 else 'no_responses'
+        }
+        
+        return JsonResponse(event_data)
+        
+    except Webinar.DoesNotExist:
+        return JsonResponse({'error': 'Event not found'}, status=404)
+    except Exception as e:
+        logger.error(f"Error fetching event details for {event_id}: {str(e)}")
+        return JsonResponse({'error': 'Failed to fetch event details'}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_event_statistics(request, event_id):
+    """
+    Get comprehensive statistics for an event including response rates,
+    rating distributions, etc.
+    """
+    try:
+        webinar = get_object_or_404(Webinar, id=event_id)
+        evaluations = webinar.evaluation.all()
+        
+        if not evaluations.exists():
+            return JsonResponse({
+                'event_title': webinar.title,
+                'total_responses': 0,
+                'statistics': None
+            })
+
+        rating_distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        question_stats = {}
+        
+        for question in ['q1', 'q2', 'q3', 'q4', 'q5', 'q6']:
+            question_stats[question] = {
+                'average': 0,
+                'responses': 0,
+                'distribution': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+            }
+
+        for evaluation in evaluations:
+            questions = [evaluation.q1, evaluation.q2, evaluation.q3, 
+                        evaluation.q4, evaluation.q5, evaluation.q6]
+            
+            for i, score in enumerate(questions, 1):
+                if score is not None:
+                    question_key = f'q{i}'
+                    question_stats[question_key]['responses'] += 1
+                    question_stats[question_key]['distribution'][score] += 1
+                    rating_distribution[score] += 1
+
+        # Calculate averages
+        for question_key in question_stats:
+            stats = question_stats[question_key]
+            if stats['responses'] > 0:
+                total_score = sum(rating * count for rating, count in stats['distribution'].items())
+                stats['average'] = round(total_score / stats['responses'], 2)
+
+        return JsonResponse({
+            'event_title': webinar.title,
+            'total_responses': evaluations.count(),
+            'overall_rating_distribution': rating_distribution,
+            'question_statistics': question_stats,
+            'statistics': calculate_event_ratings(webinar)
+        })
+
+    except Exception as e:
+        logger.error(f"Error fetching event statistics for {event_id}: {str(e)}")
+        return JsonResponse({'error': 'Failed to fetch event statistics'}, status=500)

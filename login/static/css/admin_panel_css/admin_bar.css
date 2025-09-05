@@ -1,4 +1,5 @@
 /*topbar*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .topbar {
     position: relative;
@@ -66,6 +67,7 @@
     flex-direction: column;
     z-index: 200;
     flex-shrink: 0;
+    
 }
 
 .logo {
@@ -93,19 +95,24 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    
 }
 
-.nav-item {
+.nav .nav-item {
     color: #333;
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
     transition: background 2s ease-in, color 2s ease-in;
-    
+    font-weight: 500;
+    font-family: 'poppins','san-serif';
+ 
+ 
 }
 
 .nav-item:hover {
     background-color: #f0f0f0;
+    
 }
 
 .nav-item.active {

@@ -1,15 +1,13 @@
-
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color:  rgb(235, 230, 255);
+   background: linear-gradient(to bottom right, #e7e9fae8, #d6dbff);
     color: #1e293b;
     line-height: 1.6;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
-
 
 .settings-container {
     display: flex;
@@ -21,176 +19,204 @@ body {
     width: 95%;
 }
 
-.settings-main-content {
-    flex: 1;
-}
-
-.settings-sidebar {
-    width: 280px;
-}
-
 .settings-container h2 {
-    color: #1e293b;
+    color: black;
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+   
 }
-
 
 .card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+
+
+.card h4 {
+    color: black;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    text-align: left;
+    position: relative;
+}
+
+.card h4::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 10%;
+    transform: translateX(-50%);
+    width: 4rem;
+    height: 3px;
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+    border-radius: 2px;
+}
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #64748b;
-    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.8rem;
 }
 
 .form-group input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    padding: 1rem 1.2rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
-
-.settings-sidebar .card {
-    position: sticky;
-    top: 2rem;
+.form-group input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    background: white;
 }
 
-.profile-card {
-    text-align: center;
-    padding: 2rem;
+.input-group {
+    position: relative;
 }
 
-.profile-card img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
 }
 
-.profile-card h3 {
-    margin: 0.5rem 0;
-    font-size: 1.2rem;
-}
-
-.profile-card p {
-    color: #64748b;
-    font-size: 0.875rem;
-    margin: 0.25rem 0;
+.password-toggle:hover {
+    color: #4f46e5;
 }
 
 input[type="submit"] {
-    background-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
     color: white;
-    padding: 0.75rem 2rem;
+    padding: 1rem 3rem;
     border: none;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 12px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.875rem;
-    margin-top: 1rem;
-    width: auto;
-    display: inline-block;
-}
-
-
-.notif-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-top: 1px solid #f1f5f9;
-}
-
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
-}
-
-
-.footer-buttons {
-    text-align: right;
+    font-size: 1rem;
     margin-top: 1.5rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #3730a3, #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #16a34a;
+    border-left: 4px solid #16a34a;
 }
 
 
-@media (max-width: 1024px) {
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+
 
 @media (max-width: 768px) {
-    .settings-container {
-        flex-direction: column;
-    }
-    
-    .settings-sidebar {
-        width: 100%;
-    }
-    
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .settings-container {
+        padding: 0 1rem;
+    }
+    
+    .card {
+        padding: 2rem 1.5rem;
     }
 }
 
-.settings-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
+
+
+footer {
+    background-color: #1f1f1f;
+    color: #fff;
+    padding: 2rem;
     margin-top: 2rem;
+    border-top: 1px solid #444;
 }
 
-.settings-section {
-    margin-bottom: 3rem;
+footer a {
+    color: #9fc3ff;
+    text-decoration: none;
 }
 
-.settings-section h3 {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 0.5rem;
+footer a:hover {
+    text-decoration: underline;
+}
+.password-error {
+    display: none;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 14px;
 }
 
-.status-indicator {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 0.5rem;
+.password-error.show {
+    display: block;
 }
 
-.status-active {
-    background-color: #10b981;
+.password-error i {
+    margin-right: 8px;
 }
-
-.status-inactive {
-    background-color: #ef4444;
+@media screen and (max-width: 1000px) {
+    .d-sidebar {
+        display: none;
+    }
 }

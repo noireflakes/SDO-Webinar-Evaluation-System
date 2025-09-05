@@ -11,7 +11,7 @@ body, html{
 }
 
 body{
-    background-color: aliceblue;
+    background: linear-gradient(to bottom right, #e7e9fae8, #d6dbff);
 }
 
 .contents {

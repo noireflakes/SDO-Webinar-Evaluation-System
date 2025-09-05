@@ -2,6 +2,7 @@ html,body{
     width: 100%;
     height: 100%;
     scrollbar-width: none;
+
 }
 body {
     display: flex;
@@ -10,9 +11,22 @@ body {
     min-height: 100vh;
     margin: 0;
 
-    background-color: rgb(217, 207, 255);
+    background-color: #d6dbff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     flex-direction: column;
+
+}
+.main-content{
+    width: 100%;
+  
+}
+.bg{
+
+    position: absolute;
+    top: 10rem;
+    left: 10rem;
+    size: 10rem;
+
 }
 
 
@@ -104,13 +118,14 @@ a:hover{
 
 
 form {
-    width: 50%;
+    max-width: 80%;
+    min-width: 50%;
     padding: 30px;
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     margin: 40px 0;
-    border-top: 4px solid  #971fe7;
+    border-top: 5px solid  #971fe7;
 
 }
 
@@ -232,4 +247,11 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+form h3{
+    font-weight: 600;
+    font-size:2rem;
+    border-bottom: 2px solid #971fe7;
+    width: fit-content;
 }

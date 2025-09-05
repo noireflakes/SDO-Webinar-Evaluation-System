@@ -18,6 +18,55 @@ body, html {
     box-sizing: border-box;
 }
 
+
+table{
+    padding: 1rem;
+    
+
+}
+
+.btn-view {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+    margin-right: 0.3rem;
+}
+
+.btn-view:hover {
+    background-color: #5a6268;
+    color: white;
+}
+
+.user-detail-row {
+    margin-bottom: 0.8rem;
+    display: flex;
+}
+
+.user-detail-label {
+    font-weight: 600;
+    min-width: 120px;
+}
+
+.user-detail-value {
+    flex: 1;
+}
+
+.modal-header{
+    background-color:  #1a086b;
+}
+
+.modal-user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+
+}
+
 .page-header {
     display: flex;
     justify-content: space-between;

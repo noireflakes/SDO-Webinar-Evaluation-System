@@ -28,16 +28,36 @@ class TrustedDevice(models.Model):
 class Otp(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     otp = models.CharField(max_length=6)
-    secret_key=models.CharField(max_length=40)
+    secret_key = models.CharField(max_length=40)
     created_at = models.DateTimeField(auto_now_add=True)
     retry = models.IntegerField(default=0)
     last_attempt = models.DateTimeField(null=True, blank=True)
-    is_valid = models.BooleanField(default=True, null=True, blank=True)  
+    is_valid = models.BooleanField(default=True, null=True, blank=True)
+    
 
+    lockout_until = models.DateTimeField(null=True, blank=True)
+    total_failed_attempts = models.IntegerField(default=0) 
+    
     def __str__(self):
         return f"{self.id}-{self.user}-{self.otp}"
+    
+    def is_locked_out(self):
+        
+        if self.lockout_until:
+            return timezone.now() < self.lockout_until
+        return False
+    
+    def get_lockout_remaining_seconds(self):
+       
+        if self.lockout_until and self.is_locked_out():
+            return int((self.lockout_until - timezone.now()).total_seconds())
+        return 0
+    
+    def clear_lockout(self):
 
-
+        self.lockout_until = None
+        self.total_failed_attempts = 0
+        self.save()
 
 class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
