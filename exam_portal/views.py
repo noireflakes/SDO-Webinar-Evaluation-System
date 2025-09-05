@@ -113,6 +113,8 @@ def rounded_data(request, id):
 
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
+    
+    # Evaluation data
     email = []
     deped_id = []
     sex = []
@@ -122,6 +124,18 @@ def result_data(request, id):
     meal = []
     manage = []
 
+    # Attendance data
+    attendance_emails = []
+    attendance_deped_ids = []
+    attendance_scores = []
+    
+    # Comments data
+    comment_emails = []
+    comment_deped_ids = []
+    comment_texts = []
+    comment_timestamps = []
+
+    # Process evaluations
     for evaluation in webinar.evaluation.all():
         # User details
         email.append(evaluation.user.email)
@@ -143,9 +157,34 @@ def result_data(request, id):
         elif evaluation.type == 'manage':
             manage.append(average)
 
+    # Process attendance
+    for attendee in webinar.attendees.all():
+        attendance_emails.append(attendee.email)
+        attendance_deped_ids.append(attendee.deped_id)
+        attendance_scores.append(attendee.attendance)
+    
+    # Process comments
+    for comment in webinar.comment.all():
+        comment_emails.append(comment.user.email)
+        # Safe access to user_profile
+        try:
+            comment_deped_ids.append(comment.user.user_profile.deped_id)
+        except AttributeError:
+            comment_deped_ids.append("")
+        
+        comment_texts.append(comment.text)
+        
+        # Add timestamp if Comment model has it, otherwise use current time or empty
+        if hasattr(comment, 'timestamp'):
+            comment_timestamps.append(comment.timestamp)
+        else:
+            comment_timestamps.append("")
+
     overall = speaker + venue + meal + manage
 
-    evaluations = {
+    # Combined response data
+    response_data = {
+        # Evaluation data
         "email": email,
         "deped_id": deped_id,
         "sex": sex,                 
@@ -155,11 +194,20 @@ def result_data(request, id):
         "meal": meal,
         "manage": manage,
         "overall": overall,
+        
+        # Attendance data
+        "attendance_emails": attendance_emails,
+        "attendance_deped_ids": attendance_deped_ids,
+        "attendance_scores": attendance_scores,
+        
+        # Comments data
+        "comment_emails": comment_emails,
+        "comment_deped_ids": comment_deped_ids,
+        "comment_texts": comment_texts,
+        "comment_timestamps": comment_timestamps,
     }
 
- 
-
-    return JsonResponse(evaluations)
+    return JsonResponse(response_data)
 
 
 def test_data(request, id):

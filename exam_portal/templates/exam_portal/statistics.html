@@ -118,41 +118,147 @@
 
 <script>
     
-   async function DownloadExcel() {
+async function DownloadExcel() {
     const id = parseInt("{{ webinar.id }}");
     const response = await fetch(`/exam_portal/result_data/${id}`);
     const data = await response.json();
 
     console.log("Data fetched:", data);
 
-    
-    let csv = "Email,School ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
+    // Create workbook with multiple sheets
+    let csvContent = "";
 
-    for (let i = 0; i < data.email.length; i++) {
-        const email = data.email[i] ?? "";
-        const schoolId = data.deped_id[i] ?? "";
-        const sex = data.sex[i] ?? "";
-        const timestamp = data.timestamp[i] ?? "";
-        const speaker = data.speaker[i] ?? "";
-        const venue = data.venue[i] ?? "";
-        const meal = data.meal[i] ?? "";
-        const manage = data.manage[i] ?? "";
+    // ===== EVALUATION DATA SHEET =====
+    csvContent += "=== EVALUATION DATA ===\n";
+    csvContent += "Email,School ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
 
-        // Add to CSV line
-        csv += `${email},${schoolId},${sex},${timestamp},${speaker},${venue},${meal},${manage}\n`;
+    // Find the maximum length to ensure proper alignment
+    const maxEvalLength = Math.max(
+        data.email?.length || 0,
+        data.deped_id?.length || 0,
+        data.sex?.length || 0,
+        data.timestamp?.length || 0,
+        data.speaker?.length || 0,
+        data.venue?.length || 0,
+        data.meal?.length || 0,
+        data.manage?.length || 0
+    );
+
+    for (let i = 0; i < maxEvalLength; i++) {
+        const email = data.email?.[i] ?? "";
+        const schoolId = data.deped_id?.[i] ?? "";
+        const sex = data.sex?.[i] ?? "";
+        const timestamp = data.timestamp?.[i] ?? "";
+        const speaker = data.speaker?.[i] ?? "";
+        const venue = data.venue?.[i] ?? "";
+        const meal = data.meal?.[i] ?? "";
+        const manage = data.manage?.[i] ?? "";
+
+        // Escape commas in text fields
+        const escapedEmail = email.includes(',') ? `"${email}"` : email;
+        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
+        const escapedSex = sex.includes(',') ? `"${sex}"` : sex;
+        const escapedTimestamp = timestamp.includes(',') ? `"${timestamp}"` : timestamp;
+
+        csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${speaker},${venue},${meal},${manage}\n`;
     }
 
+    // ===== ATTENDANCE DATA SHEET =====
+    csvContent += "\n=== ATTENDANCE DATA ===\n";
+    csvContent += "Email,School ID,Attendance Score\n";
 
-    // Create file
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const maxAttendanceLength = Math.max(
+        data.attendance_emails?.length || 0,
+        data.attendance_deped_ids?.length || 0,
+        data.attendance_scores?.length || 0
+    );
+
+    for (let i = 0; i < maxAttendanceLength; i++) {
+        const email = data.attendance_emails?.[i] ?? "";
+        const schoolId = data.attendance_deped_ids?.[i] ?? "";
+        const attendanceScore = data.attendance_scores?.[i] ?? "";
+
+        // Escape commas in text fields
+        const escapedEmail = email.includes(',') ? `"${email}"` : email;
+        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
+
+        csvContent += `${escapedEmail},${escapedSchoolId},${attendanceScore}\n`;
+    }
+
+    // ===== COMMENTS DATA SHEET =====
+    csvContent += "\n=== COMMENTS DATA ===\n";
+    csvContent += "Email,School ID,Comment,Timestamp\n";
+
+    const maxCommentsLength = Math.max(
+        data.comment_emails?.length || 0,
+        data.comment_deped_ids?.length || 0,
+        data.comment_texts?.length || 0,
+        data.comment_timestamps?.length || 0
+    );
+
+    for (let i = 0; i < maxCommentsLength; i++) {
+        const email = data.comment_emails?.[i] ?? "";
+        const schoolId = data.comment_deped_ids?.[i] ?? "";
+        const commentText = data.comment_texts?.[i] ?? "";
+        const timestamp = data.comment_timestamps?.[i] ?? "";
+
+        // Escape commas and quotes in text fields
+        const escapedEmail = email.includes(',') ? `"${email}"` : email;
+        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
+        const escapedComment = commentText.replace(/"/g, '""'); // Escape quotes
+        const escapedCommentWithCommas = escapedComment.includes(',') ? `"${escapedComment}"` : escapedComment;
+        const escapedTimestamp = timestamp.includes(',') ? `"${timestamp}"` : timestamp;
+
+        csvContent += `${escapedEmail},${escapedSchoolId},"${escapedComment}",${escapedTimestamp}\n`;
+    }
+
+    // ===== SUMMARY STATISTICS =====
+    csvContent += "\n=== SUMMARY STATISTICS ===\n";
+    csvContent += "Metric,Count\n";
+    csvContent += `Total Evaluations,${maxEvalLength}\n`;
+    csvContent += `Total Attendees,${maxAttendanceLength}\n`;
+    csvContent += `Total Comments,${maxCommentsLength}\n`;
+    
+    // Calculate averages if data exists
+    if (data.speaker?.length > 0) {
+        const avgSpeaker = data.speaker.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.speaker.filter(x => x !== null && x !== undefined).length;
+        csvContent += `Average Speaker Rating,${avgSpeaker.toFixed(2)}\n`;
+    }
+    
+    if (data.venue?.length > 0) {
+        const avgVenue = data.venue.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.venue.filter(x => x !== null && x !== undefined).length;
+        csvContent += `Average Venue Rating,${avgVenue.toFixed(2)}\n`;
+    }
+    
+    if (data.meal?.length > 0) {
+        const avgMeal = data.meal.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.meal.filter(x => x !== null && x !== undefined).length;
+        csvContent += `Average Meal Rating,${avgMeal.toFixed(2)}\n`;
+    }
+    
+    if (data.manage?.length > 0) {
+        const avgManage = data.manage.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.manage.filter(x => x !== null && x !== undefined).length;
+        csvContent += `Average Management Rating,${avgManage.toFixed(2)}\n`;
+    }
+
+    if (data.attendance_scores?.length > 0) {
+        const avgAttendance = data.attendance_scores.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.attendance_scores.filter(x => x !== null && x !== undefined).length;
+        csvContent += `Average Attendance Score,${avgAttendance.toFixed(2)}\n`;
+    }
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `evaluation_data_${id}.csv`);
+    link.setAttribute("download", `webinar_complete_data_${id}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    console.log("link been click")
+
+    // Clean up URL
+    URL.revokeObjectURL(url);
 
     console.log("Download triggered!");
 }
