@@ -518,7 +518,7 @@ def register_user(request):
 
 
         email=request.POST.get("user_email")
-        password=request.POST.get("staff_password")
+        password=request.POST.get("user_password")
         deped_id=request.POST.get("deped_id")
         username=deped_id
 
