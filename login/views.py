@@ -104,38 +104,37 @@ def logout_view(request):
     logout(request)
     return redirect("index")
 
-
 def login_view(request):
     if request.user.is_authenticated:
         return redirect("index")
-    
-    credential_error = ""
     
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
         
-        user = authenticate(email=email, password=password)
+        # Simple email authentication - find user by email, then authenticate
+        try:
+            from django.contrib.auth.models import User
+            user_obj = User.objects.get(email=email)
+            user = authenticate(request, username=user_obj.username, password=password)
+        except User.DoesNotExist:
+            user = None
         
-        if user is not None:
+        if user:
             request.session['user_id'] = user.id
-            print(f"This username on login view {email}")
             
+            # Check if device is trusted
             hash = create_device_hash(request)
-            device = TrustedDevice.objects.filter(user=user, hash=hash).first()
-            
-            if device:
+            if TrustedDevice.objects.filter(user=user, hash=hash).exists():
                 login(request, user)
                 return redirect("index")
             else:
                 request.session['hash'] = hash
                 return redirect('otp', user_id=user.id)
         else:
-            credential_error = "Invalid Username or Password"
+            return render(request, 'login/login.html', {"credential_error": "Invalid Email or Password"})
     
-    return render(request, 'login/login.html', {"credential_error": credential_error})
-
-
+    return render(request, 'login/login.html')
 def generate_otp(request, user_id=None):
     if not user_id:
         return redirect('login')

@@ -1,7 +1,6 @@
 {% extends 'login/layout.html' %}
 {% load static %}
 
-
 {% block css %}
 <title>Login</title>
 
@@ -41,13 +40,13 @@
 <div class="blob three blob-yellow"></div>
 <img class="bg-login" src="{% static 'asset/logbg.png' %}" alt="login-bg">
 
-       {% if messages %}
-          {% for message in messages %}
-            {% if "expired" not in message|stringformat:"s" %}
-              <div class="alert alert-danger">{{ message }}</div>
-            {% endif %}
-          {% endfor %}
+{% if messages %}
+    {% for message in messages %}
+        {% if "expired" not in message|stringformat:"s" %}
+            <div class="alert alert-danger">{{ message }}</div>
         {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="login">    
     <img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 4rem; height: auto; margin-bottom: 5px;">
@@ -58,7 +57,7 @@
         {% csrf_token %}
 
         <label class="name">Email: <br>
-            <input type="text" placeholder="email" name="email" id="email" required>
+            <input type="email" placeholder="email@example.com" name="email" id="email" required>
         </label>
         <br>
         <label class="password">Password: <br> 
@@ -71,8 +70,6 @@
         </label>
         <br>
 
-        
-
         <input class="submit-button" 
                 type="submit" 
                 value="Log in">
@@ -81,9 +78,7 @@
         <div><a class="forgot-pass" href="{% url 'forgot_password' %}" style="color:rgb(38, 38, 129); font-weight: 500; text-decoration: none;">Forgot Password ?</a></div>
     </form>
 
-
 </div>
-
 
 <script>
     function togglePassword(element) {
@@ -106,6 +101,5 @@
         });
     }, 15000); 
 </script>
-
 
 {% endblock %}
