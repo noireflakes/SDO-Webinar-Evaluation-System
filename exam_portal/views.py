@@ -114,6 +114,7 @@ def rounded_data(request, id):
 def result_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     
+
     # Evaluation data
     email = []
     deped_id = []
@@ -123,6 +124,7 @@ def result_data(request, id):
     venue = []
     meal = []
     manage = []
+
 
     # Attendance data
     attendance_emails = []
@@ -166,7 +168,6 @@ def result_data(request, id):
     # Process comments
     for comment in webinar.comment.all():
         comment_emails.append(comment.user.email)
-        # Safe access to user_profile
         try:
             comment_deped_ids.append(comment.user.user_profile.deped_id)
         except AttributeError:

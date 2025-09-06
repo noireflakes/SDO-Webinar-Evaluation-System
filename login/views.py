@@ -16,7 +16,6 @@ import uuid
 
 
 #imports models
-
 from django.contrib.admin.models import LogEntry
 from webinar.models import Webinar,WebinarAttendees
 from exam_portal.models import CertificateTemplate
@@ -24,11 +23,12 @@ from exam_portal.serializer import CertificateSerilize
 from django.contrib.auth.models import User
 from .models import UserProfile, TrustedDevice,Otp,PasswordReset
 
+
 #decorator
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from .email_service import send_email
-
+from datetime import timedelta
 
 
 # Create your views here.
@@ -484,6 +484,7 @@ def admin_certificate(request):
         'today':today
     })
 
+
 @admin_required
 def admin_events(request):
     webinar=Webinar.objects.all()
@@ -516,7 +517,7 @@ def register_user(request):
 
 
         email=request.POST.get("user_email")
-        password=request.POST.get("user_password")
+        password=request.POST.get("staff_password")
         deped_id=request.POST.get("deped_id")
         username=deped_id
 
@@ -865,7 +866,6 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 @login_required
-
 def get_completed_events(request):
     """
     Get list of completed events with basic info for comparison dropdown.
@@ -953,9 +953,6 @@ def compare_events(request):
         }
 
         return JsonResponse(comparison_data, safe=False)
-
-    except Http404:
-        return JsonResponse({'error': 'One or both events not found'}, status=404)
 
     except Exception as e:
         logger.error(f"Error comparing events ({event1_id}, {event2_id}): {str(e)}")

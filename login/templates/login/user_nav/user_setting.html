@@ -19,6 +19,8 @@
 {% block body%}
 
 
+
+
   <div class="topbar">
         <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
         <div class="credential-cont">        
@@ -37,7 +39,7 @@
           <a href="{% url 'user_dashboard' %}" class="sb-nav-item">Dashboard</a>
           <a href="{% url 'calendar' %}" class="sb-nav-item">Upcoming Events</a>
           <a href="{% url 'certificate' %}" class="sb-nav-item">Certificate</a>
-          <a href="{% url 'user_setting' %}" class="sb-nav-item sb-active ">Settting</a>
+          <a href="{% url 'user_setting' %}" class="sb-nav-item sb-active ">Setting</a>
           <a href="{% url 'logout' %}" class="sb-nav-item">Logout </a> 
     </ul>
 
@@ -52,7 +54,7 @@
           <a href="{% url 'user_dashboard' %}" class="nav-item ">Dashboard</a>
           <a href="{% url 'calendar' %}" class="nav-item">Upcoming Events</a>
           <a href="{% url 'certificate' %}" class="nav-item">Certificate</a>
-          <a href="{% url 'user_setting' %}" class="nav-item active">Settting</a>
+          <a href="{% url 'user_setting' %}" class="nav-item active">Setting</a>
           <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
       </nav>
 
@@ -61,63 +63,115 @@
 
 
   <div class="settings-container">
-    <h2>Settings</h2>
+  <h2>Account Settings</h2>
 
-    <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
-      <h4>Personal Information</h4>
-      {% csrf_token %}
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
-          <p style="color:red;">{{ user_taken }}</p>
-        </div>
-        
-        <div class="form-group">
-          <label for="fullname">Full Name</label>
-          <input name="fullname" id="fullname" type="text" placeholder="{{ user.first_name }} {{ user.last_name }}" />
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input id="email" name="email" type="email" placeholder="{{ user.email }}" />
-        </div>
-        <div class="form-group">
-          <label for="number">Phone Number</label>
-          <input id="number" name="number" type="tel" placeholder="{{ user.user_profile.number}}" />
-        </div>
-        <div class="form-group">
-          <label for="school">School Insitution</label>
-          <input type="text" name="school" id="school"  placeholder="{{ user.user_profile.school }}" />
-        </div>
-        <div class="form-group">
-          <label>Change Profile</label>
-          <input type="file" name="img" id="img" accept=".png, .jpg, .jpeg" />
-        </div>
-      </div>
-      <input type="submit" value="Save Changes">
-    </form>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-    <form  action="{% url 'change_password' %}" method="post" class="card">
-      {% csrf_token %}
-      <h4>Change Password</h4>
-      <div class="form-group">
-          <label for="current_password">Current Password</label>
-          <input type="text" name="current_password" id="current_password" />
-          <p style="color:red;" >{{ error_password }}</p>
-      </div>
-      <div class="form-group">
-          <label for="new_password">New Password</label>
-          <input type="text" name="new_password" id="new_password" />
-      </div>
-      <input type="submit" value="Confirm Changes">
-      
+        <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
+            <h4>Personal Information</h4>
+            {% csrf_token %}
+            
+            {% if user_taken %}
+                <div class="alert alert-danger">{{ user_taken }}</div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user me-2"></i>Username</label>
+                    <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="first_name"><i class="fas fa-id-badge me-2"></i>First Name</label>
+                    <input name="first_name" id="first_name" type="text" placeholder="{{ user.first_name }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_name"><i class="fas fa-id-badge me-2"></i>Last Name</label>
+                    <input name="last_name" id="last_name" type="text" placeholder="{{ user.last_name }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                    <input id="email" name="email" type="email" placeholder="{{ user.email }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="number"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                    <input id="number" name="number" type="tel" placeholder="{{ user.user_profile.number }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="school"><i class="fas fa-school me-2"></i>School Institution</label>
+                    <input type="text" name="school" id="school" placeholder="{{ user.user_profile.school|default:'Enter school name' }}" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-image me-2"></i>Profile Picture</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="img" id="img" accept=".png,.jpg,.jpeg" onchange="previewFile(this)" />
+                </div>
+            </div>
+            
+            <input type="submit" value="Save Changes">
+        </form>
 
-
-    </form>
-
-   
-</div>
-</div>
+        <form action="{% url 'change_password' %}" method="post" class="card" id="passwordForm">
+            {% csrf_token %}
+            <h4><i class="fas fa-lock me-2"></i>Change Password</h4>
+            
+            {% if error_password %}
+                <div class="alert alert-danger">{{ error_password }}</div>
+            {% endif %}
+            
+            <!-- Password mismatch error message -->
+            <div id="password-mismatch-error" class="password-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="password-error-text"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="current_password"><i class="fas fa-key me-2"></i>Current Password</label>
+                <div class="input-group">
+                    <input type="password" name="current_password" id="current_password" required />
+                    <button type="button" class="password-toggle" onclick="togglePassword('current_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="new_password"><i class="fas fa-lock me-2"></i>New Password</label>
+                <div class="input-group">
+                    <input type="password" name="new_password" id="new_password" required minlength="8" />
+                    <button type="button" class="password-toggle" onclick="togglePassword('new_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Password must be at least 8 characters long</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password"><i class="fas fa-check-circle me-2"></i>Confirm New Password</label>
+                <div class="input-group">
+                    <input type="password" name="confirm_password" id="confirm_password" required minlength="8" />
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <input type="submit" value="Update Password">
+        </form>
+    </div>
 </div>
 
 <footer>
