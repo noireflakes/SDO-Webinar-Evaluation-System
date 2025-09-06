@@ -112,14 +112,14 @@ def login_view(request):
     credential_error = ""
     
     if request.method == "POST":
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
         
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         
         if user is not None:
             request.session['user_id'] = user.id
-            print(f"This username on login view {username}")
+            print(f"This username on login view {email}")
             
             hash = create_device_hash(request)
             device = TrustedDevice.objects.filter(user=user, hash=hash).first()
