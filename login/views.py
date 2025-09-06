@@ -388,12 +388,7 @@ def user_dashboard(request):
     past_webinar=WebinarAttendees.objects.filter(user=request.user, webinar__start_date__lt=today )
     upcoming_messages=""
     history_messages=""
-    print("hello")
-    print(today)
-    test=WebinarAttendees.objects.get(id=1)
-    print(test.user)
-    print(request.user.id)
-    print(f"UPCOMING: {upcoming_webinar} , PAST: {past_webinar}")
+
     if not upcoming_webinar.exists():
         upcoming_messages="No webinar asssigned to you please wait for further notice"
     
@@ -518,7 +513,7 @@ def register_user(request):
 
 
         email=request.POST.get("user_email")
-        password=request.POST.get("user_password")
+        password=request.POST.get("user_passwogitrd")
         deped_id=request.POST.get("deped_id")
         username=deped_id
 
