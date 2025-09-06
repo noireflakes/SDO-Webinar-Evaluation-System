@@ -98,15 +98,15 @@
 
                     <div class="form-group">
                         <label for="user_email">Email: </label>
-                        <input type="email" id="user_email" name="user_email" class="form-control" placeholder="Enter email">
+                        <input type="email" id="user_email" name="user_email" class="form-control" placeholder="Enter email" required>
                     </div>
                     <div class="form-group">
                         <label for="deped_id">Deped ID:</label>
-                        <input type="text" id="deped_id" name="deped_id" class="form-control" placeholder="Enter User Username">
+                        <input type="text" id="deped_id" name="deped_id" class="form-control" placeholder="Enter User Username" required>
                     </div>
                     <div class="form-group">
                         <label for="user_birth_date">Birth Date:</label>
-                        <input type="date" id="user_birth_date" name="user_birth_date" class="form-control">
+                        <input type="date" id="user_birth_date" name="user_birth_date" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="user_password">Password</label>
@@ -118,7 +118,6 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Register User</button>
-
                 </form>
             </div>
             
@@ -129,22 +128,22 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="staff_firstname">First name: </label>
-                        <input type="text" id="staff_firstname" name="staff_firstname" class="form-control" placeholder="Enter First Name">
+                        <input type="text" id="staff_firstname" name="staff_firstname" class="form-control" placeholder="Enter First Name" required>
 
                         <label for="staff_lastname">Last name: </label>
-                        <input type="text" id="staff_lastname" name="staff_lastname" class="form-control" placeholder="Enter Last Name">
+                        <input type="text" id="staff_lastname" name="staff_lastname" class="form-control" placeholder="Enter Last Name" required>
                     </div>
                     <div class="form-group">
                         <label for="staff_email">Email</label>
-                        <input type="email" id="staff_email" name="staff_email" class="form-control" placeholder="Enter email">
+                        <input type="email" id="staff_email" name="staff_email" class="form-control" placeholder="Enter email" required>
                     </div>
                     <div class="form-group">
                         <label for="staff_deped_id">Deped ID:</label>
-                        <input type="text" id="staff_deped_id" name="staff_deped_id" class="form-control" placeholder="Enter User Username">
+                        <input type="text" id="staff_deped_id" name="staff_deped_id" class="form-control" placeholder="Enter User Username" required>
                     </div>
                     <div class="form-group">
                         <label for="staff_birth_date">Birth Date:</label>
-                        <input type="date" id="staff_birth_date" name="staff_birth_date" class="form-control">
+                        <input type="date" id="staff_birth_date" name="staff_birth_date" class="form-control" required>
                     </div>
                     <label for="staff_password">Password</label>
                     <div class="input-group" style="margin-bottom:1.2em;" >
@@ -154,7 +153,7 @@
                         </button>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Register Admin</button>
+                    <button type="submit" class="btn btn-primary">Register Staff</button>
                 </form>
             </div>
         </div>

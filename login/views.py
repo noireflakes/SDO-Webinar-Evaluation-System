@@ -135,6 +135,7 @@ def login_view(request):
             return render(request, 'login/login.html', {"credential_error": "Invalid Email or Password"})
     
     return render(request, 'login/login.html')
+
 def generate_otp(request, user_id=None):
     if not user_id:
         return redirect('login')
@@ -497,6 +498,7 @@ def admin_events(request):
 def admin_setting(request):
     return render(request, "login/admin_panel/setting.html")
 
+
 @admin_required
 def admin_users(request):
     users = User.objects.all().order_by('-date_joined')
@@ -582,7 +584,7 @@ def create_admin(request):
         last_name=request.POST.get("staff_lastname")
         deped_id=request.POST.get("staff_deped_id")
         email = request.POST.get("staff_email")
-        password = request.POST.get("admin_password")
+        password = request.POST.get("staff_password")
         birthday= request.POST.get("staff_birth_date")
         username = deped_id
 
