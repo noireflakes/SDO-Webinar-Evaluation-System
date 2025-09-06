@@ -135,13 +135,11 @@ def login_view(request):
             return render(request, 'login/login.html', {"credential_error": "Invalid Email or Password"})
     
     return render(request, 'login/login.html')
-
 def generate_otp(request, user_id=None):
     if not user_id:
         return redirect('login')
     
     user = get_object_or_404(User, id=user_id)
-    otp_code = None 
     
     # Check for existing OTP record
     current_otp = Otp.objects.filter(user=user).first()
@@ -162,89 +160,128 @@ def generate_otp(request, user_id=None):
     if current_otp and current_otp.lockout_until and not current_otp.is_locked_out():
         current_otp.clear_lockout()
    
+    # Handle OTP verification (POST request)
     if request.method == 'POST':
         user_otp = (request.POST.get('otp') or '').strip()
         
-        if current_otp:
-            # Check if OTP is expired
-            time_diff = timezone.now() - current_otp.created_at
-            if time_diff.total_seconds() > 300:
-                current_otp.is_valid = False
-                current_otp.save()
-                
-                return render(request, 'login/otp.html', {
-                    'error': 'OTP has expired. Please request a new one.',
-                    'user_id': user_id,
-                    'expired': True
-                })
-            
-            totp = pyotp.TOTP(current_otp.secret_key, interval=300)
-            
-            if totp.verify(user_otp):
-                # Successful login - clear everything
-                login(request, user)
-                request.session.modified = True
-                request.session.pop('username', None)
-                request.session.pop("otp_generated", None)
-                print('The OTP is correct')
-                
-                device_hash = request.session.get('hash')
-                if device_hash:
-                    TrustedDevice.objects.get_or_create(
-                        user=user,
-                        hash=device_hash
-                    )
-                    request.session.pop('hash', None)
-
-                current_otp.delete()
-                return redirect('index')
-            else:
-                # Wrong OTP - increment counters
-                current_otp.retry += 1
-                current_otp.total_failed_attempts += 1
-                current_otp.last_attempt = timezone.now()
-                current_otp.save()
-                
-                if request.user.is_authenticated:
-                    return redirect('index')
-                
-                # Check if we've reached 10 total failed attempts
-                if current_otp.total_failed_attempts >= 10:
-                    # Lock out for 10 minutes
-                    current_otp.lockout_until = timezone.now() + timedelta(minutes=10)
-                    current_otp.is_valid = False
-                    current_otp.save()
-                    
-                    return render(request, 'login/otp.html', {
-                        'locked_out': True,
-                        'error': 'Account locked due to too many failed attempts. Try again in 10 minutes.',
-                        'user': user,
-                        'user_id': user_id
-                    })
-                
-                # Check if current OTP has 3 attempts (generate new OTP)
-                if current_otp.retry >= 3:
-                    current_otp.is_valid = False
-                    current_otp.save()
-                    request.session.pop("otp_generated", None)
-                    return render(request, 'login/otp.html', {
-                        'error': f'Too many failed attempts for current OTP. Please request a new OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
-                        'user_id': user_id,
-                        'expired': True
-                    })
-                
-                # Show remaining attempts for current OTP and total attempts
-                return render(request, 'login/otp.html', {
-                    'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
-                    'user_id': user_id
-                })
-        else:
+        if not current_otp:
             return render(request, 'login/otp.html', {
                 'error': 'OTP not found. Please try again.',
                 'user_id': user_id,
                 'expired': True
             })
+        
+        # Check if OTP is expired
+        time_diff = timezone.now() - current_otp.created_at
+        if time_diff.total_seconds() > 300:  # 5 minutes
+            current_otp.is_valid = False
+            current_otp.save()
+            
+            return render(request, 'login/otp.html', {
+                'error': 'OTP has expired. Please request a new one.',
+                'user_id': user_id,
+                'expired': True
+            })
+        
+        # Create TOTP instance for verification
+        totp = pyotp.TOTP(current_otp.secret_key, interval=300)
+        
+        # Debug information
+        print(f"User entered OTP: {user_otp}")
+        print(f"Current valid OTP: {totp.now()}")
+        print(f"Secret key: {current_otp.secret_key}")
+        print(f"Time diff: {time_diff.total_seconds()} seconds")
+        
+        # Try multiple verification methods to be more flexible
+        is_valid = False
+        
+        # Method 1: Direct verification with current time
+        if totp.verify(user_otp, valid_window=1):  # Allow 1 window tolerance
+            is_valid = True
+            print("OTP verified with method 1 (direct verification)")
+        
+        # Method 2: Manual time-based verification (backup)
+        if not is_valid:
+            current_time = timezone.now().timestamp()
+            current_otp_code = totp.at(current_time)
+            if user_otp == current_otp_code:
+                is_valid = True
+                print("OTP verified with method 2 (manual time)")
+        
+        # Method 3: Check stored OTP as fallback
+        if not is_valid and hasattr(current_otp, 'otp') and current_otp.otp:
+            if user_otp == str(current_otp.otp):
+                is_valid = True
+                print("OTP verified with method 3 (stored OTP)")
+        
+        if is_valid:
+            # Successful login - clear everything
+            login(request, user)
+            request.session.modified = True
+            request.session.pop('username', None)
+            
+            # Clear OTP generation flag
+            session_key = f"otp_generated_{user_id}"
+            request.session.pop(session_key, None)
+            
+            print('The OTP is correct')
+            
+            # Handle trusted device
+            device_hash = request.session.get('hash')
+            if device_hash:
+                TrustedDevice.objects.get_or_create(
+                    user=user,
+                    hash=device_hash
+                )
+                request.session.pop('hash', None)
 
+            current_otp.delete()
+            return redirect('index')
+        else:
+            # Wrong OTP - increment counters
+            current_otp.retry += 1
+            current_otp.total_failed_attempts += 1
+            current_otp.last_attempt = timezone.now()
+            current_otp.save()
+            
+            print(f"OTP verification failed. Retry: {current_otp.retry}, Total failed: {current_otp.total_failed_attempts}")
+            
+            if request.user.is_authenticated:
+                return redirect('index')
+            
+            # Check if we've reached 10 total failed attempts
+            if current_otp.total_failed_attempts >= 10:
+                # Lock out for 10 minutes
+                current_otp.lockout_until = timezone.now() + timedelta(minutes=10)
+                current_otp.is_valid = False
+                current_otp.save()
+                
+                return render(request, 'login/otp.html', {
+                    'locked_out': True,
+                    'error': 'Account locked due to too many failed attempts. Try again in 10 minutes.',
+                    'user': user,
+                    'user_id': user_id
+                })
+            
+            # Check if current OTP has 3 attempts (generate new OTP)
+            if current_otp.retry >= 3:
+                current_otp.is_valid = False
+                current_otp.save()
+                session_key = f"otp_generated_{user_id}"
+                request.session.pop(session_key, None)
+                return render(request, 'login/otp.html', {
+                    'error': f'Too many failed attempts for current OTP. Please request a new OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
+                    'user_id': user_id,
+                    'expired': True
+                })
+            
+            # Show remaining attempts for current OTP and total attempts
+            return render(request, 'login/otp.html', {
+                'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
+                'user_id': user_id
+            })
+
+    # Handle OTP generation (GET request)
     existing_otp = Otp.objects.filter(user=user).first()
     should_generate_otp = False
     
@@ -272,15 +309,22 @@ def generate_otp(request, user_id=None):
         session_key = f"otp_generated_{user_id}"
         
         if not request.session.get(session_key):
+            # Generate new OTP with better time synchronization
+            otp_secret_key = pyotp.random_base32()
+            totp = pyotp.TOTP(otp_secret_key, interval=300)
+            
+            # Use current timestamp for consistent OTP generation
+            current_time = timezone.now()
+            otp_code = totp.at(current_time.timestamp())
+            
+            print(f"Generated OTP: {otp_code} at time: {current_time}")
+            print(f"Secret key: {otp_secret_key}")
+            
             if existing_otp:
                 # Update existing OTP record but keep total_failed_attempts
-                otp_secret_key = pyotp.random_base32()
-                totp = pyotp.TOTP(otp_secret_key, interval=300)
-                otp_code = totp.now()
-                
                 existing_otp.otp = otp_code
                 existing_otp.secret_key = otp_secret_key
-                existing_otp.created_at = timezone.now()
+                existing_otp.created_at = current_time
                 existing_otp.retry = 0  # Reset current OTP attempts
                 existing_otp.is_valid = True
                 existing_otp.last_attempt = None 
@@ -288,30 +332,26 @@ def generate_otp(request, user_id=None):
                 existing_otp.save()
             else:
                 # Create new OTP record
-                otp_secret_key = pyotp.random_base32()
-                totp = pyotp.TOTP(otp_secret_key, interval=300)
-                otp_code = totp.now()
-                
-                otp = Otp.objects.create(
+                Otp.objects.create(
                     user=user,
                     otp=otp_code,
                     secret_key=otp_secret_key,
-                    created_at=timezone.now(),
+                    created_at=current_time,
                     retry=0,
                     is_valid=True,
                     total_failed_attempts=0  # Start fresh for new users
                 )
 
-    if otp_code:
-        print(f"This is the OTP code: {otp_code}")
-        result = send_email(
-            to_email=f"{user.email}",
-            subject="OTP code From SDO",
-            body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
-        )
-    
-        session_key = f"otp_generated_{user_id}"
-        request.session[session_key] = True
+            # Send OTP email
+            print(f"This is the OTP code: {otp_code}")
+            result = send_email(
+                to_email=user.email,
+                subject="OTP code From SDO",
+                body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
+            )
+        
+            # Mark OTP as generated in session
+            request.session[session_key] = True
     
     return render(request, 'login/otp.html', {
         'user_id': user_id
@@ -327,58 +367,54 @@ def resend_otp(request, user_id):
         return redirect('login')
     
     user = get_object_or_404(User, id=user_id)
-    
-   
     existing_otp = Otp.objects.filter(user=user).first()
     
     if existing_otp and existing_otp.is_locked_out():
         return redirect('otp', user_id=user_id)
     
-    if existing_otp:
+    # Generate new OTP with proper time synchronization
+    otp_secret_key = pyotp.random_base32()
+    totp = pyotp.TOTP(otp_secret_key, interval=300)
     
-        otp_secret_key = pyotp.random_base32()
-        totp = pyotp.TOTP(otp_secret_key, interval=300)
-        otp_code = totp.now()
-        
+    current_time = timezone.now()
+    otp_code = totp.at(current_time.timestamp())
+    
+    print(f"Resending OTP code: {otp_code} at time: {current_time}")
+    print(f"Secret key: {otp_secret_key}")
+    
+    if existing_otp:
         existing_otp.otp = otp_code
         existing_otp.secret_key = otp_secret_key
-        existing_otp.created_at = timezone.now()
+        existing_otp.created_at = current_time
         existing_otp.retry = 0  
         existing_otp.is_valid = True
         existing_otp.last_attempt = None
-    
         existing_otp.save()
     else:
         # Create new OTP record if none exists
-        otp_secret_key = pyotp.random_base32()
-        totp = pyotp.TOTP(otp_secret_key, interval=300)
-        otp_code = totp.now()
-        
-        existing_otp = Otp.objects.create(
+        Otp.objects.create(
             user=user,
             otp=otp_code,
             secret_key=otp_secret_key,
-            created_at=timezone.now(),
+            created_at=current_time,
             retry=0,
             is_valid=True,
             total_failed_attempts=0
         )
     
     # Send OTP email
-    print(f"Resending OTP code: {otp_code}")
     result = send_email(
-        to_email=f"{user.email}",
+        to_email=user.email,
         subject="OTP code From SDO - Resent",
         body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
     )
     
-    # Clear the session flag to ensure proper state
+    # Clear and reset the session flag
     session_key = f"otp_generated_{user_id}"
     request.session[session_key] = True
     
     # Redirect back to OTP page
     return redirect('otp', user_id=user_id)
-
 
 #user views
 @user_required
