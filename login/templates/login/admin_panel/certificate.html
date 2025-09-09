@@ -7,132 +7,359 @@
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/certificate.css' %}">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+
 {% endblock %}
+
 {% block js %}
-  <script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/sidebar.js' %}"></script>
 {% endblock %}
 
 {% block body%}
-  <div class="topbar">
-        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
-        <div class="credential-cont">        
-          <span class="username fw-semibold">{{ user.username }}</span>
-          <a class="profile">
+<div class="topbar">
+    <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+    <div class="credential-cont">        
+        <span class="username fw-semibold">{{ user.username }}</span>
+        <a class="profile">
             <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-          </a>
-        </div>
-   
-  </div>
+        </a>
+    </div>
+</div>
 
 <div class="app-container">
-
-
-      <div class="sidebar nav-sb">
-    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
-
-    <ul class="sidebar-nav">
-        <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
-        <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Event Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="sb-nav-item sb-active">Certificates</a>
-        <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
-        <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settings</a>
-        <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
-        <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-    </ul>
-
-  </div>
+    <div class="sidebar nav-sb">
+        <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
+        <ul class="sidebar-nav">
+            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="sb-nav-item ">Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="sb-nav-item sb-active">Certificates</a>
+            <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settings</a>
+            <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
+            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+        </ul>
+    </div>
+    
     <aside class="d-sidebar">
-            <div class="logo">
-        <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-        <h2>SDO Baliwag</h2>
-      </div>
-      <nav class="nav">
-        <a href="{% url 'admin_events' %}" class="nav-item">Event Management</a>
-        <a href="{% url 'admin_calendar' %}" class="nav-item ">Event Calendar</a>
-        <a href="{% url 'admin_certificate' %}" class="nav-item active">Certificates</a>
-        <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
-        <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
-        <a href="{% url 'admin_log' %}" class="nav-item">Activity Logs</a>
-        <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
-      </nav>
-
-        
+        <div class="logo">
+            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+            <h2>SDO Baliwag</h2>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'admin_events' %}" class="nav-item">Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="nav-item ">Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="nav-item active">Certificates</a>
+            <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
+            <a href="{% url 'admin_log' %}" class="nav-item">Activity Logs</a>
+            <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
+        </nav>
     </aside>
     
     <div class="main-content">
-        <div class="header-container">
+        <div class="header-container" style="margin-top: 1rem; margin-bottom: 2rem;">
             <h2>Certificate Management</h2>
-            <p class="current-date">{{ today|date:"F j, Y" }}</p>
+    
+        </div>
 
-
-            
+        <!-- Search and Filter Section -->
+        <div class="search-filter-container">
+            <h3 class="mb-4">Manage Certificates</h3>
+            <div class="search-section">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" 
+                                   id="searchInput" 
+                                   class="form-control" 
+                                   placeholder="Search webinars by title, venue, or description...">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="statusFilter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="upcoming">Not Started</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Certificates Issued</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Webinar</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for webinar in webinars %}
-                    <tr>
-                        <td>{{ webinar.title }}</td>
-                        <td>{{ webinar.start_date|date:"M j, Y" }}</td>
-                        <td>{{ webinar.until_date|date:"M j, Y" }}</td>
-                        <td>
-                          {% if webinar.start_date > today %}
-                              <span class="status-badge status-upcoming">
-                                  <i class="fas fa-clock"></i> Not Started
-                              </span>
-                          {% elif webinar.until_date < today %}
-                              <span class="status-badge status-completed">
-                                  <i class="fas fa-check-circle"></i> Certificates Issued
-                              </span>
-                          {% elif webinar.start_date <= today and webinar.until_date >= today %}
-                              <span class="status-badge status-ongoing">
-                                  <i class="fas fa-spinner fa-pulse"></i> Ongoing
-                              </span>
-                          {% endif %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Webinar</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Table content will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
-                        </td>
-                        <td>
-                            <a href="{% url 'create_certificate' webinar.id %}" class="action-link">
-                                <i class="fas fa-edit"></i> Edit Certificate
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 2rem;">
-                            No webinars found
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info" id="pagination-info">
+                    <!-- Pagination info will be populated by JavaScript -->
+                </div>
+                
+                <nav>
+                    <ul class="pagination justify-content-center mb-0" id="pagination">
+                        <!-- Pagination will be populated by JavaScript -->
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
 
 <footer>
-     <div class="container d-flex justify-content-between flex-wrap">
-      <div>
-          <p>Empowering organizations through effective performance evaluation</p>
-      </div>
-      <div>
-          <h6>Contact Us</h6>
-          <p>Baliwag City North Central School, Lopez Jaena St.</p>
-          <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
-      </div>
-  </div>
+    <div class="container d-flex justify-content-between flex-wrap">
+        <div>
+            <p>Empowering organizations through effective performance evaluation</p>
+        </div>
+        <div>
+            <h6>Contact Us</h6>
+            <p>Baliwag City North Central School, Lopez Jaena St.</p>
+            <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
+        </div>
+    </div>
 </footer>
+
+<script>
+// Webinar data from Django template
+const webinarData = [
+    {% for webinar in webinars %}
+    {
+        id: {{ webinar.id }},
+        title: "{{ webinar.title|escapejs }}",
+        description: "{{ webinar.description|escapejs }}",
+        venue: "{{ webinar.venue|escapejs }}",
+        start_date: "{{ webinar.start_date|date:'M j, Y' }}",
+        end_date: "{{ webinar.until_date|date:'M j, Y' }}",
+        start_date_raw: "{{ webinar.start_date|date:'Y-m-d' }}",
+        end_date_raw: "{{ webinar.until_date|date:'Y-m-d' }}",
+        edit_url: "{% url 'create_certificate' webinar.id %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Today's date for status calculation
+const today = "{{ today|date:'Y-m-d' }}";
+
+// Pagination settings
+const rowsPerPage = 10;
+let currentPage = 1;
+let filteredWebinarData = [...webinarData]; 
+let currentSearchTerm = '';
+let currentStatusFilter = '';
+
+function getStatusBadge(webinar) {
+    if (webinar.start_date_raw > today) {
+        return '<span class="status-badge status-upcoming"><i class="fas fa-clock"></i> Not Started</span>';
+    } else if (webinar.end_date_raw < today) {
+        return '<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> Certificates Issued</span>';
+    } else {
+        return '<span class="status-badge status-ongoing"><i class="fas fa-spinner fa-pulse"></i> Ongoing</span>';
+    }
+}
+
+function getStatus(webinar) {
+    if (webinar.start_date_raw > today) {
+        return 'upcoming';
+    } else if (webinar.end_date_raw < today) {
+        return 'completed';
+    } else {
+        return 'ongoing';
+    }
+}
+
+function displayTable(page) {
+    const tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+
+    if (filteredWebinarData.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        ${currentSearchTerm || currentStatusFilter ? 
+                            '<i class="fas fa-search"></i><h4>No results found</h4><p>Try adjusting your search criteria or clear the filters to see all webinars.</p>' :
+                            '<i class="fas fa-calendar-alt"></i><h4>No webinars found</h4><p>There are currently no webinars available.</p>'
+                        }
+                    </div>
+                </td>
+            </tr>`;
+        updatePaginationInfo(0, 0, 0);
+        return;
+    }
+
+    let start = (page - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    let paginatedData = filteredWebinarData.slice(start, end);
+
+    paginatedData.forEach((webinar, index) => {
+        let rowNumber = start + index + 1;
+        let tr = `<tr>
+                    <td>${rowNumber}</td>
+                    <td>${webinar.title}</td>
+                    <td>${webinar.start_date}</td>
+                    <td>${webinar.end_date}</td>
+                    <td>${getStatusBadge(webinar)}</td>
+                    <td>
+                        <a href="${webinar.edit_url}" class="action-link">
+                            <i class="fas fa-edit"></i> Edit Certificate
+                        </a>
+                    </td>
+                  </tr>`;
+        tableBody.innerHTML += tr;
+    });
+
+    updatePaginationInfo(start + 1, Math.min(end, filteredWebinarData.length), filteredWebinarData.length);
+}
+
+function updatePaginationInfo(startIndex, endIndex, total) {
+    const paginationInfo = document.getElementById("pagination-info");
+    if (total > 0) {
+        paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${total} entries`;
+    } else {
+        paginationInfo.textContent = "No entries found";
+    }
+}
+
+function setupPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    let pageCount = Math.ceil(filteredWebinarData.length / rowsPerPage);
+
+    if (pageCount <= 1) return;
+
+    // Previous button
+    let prevLi = document.createElement("li");
+    prevLi.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+    prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>`;
+    if (currentPage > 1) {
+        prevLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage--;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= pageCount; i++) {
+        let li = document.createElement("li");
+        li.className = "page-item " + (i === currentPage ? "active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+        li.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = i;
+            displayTable(currentPage);
+            setupPagination();
+        });
+
+        pagination.appendChild(li);
+    }
+
+    // Next button
+    let nextLi = document.createElement("li");
+    nextLi.className = "page-item " + (currentPage === pageCount ? "disabled" : "");
+    nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>`;
+    if (currentPage < pageCount) {
+        nextLi.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage++;
+            displayTable(currentPage);
+            setupPagination();
+        });
+    }
+    pagination.appendChild(nextLi);
+}
+
+// Filter webinars function
+function filterWebinars() {
+    filteredWebinarData = webinarData.filter(webinar => {
+        // Text search
+        const matchesSearch = currentSearchTerm === '' || 
+            webinar.title.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+            webinar.description.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+            webinar.venue.toLowerCase().includes(currentSearchTerm.toLowerCase());
+        
+        // Status filter
+        let matchesStatus = true;
+        if (currentStatusFilter !== '') {
+            const webinarStatus = getStatus(webinar);
+            matchesStatus = webinarStatus === currentStatusFilter;
+        }
+        
+        return matchesSearch && matchesStatus;
+    });
+    
+    // Reset to first page after filtering
+    currentPage = 1;
+    displayTable(currentPage);
+    setupPagination();
+}
+
+// Initialize pagination when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Display initial table
+    displayTable(currentPage);
+    setupPagination();
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const clearSearch = document.getElementById('clearSearch');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            currentSearchTerm = this.value;
+            filterWebinars();
+        });
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            currentStatusFilter = this.value;
+            filterWebinars();
+        });
+    }
+    
+    if (clearSearch) {
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            statusFilter.value = '';
+            currentSearchTerm = '';
+            currentStatusFilter = '';
+            filterWebinars();
+        });
+    }
+});
+</script>
+
 {% endblock %}

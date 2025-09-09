@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="{% static 'css/searchbar.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    
 {% endblock %}
 
 {% block js %}
@@ -194,360 +196,7 @@
     </div>
 </div>
 
-<style>
-/* Comparison Section Styles */
-.comparison-section {
-    margin: 2rem 0;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
 
-.comparison-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.comparison-header h3 {
-    color: #1e293b;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.comparison-header .text-muted {
-    color: #64748b;
-    font-size: 0.95rem;
-}
-
-.comparison-container {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-/* Event Selection Row */
-.event-selection-row {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.event-select-card {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.event-select-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-    transform: translateY(-2px);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.card-header h4 {
-    color: #374151;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.card-header i {
-    font-size: 1.2rem;
-}
-
-/* Select Wrapper */
-.select-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.event-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: white;
-    transition: all 0.2s ease;
-    appearance: none;
-    cursor: pointer;
-}
-
-.event-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.select-icon {
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #6b7280;
-}
-
-/* Event Info */
-.event-info {
-    padding: 0.75rem;
-    background: #f9fafb;
-    border-radius: 6px;
-    border-left: 4px solid #e5e7eb;
-}
-
-.event-info.has-selection {
-    border-left-color: #3b82f6;
-    background: #eff6ff;
-}
-
-.event-info .no-selection {
-    color: #9ca3af;
-    font-style: italic;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.event-details h5 {
-    color: #374151;
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem 0;
-}
-
-.event-details p {
-    color: #6b7280;
-    font-size: 0.85rem;
-    margin: 0;
-}
-
-/* VS Divider */
-.vs-divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.vs-circle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-}
-
-/* Compare Button */
-.compare-btn-container {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.compare-btn {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.compare-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-}
-
-.compare-btn:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Chart Container */
-.chart-container {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.chart-header h4 {
-    color: #374151;
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.reset-btn {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.reset-btn:hover {
-    background: #e5e7eb;
-}
-
-.chart-wrapper {
-    position: relative;
-    height: 400px;
-    margin-bottom: 1rem;
-}
-
-/* Chart Legend */
-.chart-legend {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.legend-color {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-}
-
-.legend-item span {
-    color: #374151;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-/* Loading State */
-.loading-state {
-    text-align: center;
-    padding: 3rem;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f4f6;
-    border-top: 4px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-state p {
-    color: #6b7280;
-    margin: 0;
-}
-
-/* Error State */
-.error-state {
-    text-align: center;
-    padding: 3rem;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-.error-state i {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.error-state p {
-    color: #6b7280;
-    margin: 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .comparison-section {
-        padding: 1rem;
-    }
-    
-    .event-selection-row {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .vs-divider {
-        order: -1;
-        margin: 1rem 0;
-    }
-    
-    .vs-circle {
-        transform: rotate(90deg);
-    }
-    
-    .chart-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-        text-align: center;
-    }
-    
-    .chart-legend {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-}
-</style>
 
 <script>
 
@@ -573,27 +222,30 @@
 
         </div>
 
-        <div class="container-fluid webinar mt-4">
-            <div class="row">
-                {% for webinar in webinars %}
-                 
-                    <div class="webinar-card" >
-                      <div class="img-container">
-                          <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
-                      </div>
-                      <div class="webinar-contents">
-                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}  </p></div>
-                          <h2 class="webinar-title">{{ webinar.title }}</h2>
-                          <p>{{ webinar.description|truncatewords:16  }}</p>
-                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">View Details</a></div>
-                      </div>
-                    </div>
-
-                 
-                
-                {% endfor %}
-            </div>
+<div class="container-fluid webinar mt-4">
+  <div class="row" id="webinar-list">
+    {% for webinar in webinars %}
+      <div class="webinar-card">
+        <div class="img-container">
+            <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
         </div>
+        <div class="webinar-contents">
+          <div class="date-time-cont">
+            <p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p>
+            <p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}</p>
+          </div>
+          <h2 class="webinar-title">{{ webinar.title }}</h2>
+          <p>{{ webinar.description|truncatewords:16 }}</p>
+          <div class="webinar-btn">
+            <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+        <div id="pagination" class="pagination mt-3 d-flex justify-content-center"></div>
+
         
 
     
@@ -662,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch completed events on page load
     fetchCompletedEvents();
 
-    async function fetchCompletedEvents() {
+    async function fetchCompletedEvents() { 
         try {
             showLoading(true, 'Loading events...');
             
@@ -1048,6 +700,7 @@ const additionalCSS = `
 const style = document.createElement('style');
 style.textContent = additionalCSS;
 document.head.appendChild(style);
+
 </script>
 
 

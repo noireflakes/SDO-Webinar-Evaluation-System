@@ -195,12 +195,6 @@
 
 
                 
-
-
-                
-
-
-                
             })
 
             const date_today = new Date().toISOString().split("T")[0];
@@ -230,13 +224,13 @@
                         div.innerHTML = `
                             <h4>Speaker </h4>
                             <label for="speaker_name${i}">Name:</label>
-                            <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control">
+                            <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control" required>
                             
                             <label for="speaker_email${i}">Email:</lSabel>
-                            <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control">
+                            <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control" required>
 
                             <label for="speaker_photo${i}">Upload Photo:</label>
-                            <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control" accept=".png, .jpg, .jpeg"  >
+                            <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control" accept=".png, .jpg, .jpeg" required >
                         `;
                         speakersContainer.appendChild(div);
                     }

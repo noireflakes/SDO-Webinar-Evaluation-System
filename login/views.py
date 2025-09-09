@@ -15,6 +15,17 @@ from django.urls import reverse
 import uuid
 
 
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Avg, Count
+
+import logging
+
+from django.utils import timezone
+
+
 #imports models
 from django.contrib.admin.models import LogEntry
 from webinar.models import Webinar,WebinarAttendees
@@ -112,7 +123,7 @@ def login_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         
-        # Simple email authentication - find user by email, then authenticate
+        
         try:
             from django.contrib.auth.models import User
             user_obj = User.objects.get(email=email)
@@ -173,7 +184,7 @@ def generate_otp(request, user_id=None):
         
         # Check if OTP is expired
         time_diff = timezone.now() - current_otp.created_at
-        if time_diff.total_seconds() > 300:  # 5 minutes
+        if time_diff.total_seconds() > 300:  
             current_otp.is_valid = False
             current_otp.save()
             
@@ -183,24 +194,24 @@ def generate_otp(request, user_id=None):
                 'expired': True
             })
         
-        # Create TOTP instance for verification
+        
         totp = pyotp.TOTP(current_otp.secret_key, interval=300)
         
-        # Debug information
+        
         print(f"User entered OTP: {user_otp}")
         print(f"Current valid OTP: {totp.now()}")
         print(f"Secret key: {current_otp.secret_key}")
         print(f"Time diff: {time_diff.total_seconds()} seconds")
         
-        # Try multiple verification methods to be more flexible
+        
         is_valid = False
         
-        # Method 1: Direct verification with current time
-        if totp.verify(user_otp, valid_window=1):  # Allow 1 window tolerance
+        
+        if totp.verify(user_otp, valid_window=1):  
             is_valid = True
             print("OTP verified with method 1 (direct verification)")
         
-        # Method 2: Manual time-based verification (backup)
+    
         if not is_valid:
             current_time = timezone.now().timestamp()
             current_otp_code = totp.at(current_time)
@@ -208,7 +219,7 @@ def generate_otp(request, user_id=None):
                 is_valid = True
                 print("OTP verified with method 2 (manual time)")
         
-        # Method 3: Check stored OTP as fallback
+
         if not is_valid and hasattr(current_otp, 'otp') and current_otp.otp:
             if user_otp == str(current_otp.otp):
                 is_valid = True
@@ -487,6 +498,7 @@ def certificate(request):
 
     })
 
+
 def certificate_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     certificate = CertificateTemplate.objects.filter(webinar=webinar)
@@ -518,7 +530,7 @@ def admin_certificate(request):
 
 @admin_required
 def admin_events(request):
-    webinar=Webinar.objects.all()
+    webinar=Webinar.objects.all().order_by("-id")
 
     return render(request, "login/admin_panel/events.html",{
         'webinars':webinar,
@@ -636,6 +648,7 @@ def create_admin(request):
             messages.success(request, "Admin account created successfully.")
 
     return redirect('admin_users')
+
 
 @admin_required
 def delete_user(request, id):
@@ -884,16 +897,6 @@ def cal_event_data(request, id):
     return JsonResponse(results)
 
 
-# views.py
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Avg, Count
-
-import logging
-
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -931,13 +934,10 @@ def get_completed_events(request):
         logger.error(f"Error fetching completed events: {str(e)}")
         return JsonResponse({'error': 'Failed to fetch completed events'}, status=500)
 
-
-                           
+    
 
 @login_required 
 @require_http_methods(["GET"])
-
-
 def compare_events(request):
     """
     Compare ratings between two events and return comparison data.
@@ -989,6 +989,7 @@ def compare_events(request):
     except Exception as e:
         logger.error(f"Error comparing events ({event1_id}, {event2_id}): {str(e)}")
         return JsonResponse({'error': 'Failed to compare events'}, status=500)
+
 
 def calculate_event_ratings(webinar):
   
@@ -1136,3 +1137,5 @@ def get_event_statistics(request, event_id):
     except Exception as e:
         logger.error(f"Error fetching event statistics for {event_id}: {str(e)}")
         return JsonResponse({'error': 'Failed to fetch event statistics'}, status=500)
+    
+

@@ -244,7 +244,7 @@ def test_score(request, id, type):
     
 
 def generate_qr(request, id, type):
-    url = 'https://sdo-webinar-evaluation-system-production.up.railway.app'
+    url = 'https://sdo-webinar-evaluation-system.xyz'
     
     qr=TestQR.objects.filter(test__id=id, type=type)
 
@@ -252,7 +252,7 @@ def generate_qr(request, id, type):
     if not qr:
         
         webinar=Webinar.objects.get(id=id)
-        url_path=f'{url}/exam_portal/display_test/{id}/{type}/'
+        url_path=f'{url}/webinar/check_attendance/{id}'
         qr = qrcode.make(url_path)
         
         # Save to database
@@ -277,7 +277,7 @@ def qr_evalution(request, id):
     type=webinar.event_type
     qr=EvalQR.objects.filter(test__id=id, type=type)
     
-    url=f"https://sdo-webinar-evaluation-system-production.up.railway.app/webinar/questionaire/{webinar.id}/"
+    url=f"https://sdo-webinar-evaluation-system.xyz/webinar/check_attendance/{webinar.id}/"
 
     if not qr:
         

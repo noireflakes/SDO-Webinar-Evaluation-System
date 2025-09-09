@@ -5,29 +5,56 @@ from django.utils import timezone
 from cloudinary_storage.storage import MediaCloudinaryStorage
 # Create your models here.
 
+class Webinar(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=1000)
+    number_of_speaker = models.IntegerField(default=1)
+    event_type = models.CharField(max_length=20, null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    until_date = models.DateField(null=True, blank=True)
+    time = models.TimeField(max_length=20)
+    banner = models.ImageField(storage=MediaCloudinaryStorage(), upload_to='banner')
+    venue = models.CharField(max_length=500)
 
-class Webinar(models.Model): 
-    title=models.CharField(max_length=200)
-    description=models.CharField(max_length=1000)
-    number_of_speaker=models.IntegerField(default=1)
-    event_type=models.CharField(max_length=20, null=True ,blank=True)
-    start_date=models.DateField(null=True ,blank=True)
-    until_date=models.DateField(null=True, blank=True)
-    time=models.TimeField(max_length=20)
-    banner=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='banner')
-    venue=models.CharField(max_length=500)
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                old_instance = Webinar.objects.get(pk=self.pk)
+                if old_instance.banner and old_instance.banner != self.banner:
+                    old_instance.banner.delete(save=False)
+            except Webinar.DoesNotExist:
+                pass
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f" {str(self.id)} -{self.title}"
-    
-
+        return f"{str(self.id)} - {self.title}"
 
 
 class Speaker(models.Model):
-    webinar=models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="speaker")
-    img=models.ImageField(storage=MediaCloudinaryStorage(), upload_to="SpeakerProfile",blank=True,default='UserProfile/1.jpg', null=True)
-    name=models.CharField(max_length=250)
-    email=models.EmailField(max_length=250, null=True)
+    webinar = models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name="speaker")
+    img = models.ImageField(
+        storage=MediaCloudinaryStorage(), 
+        upload_to="SpeakerProfile", 
+        blank=True, 
+        default='UserProfile/1.jpg', 
+        null=True
+    )
+    name = models.CharField(max_length=250)
+    email = models.EmailField(max_length=250, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                old_instance = Speaker.objects.get(pk=self.pk)
+                if (old_instance.img and 
+                    old_instance.img != self.img and 
+                    old_instance.img.name != 'UserProfile/1.jpg'):
+                    old_instance.img.delete(save=False)
+            except Speaker.DoesNotExist:
+                pass
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

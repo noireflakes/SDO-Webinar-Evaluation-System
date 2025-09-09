@@ -17,5 +17,8 @@ urlpatterns=[
     path("delete_test/<int:id>/", views.delete_question, name="delete_question"),
 
     path("eventsdata", views.events_data, name="events_data"),
-    path("user_event_date", views.user_events_data, name="user_events_data")
+    path("user_event_date", views.user_events_data, name="user_events_data"),
+
+    path('check_attendance/<int:id>/',views.check_attendance, name="check_attendance" )
+    
 ]

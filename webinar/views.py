@@ -10,6 +10,8 @@ from django.contrib import messages
 import re
 from login.models import UserProfile
 from login.email_service import send_email
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 #create events
 def make_webinar(request):
@@ -480,3 +482,41 @@ def record_test(request, id, type):
 
         
     return redirect("test_result", webinar.id, type, user.id)
+
+
+
+
+def check_attendance(request, id):
+    webinar = get_object_or_404(Webinar, id=id)
+
+    if request.method == 'POST':
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password):
+                print(f"User verified: {user}")
+
+                if WebinarAttendees.objects.filter(webinar=webinar, user=user).exists():
+                    messages.success(request,"Success! You may now complete the evaluation form.")
+                    return render(request, f'webinar/evaluation/{webinar.event_type}.html',{
+                        'webinar':webinar
+                    })
+                else:
+                    print("Participant not listed")
+                    messages.error(request, "This user is not listed as a participant")
+                    return redirect("check_attendance", webinar.id)
+            else:
+                print("Incorrect password")
+                messages.error(request, "Wrong credentials")
+                return redirect("check_attendance", webinar.id)
+
+        except User.DoesNotExist:
+            print("User does not exist")
+            messages.error(request, "No user found with that email")
+            return redirect("check_attendance", webinar.id)
+
+    return render(request, "webinar/validate.html", {
+        "webinar": webinar
+    })

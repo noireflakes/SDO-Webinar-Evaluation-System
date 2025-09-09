@@ -176,9 +176,11 @@ async function downloadCertificate(webinarId) {
 
     const response = await fetch(`/certificate_data/${webinarId}/`);
     const data = await response.json();
-    console.log(data);
+
 
     const certData = Array.isArray(data) ? data[0] : data;
+    console.log(`this is the array or json ${certData}`)
+    console.log(`this is the ${certData.title}`)
 
     function drawCertificate(data) {
         const img = new Image();
@@ -213,20 +215,33 @@ async function downloadCertificate(webinarId) {
         if (!val || val.toLowerCase() === "none") {
             return "";
         }
+        console.log(` boy this the value${val}`);
         return val;
+        
     }
+
+    function CheckValue(data){
+        if (data){
+            return data;
+        }else{
+            return "";
+        }
+    }
+
+
+
 
     function drawTxt() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (!saveState) return;
         ctx.putImageData(saveState, 0, 0);
 
-        const title = safeValueById("certificate-title");
-        const subtitle = safeValueById("certificate-subtitle");
+        const title = certData.title;
+        const subtitle = CheckValue(certData.subtitle);
         const name = "{{ user.first_name }} {{ user.last_name }}";
-        const host = safeValueById("certificate-host");
-        console.log("change");
-        
+        const host = CheckValue(certData.host);
+        console.log(`this is title: ${title}`)
+    
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
@@ -257,9 +272,9 @@ async function downloadCertificate(webinarId) {
     }
 
     function drawAllParagraphs(maxWidth, y) {
-        const subject = safeValueById("certificate-subject");
-        const address = safeValueById("certificate-address");
-        const date = safeValueById("certificate-date");
+        const subject = CheckValue(certData.subject);
+        const address = CheckValue(certData.address);
+        const date = CheckValue(certData.date);
 
         ctx.textAlign = "center";
         ctx.fillStyle = "black";

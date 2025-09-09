@@ -95,7 +95,26 @@ form {
     gap: 5px;
    
 }
-
+    .password-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        font-size: 18px;
+        user-select: none;
+    }
+    
+    .password-toggle:hover {
+        color: #333;
+    }
 label {
     display: block;
     text-align: left;

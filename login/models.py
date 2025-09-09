@@ -12,6 +12,22 @@ class UserProfile(models.Model):
     school=models.CharField(max_length=100, null=True, blank=True)
     birthday=models.DateField(default=timezone.now)
 
+    #delete old img 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                old_instance = UserProfile.objects.get(pk=self.pk)
+                if (old_instance.img and 
+                    old_instance.img != self.img and 
+                    old_instance.img.name != 'UserProfile/defaultprofile_ntxlw1.jpg'):
+                    old_instance.img.delete(save=False)
+            except UserProfile.DoesNotExist:
+                pass
+        
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.user.first_name
 
     def __str__(self):
         return self.user.first_name
