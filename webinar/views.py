@@ -497,7 +497,7 @@ def check_attendance(request, id):
                     attendee=get_object_or_404(WebinarAttendees,webinar=webinar, user=user)
                     if attendee.attendance>0:
                         messages.error(request,"You already answered the evaluation")
-                        return redirect("check_attendance")
+                        return redirect("check_attendance", webinar.id)
                     
                     else:
                         return render(request, f'webinar/evaluation/{webinar.event_type}.html',{
@@ -507,16 +507,16 @@ def check_attendance(request, id):
                         
                 except WebinarAttendees.DoesNotExist:
                     messages.error(request, "user is not on the attendance list")
-                    return redirect("check_attendance")
+                    return redirect("check_attendance", webinar.id)
    
             else:
 
                 messages.error(request, "Incorect password")
-                return redirect("check_attendance")
+                return redirect("check_attendance", webinar.id)
 
         except User.DoesNotExist:
             messages.error(request, "No user found with that email")
-            return redirect("check_attendance")
+            return redirect("check_attendance", webinar.id)
 
     return render(request, "webinar/validate.html", {
         "webinar": webinar
