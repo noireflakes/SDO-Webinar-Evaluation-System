@@ -87,15 +87,17 @@ def make_webinar(request):
 
 
 def webinar_detail(request, id):
-    webinar=get_object_or_404(Webinar, id=id)
-
+    webinar = get_object_or_404(Webinar, id=id)
+    attendees = WebinarAttendees.objects.filter(webinar=webinar)
+    
     if request.user.is_authenticated:
-        return render(request, "webinar/webinar_detail.html",{
-            'webinar':webinar
+        return render(request, "webinar/webinar_detail.html", {
+            'webinar': webinar,
+            'attendees': attendees 
         })
+    
     messages.error(request, "Please Login first to access the Events.")
     return redirect("index")
-
 
 def edit_events(request, id):
     webinar=get_object_or_404(Webinar, id=id)
