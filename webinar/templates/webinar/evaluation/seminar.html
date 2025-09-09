@@ -68,11 +68,13 @@
             {% endif %}
         <table class="info-table">
             <tr >
-                <td class="schoolid-label">Deped Id: <input type="text" name="deped_id"></td>
                 <td><p class="sex-label">Sex: 
                 <label><input type="radio" name="sex" value="male"> Male</label>
                 <label><input type="radio" name="sex" value="female"> Female</label>
                 </p></td>
+                                <td style="display: none;">
+                    <input type="text"  value="{{ user.email }}" name="email" id="email">
+                </td>
 
             </tr>
         </table>   

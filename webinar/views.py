@@ -218,17 +218,16 @@ def questionaire(request, id):
 
     if request.method=='POST':
         sex=request.POST.get('sex')
-        deped_id=request.POST.get('deped_id')
+        email=request.POST.get('email')
         try:
-            userprofile=UserProfile.objects.get(deped_id=deped_id)
-            attendee=get_object_or_404(WebinarAttendees, user=userprofile.user, webinar=webinar)
-
+            user = get_object_or_404(User, email=email)
+            attendee = get_object_or_404(WebinarAttendees, user=user, webinar=webinar)
             if attendee.attendance<1:
       
                 if request.POST.get('comment'):
                     Comment.objects.create(
                         webinar=webinar,
-                        user=userprofile.user,
+                        user=user,
                         text= request.POST.get('comment')
                     )
 
@@ -249,7 +248,7 @@ def questionaire(request, id):
 
                     ResponseQuestionaire.objects.create(
                             webinar=webinar,
-                            user=userprofile.user,
+                            user=user,
                             type=catergory,
                             q1=response[0],
                             q2=response[1],
@@ -484,8 +483,6 @@ def record_test(request, id, type):
     return redirect("test_result", webinar.id, type, user.id)
 
 
-
-
 def check_attendance(request, id):
     webinar = get_object_or_404(Webinar, id=id)
 
@@ -501,7 +498,8 @@ def check_attendance(request, id):
                 if WebinarAttendees.objects.filter(webinar=webinar, user=user).exists():
                     messages.success(request,"Success! You may now complete the evaluation form.")
                     return render(request, f'webinar/evaluation/{webinar.event_type}.html',{
-                        'webinar':webinar
+                        'webinar':webinar,
+                        'user':user
                     })
                 else:
                     print("Participant not listed")
