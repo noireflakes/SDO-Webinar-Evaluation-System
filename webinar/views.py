@@ -493,27 +493,26 @@ def check_attendance(request, id):
         try:
             user = User.objects.get(email=email)
             if user.check_password(password):
-                print(f"User verified: {user}")
-
-                if WebinarAttendees.objects.filter(webinar=webinar, user=user).exists():
-                    messages.success(request,"Success! You may now complete the evaluation form.")
-                    return render(request, f'webinar/evaluation/{webinar.event_type}.html',{
+                try:
+                    attendee=get_object_or_404(WebinarAttendees,webinar=webinar, user=user)
+                    if attendee.attendance>0:
+                        return messages.error(request,"You already answered the evaluation")
+                    
+                    else:
+                        return render(request, f'webinar/evaluation/{webinar.event_type}.html',{
                         'webinar':webinar,
                         'user':user
                     })
-                else:
-                    print("Participant not listed")
-                    messages.error(request, "This user is not listed as a participant")
-                    return redirect("check_attendance", webinar.id)
+                        
+                except WebinarAttendees.DoesNotExist:
+                    return messages.error(request, "user is not on the attendance list")
+   
             else:
                 print("Incorrect password")
-                messages.error(request, "Wrong credentials")
-                return redirect("check_attendance", webinar.id)
+                return messages.error(request, "Incorect password")
 
         except User.DoesNotExist:
-            print("User does not exist")
-            messages.error(request, "No user found with that email")
-            return redirect("check_attendance", webinar.id)
+            return messages.error(request, "No user found with that email")
 
     return render(request, "webinar/validate.html", {
         "webinar": webinar
