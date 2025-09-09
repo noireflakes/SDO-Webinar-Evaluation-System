@@ -99,6 +99,7 @@ def webinar_detail(request, id):
     messages.error(request, "Please Login first to access the Events.")
     return redirect("index")
 
+
 def edit_events(request, id):
     webinar=get_object_or_404(Webinar, id=id)
     return render(request, "webinar/makewebinar.html",{
@@ -206,35 +207,37 @@ def validation(request, id):
 
 #questionaire
 def questionaire(request, id):
-    webinar=get_object_or_404(Webinar, id=id)
+    webinar = get_object_or_404(Webinar, id=id)
 
-    speaker=[]
-    venue=[]
-    meals=[]
-    manage=[]
+    speaker = []
+    venue = []
+    meals = []
+    manage = []
     all_responses = {
-    "speaker": speaker,
-    "venue": venue,
-    "meals": meals,
-    "manage": manage}
+        "speaker": speaker,
+        "venue": venue,
+        "meals": meals,
+        "manage": manage
+    }
 
-    if request.method=='POST':
-        sex=request.POST.get('sex')
-        email=request.POST.get('email')
+    if request.method == 'POST':
+        sex = request.POST.get('sex')
+        email = request.POST.get('email')
         try:
             user = get_object_or_404(User, email=email)
             attendee = get_object_or_404(WebinarAttendees, user=user, webinar=webinar)
-            if attendee.attendance<1:
-      
+            
+            if attendee.attendance < 1:
+            
                 if request.POST.get('comment'):
                     Comment.objects.create(
                         webinar=webinar,
                         user=user,
-                        text= request.POST.get('comment')
+                        text=request.POST.get('comment')
                     )
 
+         
                 for key, value in request.POST.items():
-                    
                     if key.startswith('speaker'):
                         speaker.append(value)
                     elif key.startswith('venue'):
@@ -243,15 +246,17 @@ def questionaire(request, id):
                         meals.append(value)
                     elif key.startswith("manage"):
                         manage.append(value)
-                    
-                for catergory , response in all_responses.items():
-                    if len(response) <5:
-                        response.append(None)
 
-                    ResponseQuestionaire.objects.create(
+                for category, response in all_responses.items():
+                    if response:  
+                    
+                        while len(response) < 5:
+                            response.append(None)
+
+                        ResponseQuestionaire.objects.create(
                             webinar=webinar,
                             user=user,
-                            type=catergory,
+                            type=category,
                             q1=response[0],
                             q2=response[1],
                             q3=response[2],
@@ -259,56 +264,49 @@ def questionaire(request, id):
                             q5=response[4],
                             sex=sex
                         )
-                    
-        
-                attendee.attendance=1
+
+                attendee.attendance = 1
                 attendee.save()
 
-
                 return redirect("index")
-            
 
             else:
-                error_message="You already answered"
+                error_message = "You already answered"
                 messages.error(request, "You already answered")
                 return redirect("index")
+
+        except User.DoesNotExist:  
+            error_message = "Invalid id please recheck your Deped id"
             
-
-
-        except UserProfile.DoesNotExist:
-            error_message="Invalid id please recheck your Deped id"
             if webinar.event_type == 'recognition':
-                return render(request,'webinar/evaluation/recognition.html',{
-                'webinar':webinar,
-                'error_message':error_message
-            })
-
+                return render(request, 'webinar/evaluation/recognition.html', {
+                    'webinar': webinar,
+                    'error_message': error_message
+                })
             elif webinar.event_type == 'seminar':
-                return render(request,'webinar/evaluation/seminar.html',{
-                'webinar':webinar,
-                'error_message':error_message
-
-            })
-
-            return render(request,'webinar/evaluation/workshop.html',{
-                'webinar':webinar,
-                'error_message':error_message
-            })
+                return render(request, 'webinar/evaluation/seminar.html', {
+                    'webinar': webinar,
+                    'error_message': error_message
+                })
             
+            return render(request, 'webinar/evaluation/workshop.html', {
+                'webinar': webinar,
+                'error_message': error_message
+            })
 
+    # GET request handling
     if webinar.event_type == 'recognition':
-        return render(request,'webinar/evaluation/recognition.html',{
-            'webinar':webinar
+        return render(request, 'webinar/evaluation/recognition.html', {
+            'webinar': webinar
         })
-
     elif webinar.event_type == 'seminar':
-        return render(request,'webinar/evaluation/seminar.html',{
-            'webinar':webinar
+        return render(request, 'webinar/evaluation/seminar.html', {
+            'webinar': webinar
         })
-
-    return render(request,'webinar/evaluation/workshop.html',{
-        'webinar':webinar
-        })
+    
+    return render(request, 'webinar/evaluation/workshop.html', {
+        'webinar': webinar
+    })
 
 
 def create_test(request, id):
