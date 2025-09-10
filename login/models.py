@@ -5,11 +5,13 @@ from django.utils import timezone
 import uuid
 # Create your models here.
 class UserProfile(models.Model):
+    
     user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
-    img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='UserProfile', null=True, blank=True , default='UserProfile/defaultprofile_ntxlw1.jpg',)
+    img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='UserProfile', null=True, blank=True , default='media/UserProfile/defaultprofile_pv9ccz.jpg',)
     deped_id=models.CharField(max_length=100, null=True, blank=True)
     number=models.CharField(max_length=100, null=True, blank=True)
     school=models.CharField(max_length=100, null=True, blank=True)
+    middle_initial=models.CharField(max_length=200, null=True, blank=True)
     birthday=models.DateField(default=timezone.now)
 
     #delete old img 
@@ -29,8 +31,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.first_name
 
-    def __str__(self):
-        return self.user.first_name
+   
 
 class TrustedDevice(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,  related_name="trusted_device")

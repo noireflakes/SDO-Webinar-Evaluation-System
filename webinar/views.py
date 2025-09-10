@@ -141,22 +141,25 @@ def register(request, id):
     attendees = WebinarAttendees.objects.filter(webinar=webinar)
 
     if request.method == 'POST':
-        deped_id = request.POST.get('deped_id')
+
         email = request.POST.get('email')
 
         try:
-            user = UserProfile.objects.get(deped_id=deped_id)
-        except UserProfile.DoesNotExist:
-            messages.error(request, "School ID not found.")
-            return redirect('register', id=webinar.id)
+            user=User.objects.get(email=email)
+        except User.DoesNotExist:
+            print("user not found")
+            messages.error(request, "This Email is invalid")
+            return redirect("register", webinar.id)
+        
 
-        already_registered = WebinarAttendees.objects.filter(webinar=webinar, user=user.user).exists()
+
+        already_registered = WebinarAttendees.objects.filter(webinar=webinar, user=user).exists()
 
         if already_registered:
             messages.warning(request, "You are already registered for this webinar.")
             return redirect('register', id=webinar.id)
 
-        attendee = WebinarAttendees(webinar=webinar, user=user.user, deped_id=deped_id, email=email)
+        attendee = WebinarAttendees(webinar=webinar, user=user, email=email)
         attendee.save()
 
         subject = f"Registration Confirmed: {webinar.title}"

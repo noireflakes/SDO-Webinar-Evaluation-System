@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 import uuid
 
-
+from datetime import date
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -146,6 +146,8 @@ def login_view(request):
             return render(request, 'login/login.html', {"credential_error": "Invalid Email or Password"})
     
     return render(request, 'login/login.html')
+
+
 def generate_otp(request, user_id=None):
     if not user_id:
         return redirect('login')
@@ -427,6 +429,7 @@ def resend_otp(request, user_id):
     # Redirect back to OTP page
     return redirect('otp', user_id=user_id)
 
+
 #user views
 @user_required
 def user_dashboard(request):
@@ -460,6 +463,7 @@ def calendar(request):
         'upcoming_webinars':upcoming_webinar
     })
 
+
 def event_data(request):
     data=[]
     webinars=Webinar.objects.all()
@@ -474,6 +478,7 @@ def event_data(request):
 @user_required
 def user_setting(request):
     return render(request, "login/user_nav/user_setting.html")
+
 
 @user_required
 def certificate(request):
@@ -517,6 +522,7 @@ def admin_calendar(request):
         "upcoming_webinars":upcoming_webinars
     })
 
+
 @admin_required
 def admin_certificate(request):
     webinars=Webinar.objects.all()
@@ -537,6 +543,7 @@ def admin_events(request):
       
     })
 
+
 @admin_required
 def admin_setting(request):
     return render(request, "login/admin_panel/setting.html")
@@ -553,17 +560,40 @@ def admin_users(request):
 #create user and edit credential
 @admin_required
 def register_user(request):
+    today = timezone.now().date()
     if request.method=="POST":
 
         first_name=request.POST.get("user_firstname")
         last_name=request.POST.get("user_lastname")
-        birth_date=request.POST.get("user_birth_date")
-
-
+        middle=request.POST.get("user_middle")
+        birth_date_str=request.POST.get("user_birth_date")
         email=request.POST.get("user_email")
-        password=request.POST.get("user_passwogitrd")
-        deped_id=request.POST.get("deped_id")
-        username=deped_id
+        password=request.POST.get("user_password")
+
+
+        if request.POST.get("user_middle"):
+            middle=request.POST.get("user_middle")
+        else:
+            middle="N/A"
+
+
+        try:
+            birth_date = date.fromisoformat(birth_date_str)  
+        except (TypeError, ValueError):
+            messages.error(request, "Invalid birth date format.")
+            return redirect('admin_users')
+
+        if birth_date > today:
+            messages.error(request, "Invalid BirthDate")
+            return redirect('admin_users')
+
+        if request.POST.get("deped_id"):
+            deped_id=request.POST.get("deped_id")
+        else:
+            deped_id="N/A"
+
+     
+        username=first_name
 
         if User.objects.filter(username=username).exists():
             messages.error(request,"username Already Exist")
@@ -574,7 +604,7 @@ def register_user(request):
             return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
-            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birthday=birth_date)
+            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birthday=birth_date, middle_initial=middle)
 
 
         result = send_email(
@@ -629,7 +659,11 @@ def create_admin(request):
         email = request.POST.get("staff_email")
         password = request.POST.get("staff_password")
         birthday= request.POST.get("staff_birth_date")
-        username = deped_id
+        if request.POST.get("staff_middle"):
+            middle=request.POST.get("user_middle")
+        else:
+            middle="N/A"
+        username = first_name
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
@@ -644,7 +678,7 @@ def create_admin(request):
                 password=password)
             user.is_staff = True
             user.save()
-            UserProfile.objects.create(user=user,deped_id=deped_id, birthday=birthday)
+            UserProfile.objects.create(user=user,deped_id=deped_id, birthday=birthday, middle_initial=middle)
             messages.success(request, "Admin account created successfully.")
 
     return redirect('admin_users')

@@ -130,7 +130,7 @@ async function DownloadExcel() {
 
     // ===== EVALUATION DATA SHEET =====
     csvContent += "=== EVALUATION DATA ===\n";
-    csvContent += "Email,School ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
+    csvContent += "Email,Deped ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
 
     // Find the maximum length to ensure proper alignment
     const maxEvalLength = Math.max(
@@ -165,7 +165,7 @@ async function DownloadExcel() {
 
     // ===== ATTENDANCE DATA SHEET =====
     csvContent += "\n=== ATTENDANCE DATA ===\n";
-    csvContent += "Email,School ID,Attendance Score\n";
+    csvContent += "Email,Deped ID,Attendance Score\n";
 
     const maxAttendanceLength = Math.max(
         data.attendance_emails?.length || 0,
@@ -187,7 +187,7 @@ async function DownloadExcel() {
 
     // ===== COMMENTS DATA SHEET =====
     csvContent += "\n=== COMMENTS DATA ===\n";
-    csvContent += "Email,School ID,Comment,Timestamp\n";
+    csvContent += "Email,Deped ID,Comment,Timestamp\n";
 
     const maxCommentsLength = Math.max(
         data.comment_emails?.length || 0,

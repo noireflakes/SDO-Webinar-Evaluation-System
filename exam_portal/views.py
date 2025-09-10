@@ -111,102 +111,127 @@ def rounded_data(request, id):
     return JsonResponse(evaluations)
 
 
-def result_data(request, id):
+def result_data(request, id):     
     webinar = get_object_or_404(Webinar, id=id)
-    
+           
+    # Evaluation data     
+    email = []     
+    deped_id = []     
+    sex = []     
+    timestamps = []     
+    speaker = []     
+    venue = []     
+    meal = []     
+    manage = []       
 
-    # Evaluation data
-    email = []
-    deped_id = []
-    sex = []
-    timestamps = []
-    speaker = []
-    venue = []
-    meal = []
-    manage = []
-
-
-    # Attendance data
+    # Attendance data     
     attendance_emails = []
-    attendance_deped_ids = []
-    attendance_scores = []
-    
-    # Comments data
-    comment_emails = []
-    comment_deped_ids = []
-    comment_texts = []
-    comment_timestamps = []
+    attendance_deped_ids = []     
+    attendance_scores = []          
 
-    # Process evaluations
+    # Comments data     
+    comment_emails = []     
+    comment_deped_ids = []     
+    comment_texts = []     
+    comment_timestamps = []      
+
+    # Group evaluations by user to avoid duplicates
+    user_evaluations = {}
+    
+    # First, collect all evaluations and group by user
     for evaluation in webinar.evaluation.all():
-        # User details
-        email.append(evaluation.user.email)
-        deped_id.append(evaluation.user.user_profile.deped_id)
-        sex.append(evaluation.sex)  
-        timestamps.append(evaluation.timestamp)     
+        user_email = evaluation.user.email
         
-        # Average per evaluation type
-        total = [evaluation.q1, evaluation.q2, evaluation.q3, evaluation.q4, evaluation.q5, evaluation.q6]
-        valid_number = [s for s in total if s is not None]
-        average = sum(valid_number) / len(valid_number) if valid_number else 0
-
+        if user_email not in user_evaluations:
+            user_evaluations[user_email] = {
+                'user': evaluation.user,
+                'sex': evaluation.sex,
+                'timestamp': evaluation.timestamp,
+                'speaker': [],
+                'venue': [],
+                'meal': [],
+                'manage': []
+            }
+        
+        # Group scores by type
+        total = [evaluation.q1, evaluation.q2, evaluation.q3, evaluation.q4, evaluation.q5]
+        valid_numbers = [s for s in total if s is not None]
+        average = sum(valid_numbers) / len(valid_numbers) if valid_numbers else 0
+        
         if evaluation.type == 'speaker':
-            speaker.append(average)
+            user_evaluations[user_email]['speaker'].append(average)
         elif evaluation.type == 'venue':
-            venue.append(average)
+            user_evaluations[user_email]['venue'].append(average)
         elif evaluation.type == 'meals':
-            meal.append(average)
+            user_evaluations[user_email]['meal'].append(average)
         elif evaluation.type == 'manage':
-            manage.append(average)
-
-    # Process attendance
-    for attendee in webinar.attendees.all():
-        attendance_emails.append(attendee.email)
-        attendance_deped_ids.append(attendee.deped_id)
-        attendance_scores.append(attendee.attendance)
+            user_evaluations[user_email]['manage'].append(average)
     
-    # Process comments
-    for comment in webinar.comment.all():
-        comment_emails.append(comment.user.email)
-        try:
-            comment_deped_ids.append(comment.user.user_profile.deped_id)
-        except AttributeError:
-            comment_deped_ids.append("")
+    # Now create one entry per user
+    for user_email, data in user_evaluations.items():
+        email.append(user_email)
+        deped_id.append(data['user'].user_profile.deped_id)
+        sex.append(data['sex'])
+        timestamps.append(data['timestamp'])
         
-        comment_texts.append(comment.text)
+        # Calculate average for each category (in case there are multiple scores)
+        speaker_avg = sum(data['speaker']) / len(data['speaker']) if data['speaker'] else 0
+        venue_avg = sum(data['venue']) / len(data['venue']) if data['venue'] else 0
+        meal_avg = sum(data['meal']) / len(data['meal']) if data['meal'] else 0
+        manage_avg = sum(data['manage']) / len(data['manage']) if data['manage'] else 0
         
-        # Add timestamp if Comment model has it, otherwise use current time or empty
-        if hasattr(comment, 'timestamp'):
-            comment_timestamps.append(comment.timestamp)
-        else:
-            comment_timestamps.append("")
+        speaker.append(speaker_avg)
+        venue.append(venue_avg)
+        meal.append(meal_avg)
+        manage.append(manage_avg)
 
-    overall = speaker + venue + meal + manage
+    # Process attendance     
+    for attendee in webinar.attendees.all():         
+        attendance_emails.append(attendee.email)         
+        attendance_deped_ids.append(attendee.deped_id)         
+        attendance_scores.append(attendee.attendance)          
 
-    # Combined response data
-    response_data = {
-        # Evaluation data
-        "email": email,
-        "deped_id": deped_id,
-        "sex": sex,                 
-        "timestamp": timestamps,    
-        "speaker": speaker,
-        "venue": venue,
-        "meal": meal,
-        "manage": manage,
-        "overall": overall,
-        
-        # Attendance data
-        "attendance_emails": attendance_emails,
-        "attendance_deped_ids": attendance_deped_ids,
-        "attendance_scores": attendance_scores,
-        
-        # Comments data
-        "comment_emails": comment_emails,
-        "comment_deped_ids": comment_deped_ids,
-        "comment_texts": comment_texts,
-        "comment_timestamps": comment_timestamps,
-    }
+    # Process comments     
+    for comment in webinar.comment.all():         
+        comment_emails.append(comment.user.email)         
+        try:             
+            comment_deped_ids.append(comment.user.user_profile.deped_id)         
+        except AttributeError:             
+            comment_deped_ids.append("")                          
+        comment_texts.append(comment.text)                          
+
+        if hasattr(comment, 'timestamp'):             
+            comment_timestamps.append(comment.timestamp)         
+        else:             
+            comment_timestamps.append("")               
+
+    overall = speaker + venue + meal + manage      
+
+    # Combined response data     
+    response_data = {         
+        # Evaluation data         
+        "email": email,         
+        "deped_id": deped_id,         
+        "sex": sex,                                  
+        "timestamp": timestamps,                     
+        "speaker": speaker,         
+        "venue": venue,         
+        "meal": meal,         
+        "manage": manage,         
+        "overall": overall,                          
+
+        # Attendance data         
+        "attendance_emails": attendance_emails,         
+        "attendance_deped_ids": attendance_deped_ids,         
+        "attendance_scores": attendance_scores,                          
+
+        # Comments data         
+        "comment_emails": comment_emails,         
+        "comment_deped_ids": comment_deped_ids,         
+        "comment_texts": comment_texts,         
+        "comment_timestamps": comment_timestamps,     
+    }      
+    print("evaluation")
 
     return JsonResponse(response_data)
 

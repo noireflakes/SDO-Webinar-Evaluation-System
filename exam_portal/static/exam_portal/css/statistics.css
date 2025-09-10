@@ -15,6 +15,16 @@ html, body{
    
 
 }
+       .chart-wrapper:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+   .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(45deg, #5a67d8, #6b46c1);
+        }
 
 .btn-download{
     flex: 1;
@@ -193,6 +203,7 @@ a:hover{
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 
     width: 280px;
+    transition: all 0.3s ease;
 }
 
 .chart {

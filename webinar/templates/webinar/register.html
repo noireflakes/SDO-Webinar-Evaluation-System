@@ -5,6 +5,9 @@
  <link rel="stylesheet" href="{% static 'webinar/css/register_attendees.css' %}">
  <link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
 
+ <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
+
+
   {% endblock %}
 
 {% block body %}
@@ -15,16 +18,33 @@
         <h2>{{ webinar.title }}</h2>
        
     </div>
+    {% if messages %}
+  <div class="popup-messages" id="popupMessages">
+    {% for message in messages %}
+      {% if "expired" not in message|stringformat:"s" %}
+        <div class="popup-message {{ message.tags }}">
+          <i class="popup-message-icon fas 
+            {% if message.tags == 'error' %}fa-exclamation-triangle
+            {% elif message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'warning' %}fa-exclamation-circle
+            {% elif message.tags == 'info' %}fa-info-circle
+            {% else %}fa-exclamation-triangle{% endif %}"></i>
+          <div class="popup-message-content">{{ message }}</div>
+          <button class="popup-message-close" onclick="closeMessage(this)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
 
 <div class="container-fluid registration-container">
     <form class="registration-form" action="{% url 'register' webinar.id %}" method="post">
         {% csrf_token %}
         <h2 class="form-title">Register Attendees</h2>
 
-        <div class="form-group">
-            <label for="deped_id">Deped ID:</label>
-            <input type="text" name="deped_id" id="deped_id" required>
-        </div>
+
 
         <div class="form-group">
             <label for="email">Email:</label>
@@ -32,15 +52,6 @@
         </div>
 
         <input class="submit-button" type="submit" value="Register">
-                {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                <div{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </ul>   
-        {% endif %}
     </form>
 
     <div class="attendees-section">
@@ -59,7 +70,7 @@
                     {% endif %}
                     <div class="attendee-info">
                         <div class="attendee-name">{{ attendee.user.username }}</div>
-                        <div class="attendee-id">{{ attendee.user.user_profile.deped_id }}</div>
+                        <div class="attendee-id">{{ attendee.user.email }}</div>
                     </div>
                 </div>
                 {% endfor %}
