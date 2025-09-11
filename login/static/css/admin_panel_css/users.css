@@ -8,6 +8,7 @@ body, html {
 }
 
 
+
 .main-content {
     flex: 1;
     padding-left: 1em;
@@ -566,3 +567,9 @@ table{
         font-size: 0.8rem;
     }
 }
+
+.users-table{
+
+    padding: 1rem;
+}
+

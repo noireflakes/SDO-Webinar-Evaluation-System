@@ -74,9 +74,14 @@ h1{
 
 .row{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     width: 100%;
     margin-top: 30px;
+    margin-left: clamp(0.5rem, 2vw, 10rem); 
+   
+   
+    
+    gap: clamp(0.5rem, 2vw, 6rem);
    
 
 
@@ -207,6 +212,7 @@ h1{
     align-items: center;
     gap: 1.5rem;
     margin-bottom: 2rem;
+ 
 }
 
 .event-select-card {
@@ -537,7 +543,6 @@ h1{
 
     
 }
-
 
 
 

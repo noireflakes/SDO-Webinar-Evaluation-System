@@ -12,15 +12,12 @@
 <link rel="stylesheet" href="{% static 'css/searchbar.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    
 {% endblock %}
 
 {% block js %}
   <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/event.js' %}" ></script>
   <script src="{% static 'js/searchbar.js' %}" ></script>
-
-
 {% endblock %}
 
 {% block body%}
@@ -37,7 +34,6 @@
   <div class="app-container">
   <!--Mobile sidebar -->
   <aside class="sidebar nav-sb">
-
     <div class="close-cont">
       <button class="close-sb">
         <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
@@ -53,17 +49,13 @@
         <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
         <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
     </ul>
-
   </aside>
 
-
-<!--Deskstop sidebar sidebar -->
+<!--Desktop sidebar -->
     <aside class="d-sidebar">
-
       <div class="logo">
         <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
         <h2>SDO Baliwag</h2>
-        
       </div>
 
       <nav class="nav">
@@ -75,16 +67,13 @@
         <a href="{% url 'admin_log' %}" class="nav-item">Activity Logs</a>
         <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
       </nav>
-
     </aside>
 
-    <div class=" contents">
-
+    <div class="contents">
         <div style="flex:1;" class="title-container">
             <h1>Events Management</h1>
- 
-    
         </div>
+
         {% if messages %}
           {% for message in messages %}
             {% if "expired" not in message|stringformat:"s" %}
@@ -92,168 +81,155 @@
             {% endif %}
           {% endfor %}
         {% endif %}
-<!-- Add this container after the search-wrapper div in your template -->
-<div class="comparison-section">
-    <div class="comparison-header">
-        <h3>Event Rating Comparison</h3>
-        <p class="text-muted">Compare overall ratings between two events</p>
-    </div>
-    
-    <div class="comparison-container">
-        <!-- Event Selection Cards -->
-        <div class="event-selection-row">
-            <!-- First Event Selection -->
-            <div class="event-select-card">
-                <div class="card-header">
-                    <h4>Event 1</h4>
-                    <i class="bi bi-bar-chart text-primary"></i>
-                </div>
-                <div class="select-wrapper">
-<select id="event1-select" class="event-select">
-    <option value="">Select First Event</option>
-    {% for webinar in webinars %}
-        <option value="{{ webinar.id }}">{{ webinar.title }}</option>
-    {% endfor %}
-</select>
-                    <i class="bi bi-chevron-down select-icon"></i>
-                </div>
-                <div class="event-info" id="event1-info">
-                    <p class="no-selection">No event selected</p>
-                </div>
+
+        <!-- Event Rating Comparison Section -->
+        <div class="comparison-section">
+            <div class="comparison-header">
+                <h3>Event Rating Comparison</h3>
+                <p class="text-muted">Compare overall ratings between two events</p>
             </div>
+            
+            <div class="comparison-container">
+                <!-- Event Selection Cards -->
+                <div class="event-selection-row">
+                    <!-- First Event Selection -->
+                    <div class="event-select-card">
+                        <div class="card-header">
+                            <h4>Event 1</h4>
+                            <i class="bi bi-bar-chart text-primary"></i>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="event1-select" class="event-select">
+                                <option value="">Select First Event</option>
+                                {% for webinar in webinars %}
+                                    <option value="{{ webinar.id }}">{{ webinar.title }}</option>
+                                {% endfor %}
+                            </select>
+                            <i class="bi bi-chevron-down select-icon"></i>
+                        </div>
+                        <div class="event-info" id="event1-info">
+                            <p class="no-selection">No event selected</p>
+                        </div>
+                    </div>
 
-            <!-- VS Divider -->
-            <div class="vs-divider">
-                <div class="vs-circle">
-                    <span>VS</span>
-                </div>
-            </div>
+                    <!-- VS Divider -->
+                    <div class="vs-divider">
+                        <div class="vs-circle">
+                            <span>VS</span>
+                        </div>
+                    </div>
 
-            <!-- Second Event Selection -->
-            <div class="event-select-card">
-                <div class="card-header">
-                    <h4>Event 2</h4>
-                    <i class="bi bi-bar-chart text-secondary"></i>
+                    <!-- Second Event Selection -->
+                    <div class="event-select-card">
+                        <div class="card-header">
+                            <h4>Event 2</h4>
+                            <i class="bi bi-bar-chart text-secondary"></i>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="event2-select" class="event-select">
+                                <option value="">Select Second Event</option>
+                            </select>
+                            <i class="bi bi-chevron-down select-icon"></i>
+                        </div>
+                        <div class="event-info" id="event2-info">
+                            <p class="no-selection">No event selected</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="select-wrapper">
-                    <select id="event2-select" class="event-select">
-                        <option value="">Select Second Event</option>
-                        <!-- Options will be populated via JavaScript -->
-                    </select>
-                    <i class="bi bi-chevron-down select-icon"></i>
-                </div>
-                <div class="event-info" id="event2-info">
-                    <p class="no-selection">No event selected</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Compare Button -->
-        <div class="compare-btn-container">
-            <button id="compare-btn" class="compare-btn" disabled>
-                <i class="bi bi-graph-up"></i>
-                Compare Events
-            </button>
-        </div>
-
-        <!-- Chart Container -->
-        <div class="chart-container" id="chart-container" style="display: none;">
-            <div class="chart-header">
-                <h4>Rating Comparison Results</h4>
-                <div class="chart-controls">
-                    <button id="reset-comparison" class="reset-btn">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        Reset
+                <!-- Compare Button -->
+                <div class="compare-btn-container">
+                    <button id="compare-btn" class="compare-btn" disabled>
+                        <i class="bi bi-graph-up"></i>
+                        Compare Events
                     </button>
                 </div>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="comparison-chart"></canvas>
-            </div>
-            <div class="chart-legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #3b82f6;"></div>
-                    <span id="event1-legend">Event 1</span>
+
+                <!-- Chart Container -->
+                <div class="chart-container" id="chart-container" style="display: none;">
+                    <div class="chart-header">
+                        <h4>Rating Comparison Results</h4>
+                        <div class="chart-controls">
+                            <button id="reset-comparison" class="reset-btn">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="comparison-chart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #3b82f6;"></div>
+                            <span id="event1-legend">Event 1</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ef4444;"></div>
+                            <span id="event2-legend">Event 2</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444;"></div>
-                    <span id="event2-legend">Event 2</span>
+
+                <!-- Loading State -->
+                <div class="loading-state" id="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading comparison data...</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="error-state" id="error-state" style="display: none;">
+                    <i class="bi bi-exclamation-triangle text-danger"></i>
+                    <p>Error loading comparison data. Please try again.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div class="loading-state" id="loading-state" style="display: none;">
-            <div class="spinner"></div>
-            <p>Loading comparison data...</p>
-        </div>
+        <!-- Include Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <!-- Error State -->
-        <div class="error-state" id="error-state" style="display: none;">
-            <i class="bi bi-exclamation-triangle text-danger"></i>
-            <p>Error loading comparison data. Please try again.</p>
-        </div>
-    </div>
-</div>
-
-
-
-<script>
-
-  
-
-</script>
-
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <div class="btn-container">
-        <a class="create-btn" href="{% url 'make_webinar' %}">
-          Create Event 
-          <i class="bi bi-plus"></i>
-        </a>
+            <a class="create-btn" href="{% url 'make_webinar' %}">
+                Create Event 
+                <i class="bi bi-plus"></i>
+            </a>
         </div>
 
-        <div  class="search-wrapper">
-          <div class="search-cont" tabindex="0"  role="button">
-            <input type="text" name="search-Input" class="search-Input">
-            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-
-          </div>
-
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+            <div class="search-cont" tabindex="0" role="button">
+                <input type="text" name="search-Input" class="search-Input" placeholder="Search events by title or description...">
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
         </div>
 
-<div class="container-fluid webinar mt-4">
-  <div class="row" id="webinar-list">
-    {% for webinar in webinars %}
-      <div class="webinar-card">
-        <div class="img-container">
-            <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
+        <!-- Webinar List -->
+        <div class="container-fluid webinar mt-4">
+            <div class="row" id="webinar-list">
+                {% for webinar in webinars %}
+                <div class="webinar-card">
+                    <div class="img-container">
+                        <img class="webinar-img" src="{{ webinar.banner.url }}" alt="">
+                    </div>
+                    <div class="webinar-contents">
+                        <div class="date-time-cont">
+                            <p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p>
+                            <p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}</p>
+                        </div>
+                        <h2 class="webinar-title">{{ webinar.title }}</h2>
+                        <p>{{ webinar.description|truncatewords:16 }}</p>
+                        <div class="webinar-btn">
+                            <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="webinar-contents">
-          <div class="date-time-cont">
-            <p><i class="bi bi-calendar"></i> {{ webinar.start_date }}</p>
-            <p><i class="bi bi-clock"></i> {{ webinar.time|time:"h:i A" }}</p>
-          </div>
-          <h2 class="webinar-title">{{ webinar.title }}</h2>
-          <p>{{ webinar.description|truncatewords:16 }}</p>
-          <div class="webinar-btn">
-            <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">View Details</a>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-</div>
+
+        <!-- Pagination Container -->
         <div id="pagination" class="pagination mt-3 d-flex justify-content-center"></div>
-
-        
-
-    
-
-  
-  
-  
-</div>
+    </div>
   </div>
 
 <footer>
@@ -268,441 +244,6 @@
         </div>
     </div>
 </footer>
-
-</div>
-<script>
-document.querySelectorAll('a').forEach(link => {
-  const url = new URL(link.href, window.location.href);
-
-  // Make sure it’s an internal link and not # or JS
-  if (url.origin === window.location.origin && !link.href.includes('#')) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      document.body.classList.add('slide-out');
-      setTimeout(() => {
-        window.location.href = link.href;
-      }, 400); 
-    });
-  }
-});
-
-
-  setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function(el) {
-      el.style.display = 'none';
-    });
-  }, 15000); 
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const event1Select = document.getElementById('event1-select');
-    const event2Select = document.getElementById('event2-select');
-    const compareBtn = document.getElementById('compare-btn');
-    const chartContainer = document.getElementById('chart-container');
-    const loadingState = document.getElementById('loading-state');
-    const errorState = document.getElementById('error-state');
-    const resetBtn = document.getElementById('reset-comparison');
-    
-    let chart = null;
-    let completedEvents = [];
-
-    // Get CSRF token for API requests
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                      document.querySelector('meta[name=csrf-token]')?.getAttribute('content');
-
-    // Fetch completed events on page load
-    fetchCompletedEvents();
-
-    async function fetchCompletedEvents() { 
-        try {
-            showLoading(true, 'Loading events...');
-            
-            const response = await fetch('/api/completed-events/', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            completedEvents = await response.json();
-            
-            if (completedEvents.length === 0) {
-                showError('No completed events with evaluations found');
-                return;
-            }
-            
-            populateEventSelects();
-            hideError();
-            
-        } catch (error) {
-            console.error('Error fetching events:', error);
-            showError('Failed to load events. Please refresh the page.');
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    function populateEventSelects() {
-        const event1Options = completedEvents.map(event => 
-            `<option value="${event.id}" data-title="${event.title}" data-date="${event.date}" data-responses="${event.response_count}">
-                ${event.title}
-            </option>`
-        ).join('');
-        
-        const event2Options = completedEvents.map(event => 
-            `<option value="${event.id}" data-title="${event.title}" data-date="${event.date}" data-responses="${event.response_count}">
-                ${event.title}
-            </option>`
-        ).join('');
-
-        event1Select.innerHTML = '<option value="">Select First Event</option>' + event1Options;
-        event2Select.innerHTML = '<option value="">Select Second Event</option>' + event2Options;
-    }
-
-    // Event listeners
-    event1Select.addEventListener('change', handleEventSelection);
-    event2Select.addEventListener('change', handleEventSelection);
-    compareBtn.addEventListener('click', compareEvents);
-    resetBtn.addEventListener('click', resetComparison);
-
-    function handleEventSelection() {
-        updateEventInfo();
-        updateCompareButton();
-        
-        // Hide chart when selection changes
-        hideChart();
-    }
-
-    function updateEventInfo() {
-        updateSingleEventInfo('event1', event1Select.value, event1Select);
-        updateSingleEventInfo('event2', event2Select.value, event2Select);
-    }
-
-    function updateSingleEventInfo(eventNum, eventId, selectElement) {
-        const infoContainer = document.getElementById(`${eventNum}-info`);
-        
-        if (!eventId) {
-            infoContainer.innerHTML = '<p class="no-selection">No event selected</p>';
-            infoContainer.classList.remove('has-selection');
-            return;
-        }
-
-        // Get event data from the selected option's data attributes
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const eventTitle = selectedOption.getAttribute('data-title');
-        const eventDate = selectedOption.getAttribute('data-date');
-        const responseCount = selectedOption.getAttribute('data-responses');
-
-        if (eventTitle) {
-            infoContainer.innerHTML = `
-                <div class="event-details">
-                    <h5>${eventTitle}</h5>
-                    <p><i class="bi bi-calendar-event"></i> ${eventDate}</p>
-                    <p><i class="bi bi-people"></i> ${responseCount} responses</p>
-                </div>
-            `;
-            infoContainer.classList.add('has-selection');
-        }
-    }
-
-    function updateCompareButton() {
-        const hasSelection = event1Select.value && event2Select.value;
-        const isDifferent = event1Select.value !== event2Select.value;
-        
-        compareBtn.disabled = !(hasSelection && isDifferent);
-        
-        if (hasSelection && !isDifferent) {
-            compareBtn.title = "Please select two different events";
-        } else {
-            compareBtn.title = "";
-        }
-    }
-
-    async function compareEvents() {
-        const event1Id = event1Select.value;
-        const event2Id = event2Select.value;
-
-        if (!event1Id || !event2Id) {
-            alert('Please select both events to compare');
-            return;
-        }
-
-        if (event1Id === event2Id) {
-            alert('Please select two different events to compare');
-            return;
-        }
-
-        showLoading(true, 'Comparing events...');
-        hideError();
-        hideChart();
-
-        try {
-            // Fetch data for both events
-            const [event1Data, event2Data] = await Promise.all([
-                fetchEventData(event1Id),
-                fetchEventData(event2Id)
-            ]);
-            
-            if (!event1Data || !event2Data) {
-                throw new Error('Failed to load event data');
-            }
-            
-            showChart(event1Data, event2Data);
-            
-        } catch (error) {
-            console.error('Error comparing events:', error);
-            showError(error.message || 'Failed to load comparison data. Please try again.');
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    async function fetchEventData(eventId) {
-        try {
-            const response = await fetch(`/cal_event_data/${eventId}/`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            // Get the event title from the select options
-            const eventSelect = eventId === event1Select.value ? event1Select : event2Select;
-            const selectedOption = Array.from(eventSelect.options).find(opt => opt.value === eventId);
-            const eventTitle = selectedOption ? selectedOption.getAttribute('data-title') : `Event ${eventId}`;
-            
-            return {
-                title: eventTitle,
-                speaker: data.speaker || 0,
-                venue: data.venue || 0,
-                meals: data.meals || 0,
-                manage: data.manage || 0,
-                overall: data.overall || 0
-            };
-            
-        } catch (error) {
-            console.error(`Error fetching data for event ${eventId}:`, error);
-            throw error;
-        }
-    }
-
-    function showChart(event1Data, event2Data) {
-        hideError();
-        chartContainer.style.display = 'block';
-        
-        // Update legend with event titles
-        document.getElementById('event1-legend').textContent = event1Data.title;
-        document.getElementById('event2-legend').textContent = event2Data.title;
-
-        // Destroy existing chart
-        if (chart) {
-            chart.destroy();
-        }
-
-        // Prepare chart data with categories
-        const labels = ['Speaker', 'Venue', 'Meals', 'Management', 'Overall'];
-        const event1DataValues = [
-            event1Data.speaker, 
-            event1Data.venue, 
-            event1Data.meals, 
-            event1Data.manage, 
-            event1Data.overall
-        ];
-        
-        const event2DataValues = [
-            event2Data.speaker, 
-            event2Data.venue, 
-            event2Data.meals, 
-            event2Data.manage, 
-            event2Data.overall
-        ];
-
-        // Create new chart
-        const ctx = document.getElementById('comparison-chart').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: event1Data.title,
-                        data: event1DataValues,
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: '#1d4ed8',
-                        borderWidth: 2,
-                        borderRadius: 4
-                    },
-                    {
-                        label: event2Data.title,
-                        data: event2DataValues,
-                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                        borderColor: '#dc2626',
-                        borderWidth: 2,
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false // We use custom legend below the chart
-                    },
-                    title: {
-                        display: true,
-                        text: `${event1Data.title} vs ${event2Data.title}`,
-                        font: {
-                            size: 16,
-                            weight: '600'
-                        },
-                        padding: {
-                            bottom: 20
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}/5.0`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 5,
-                        ticks: {
-                            stepSize: 0.5,
-                            callback: function(value) {
-                                return value.toFixed(1);
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Rating (1-5 scale)',
-                            font: {
-                                size: 12,
-                                weight: '500'
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
-
-        // Scroll to chart
-        setTimeout(() => {
-            chartContainer.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest' 
-            });
-        }, 100);
-    }
-
-    function resetComparison() {
-        event1Select.value = '';
-        event2Select.value = '';
-        updateEventInfo();
-        updateCompareButton();
-        hideChart();
-        hideError();
-    }
-
-    function showLoading(show, message = 'Loading...') {
-        if (show) {
-            loadingState.style.display = 'block';
-            loadingState.querySelector('p').textContent = message;
-        } else {
-            loadingState.style.display = 'none';
-        }
-    }
-
-    function hideChart() {
-        chartContainer.style.display = 'none';
-    }
-
-    function showError(message) {
-        errorState.querySelector('p').textContent = message;
-        errorState.style.display = 'block';
-    }
-
-    function hideError() {
-        errorState.style.display = 'none';
-    }
-
-    // Add keyboard support
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            resetComparison();
-        }
-    });
-});
-
-// Add this CSS for better error styling (add to your existing CSS)
-const additionalCSS = `
-.error-state p {
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.loading-state p {
-    font-size: 0.95rem;
-    color: #6b7280;
-    margin: 0;
-}
-
-.compare-btn[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.event-select option {
-    padding: 0.5rem;
-}
-
-.chart-container {
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-`;
-
-// Inject additional CSS
-const style = document.createElement('style');
-style.textContent = additionalCSS;
-document.head.appendChild(style);
-
-</script>
-
 
 
 {% endblock %}

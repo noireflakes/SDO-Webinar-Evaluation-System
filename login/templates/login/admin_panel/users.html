@@ -110,7 +110,7 @@
         <input type="text" id="user_firstname" name="user_firstname" class="form-control" 
                placeholder="Enter First Name" autocomplete="given-name" required>
 
-        <label for="user_middle">Middle Intial: </label>
+        <label for="user_middle">Middle Initial: </label>
         <input type="text" id="user_middle" name="user_middle" class="form-control" 
             placeholder="Enter Last name" autocomplete="family-name">
 
@@ -171,7 +171,7 @@
         <input type="text" id="staff_firstname" name="staff_firstname" class="form-control" 
                placeholder="Enter First Name" required autocomplete="given-name">
 
-              <label for="staff_middle">Middle Intial: </label>
+              <label for="staff_middle">Middle Initial: </label>
         <input type="text" id="staff_middle" name="staff_middle" class="form-control" 
             placeholder="Enter Last name" autocomplete="family-name">
 
@@ -249,7 +249,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Users Table -->
             <div class="users-table">
                 <div class="table-responsive">
@@ -607,17 +607,17 @@ function generatePassword(length = 12) {
 
 function generateAndSetPassword(user) {
     if (user==="user"){
-        console.log("this what being called")
+        console.log("this what being called user")
         const passwordInput = document.querySelector("#user_password");
     }else{
-         console.log("this what being called")
+         console.log("this what being called staff")
         const passwordInput = document.querySelector("#staff_password");
     }
     
     passwordInput.value = generatePassword(12); 
 }
 function clearPassword(user) {
-        if (user==="user"){
+    if (user==="user"){
         const passwordInput = document.getElementById("user_password");
     }else{
         const passwordInput = document.getElementById("staff_password");
@@ -664,7 +664,6 @@ function setupDepedIdPasswordFallback(depedIdInputId, passwordInputId) {
     
     if (depedIdInput && passwordInput) {
         depedIdInput.addEventListener("change", () => {
-            // Only auto-fill with DepEd ID if password is empty or was generated from first name
             if (passwordInput.value === '' || passwordInput.dataset.generatedFromFirstName === 'true') {
                 passwordInput.value = depedIdInput.value;
                 passwordInput.dataset.generatedFromFirstName = 'false';
@@ -673,13 +672,12 @@ function setupDepedIdPasswordFallback(depedIdInputId, passwordInputId) {
     }
 }
 
-// Initialize everything when page loads
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Display initial table
+
     displayTable(currentPage);
     setupPagination();
 
-    // Search functionality
     const searchInput = document.getElementById('searchInput');
     const roleFilter = document.getElementById('roleFilter');
     const clearSearch = document.getElementById('clearSearch');

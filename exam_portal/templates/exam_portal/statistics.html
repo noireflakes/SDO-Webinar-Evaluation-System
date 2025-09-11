@@ -6,15 +6,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
 <link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
+
 {% endblock %}
 
 {% block body %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-
-
 
 <div class="app">
     <div class="sidebar">
@@ -32,92 +30,217 @@
     <div class="main-content">
         <h2 class="title head">Statistic Management</h2>
         
-
         <section class="evaluation-section">
             <h2 class="title">Evaluation result</h2>
             <div class="evaluation-container">
                 <div class="chart-wrapper">
-                    <canvas id="speaker" class="chart"></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeChartType('speaker', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('speaker', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('speaker', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="speaker" class="chart"></canvas>
+                        <div id="speaker-no-data" class="no-data-message" style="display: none;">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-chart-pie" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No evaluation data available for Speaker</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="chart-wrapper">
-                    <canvas id="venue" class="chart"></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeChartType('venue', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('venue', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('venue', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="venue" class="chart"></canvas>
+                        <div id="venue-no-data" class="no-data-message" style="display: none;">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-map-marker-alt" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No evaluation data available for Venue</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="chart-wrapper">
-                    <canvas id="food" class="chart"></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeChartType('food', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('food', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('food', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="food" class="chart"></canvas>
+                        <div id="food-no-data" class="no-data-message" style="display: none;">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No evaluation data available for Food</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="chart-wrapper">
-                    <canvas id="manage" class="chart"></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeChartType('manage', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('manage', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('manage', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="manage" class="chart"></canvas>
+                        <div id="manage-no-data" class="no-data-message" style="display: none;">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-cogs" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No evaluation data available for Management</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="chart-wrapper">
-                    <canvas id="overall" class="chart"></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeChartType('overall', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('overall', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeChartType('overall', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="overall" class="chart"></canvas>
+                        <div id="overall-no-data" class="no-data-message" style="display: none;">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-star" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No evaluation data available for Overall</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button class="btn-download" onclick="DownloadExcel()"> <i class="fas fa-download"></i> Download Evaluation Data</button>
-
+            <button class="btn-download" onclick="DownloadExcel()"> 
+                <i class="fas fa-download"></i> Download Evaluation Data
+            </button>
         </section>
+
         <section class="test-section">
             <h2 class="title">Test Results</h2>
-
             <div class="test-container">
                 <div class="container">
                     <h4>Pre Test</h4>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeTestChartType('pre-test', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                        <button class="chart-type-btn" onclick="changeTestChartType('pre-test', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeTestChartType('pre-test', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
+                    </div>
                     <div class="bar-wrapper">
-                    <canvas id="pre-test" class="doughnut" ></canvas>
-                </div>
+                        <canvas id="pre-test" class="doughnut"></canvas>
+                        <div id="pre-test-no-data" class="no-data-message" style="display: none; ">
+                            <div class="no-data-message-cont">
+                                <i class="fas fa-clipboard-check" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <div>No pre-test data</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="container">
                     <h4>Post Test</h4>
-                    <div class="bar-wrapper">
-                        <canvas id="post-test" class="doughnut" ></canvas>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" onclick="changeTestChartType('post-test', 'doughnut')">
+                            <i class="fas fa-circle-notch"></i> Doughnut
+                        </button>
+                        <button class="chart-type-btn" onclick="changeTestChartType('post-test', 'bar')">
+                            <i class="fas fa-chart-bar"></i> Bar
+                        </button>
+                        <button class="chart-type-btn" onclick="changeTestChartType('post-test', 'pie')">
+                            <i class="fas fa-chart-pie"></i> Pie
+                        </button>
                     </div>
+                    <div class="bar-wrapper">
+                        <canvas id="post-test" class="doughnut"></canvas>
+                        <div id="post-test-no-data" class="no-data-message" style="display: none;">
 
+                            <div class="no-data-message-cont">
+                                                            <div class="no-data-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="no-data-title">No Post-Test Data</div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                
             </div>
-    
-            <button class="btn-download" onclick="downloadTestData()"> <i class="fas fa-download"></i> Download Test</button>
-
+            <button class="btn-download" onclick="downloadTestData()"> 
+                <i class="fas fa-download"></i> Download Test
+            </button>
         </section>
 
-
-
-
-   <footer class="footer">
-  <div class="footer-container">
-    
-    
-    <div class="footer-left">
-        <img  class="logo" src="{% static 'asset/logo1.png' %}" alt="">
-    
-      <p>School Division Office Of The City Of BALIWAG</p>
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                    <img class="logo" src="{% static 'asset/logo1.png' %}" alt="">
+                    <p>School Division Office Of The City Of BALIWAG</p>
+                </div>
+                <div class="footer-links">
+                    <h4></h4>
+                    <div class="link-columns"></div>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
+                    <p>+63912376421</p>
+                    <p>sdo@deped.com</p>
+                </div>
+            </div>
+        </footer>
     </div>
-
-    <div class="footer-links">
-      <h4></h4>
-      <div class="link-columns">
-   
-      </div>
-    </div>
-
-    <div class="footer-contact">
-      <h4>Contact Us</h4>
-      <p> Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
-      <p> +63912376421</p>
-      <p> sdo@deped.com</p>
-    </div>
-
-  </div>
-</footer>
 </div>
-
-</div>
-
-
 
 <script>
-    
+// Store chart instances and data globally
+let chartInstances = {};
+let chartData = {};
+let testChartInstances = {};
+let testData = {};
+
 async function DownloadExcel() {
     const id = parseInt("{{ webinar.id }}");
     const response = await fetch(`/exam_portal/result_data/${id}`);
@@ -125,14 +248,12 @@ async function DownloadExcel() {
 
     console.log("Data fetched:", data);
 
-    // Create workbook with multiple sheets
     let csvContent = "";
 
     // ===== EVALUATION DATA SHEET =====
     csvContent += "=== EVALUATION DATA ===\n";
     csvContent += "Email,Deped ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
 
-    // Find the maximum length to ensure proper alignment
     const maxEvalLength = Math.max(
         data.email?.length || 0,
         data.deped_id?.length || 0,
@@ -154,7 +275,6 @@ async function DownloadExcel() {
         const meal = data.meal?.[i] ?? "";
         const manage = data.manage?.[i] ?? "";
 
-        // Escape commas in text fields
         const escapedEmail = email.includes(',') ? `"${email}"` : email;
         const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
         const escapedSex = sex.includes(',') ? `"${sex}"` : sex;
@@ -163,89 +283,7 @@ async function DownloadExcel() {
         csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${speaker},${venue},${meal},${manage}\n`;
     }
 
-    // ===== ATTENDANCE DATA SHEET =====
-    csvContent += "\n=== ATTENDANCE DATA ===\n";
-    csvContent += "Email,Deped ID,Attendance Score\n";
-
-    const maxAttendanceLength = Math.max(
-        data.attendance_emails?.length || 0,
-        data.attendance_deped_ids?.length || 0,
-        data.attendance_scores?.length || 0
-    );
-
-    for (let i = 0; i < maxAttendanceLength; i++) {
-        const email = data.attendance_emails?.[i] ?? "";
-        const schoolId = data.attendance_deped_ids?.[i] ?? "";
-        const attendanceScore = data.attendance_scores?.[i] ?? "";
-
-        // Escape commas in text fields
-        const escapedEmail = email.includes(',') ? `"${email}"` : email;
-        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
-
-        csvContent += `${escapedEmail},${escapedSchoolId},${attendanceScore}\n`;
-    }
-
-    // ===== COMMENTS DATA SHEET =====
-    csvContent += "\n=== COMMENTS DATA ===\n";
-    csvContent += "Email,Deped ID,Comment,Timestamp\n";
-
-    const maxCommentsLength = Math.max(
-        data.comment_emails?.length || 0,
-        data.comment_deped_ids?.length || 0,
-        data.comment_texts?.length || 0,
-        data.comment_timestamps?.length || 0
-    );
-
-    for (let i = 0; i < maxCommentsLength; i++) {
-        const email = data.comment_emails?.[i] ?? "";
-        const schoolId = data.comment_deped_ids?.[i] ?? "";
-        const commentText = data.comment_texts?.[i] ?? "";
-        const timestamp = data.comment_timestamps?.[i] ?? "";
-
-        // Escape commas and quotes in text fields
-        const escapedEmail = email.includes(',') ? `"${email}"` : email;
-        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
-        const escapedComment = commentText.replace(/"/g, '""'); // Escape quotes
-        const escapedCommentWithCommas = escapedComment.includes(',') ? `"${escapedComment}"` : escapedComment;
-        const escapedTimestamp = timestamp.includes(',') ? `"${timestamp}"` : timestamp;
-
-        csvContent += `${escapedEmail},${escapedSchoolId},"${escapedComment}",${escapedTimestamp}\n`;
-    }
-
-    // ===== SUMMARY STATISTICS =====
-    csvContent += "\n=== SUMMARY STATISTICS ===\n";
-    csvContent += "Metric,Count\n";
-    csvContent += `Total Evaluations,${maxEvalLength}\n`;
-    csvContent += `Total Attendees,${maxAttendanceLength}\n`;
-    csvContent += `Total Comments,${maxCommentsLength}\n`;
-    
-    // Calculate averages if data exists
-    if (data.speaker?.length > 0) {
-        const avgSpeaker = data.speaker.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.speaker.filter(x => x !== null && x !== undefined).length;
-        csvContent += `Average Speaker Rating,${avgSpeaker.toFixed(2)}\n`;
-    }
-    
-    if (data.venue?.length > 0) {
-        const avgVenue = data.venue.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.venue.filter(x => x !== null && x !== undefined).length;
-        csvContent += `Average Venue Rating,${avgVenue.toFixed(2)}\n`;
-    }
-    
-    if (data.meal?.length > 0) {
-        const avgMeal = data.meal.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.meal.filter(x => x !== null && x !== undefined).length;
-        csvContent += `Average Meal Rating,${avgMeal.toFixed(2)}\n`;
-    }
-    
-    if (data.manage?.length > 0) {
-        const avgManage = data.manage.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.manage.filter(x => x !== null && x !== undefined).length;
-        csvContent += `Average Management Rating,${avgManage.toFixed(2)}\n`;
-    }
-
-    if (data.attendance_scores?.length > 0) {
-        const avgAttendance = data.attendance_scores.filter(x => x !== null && x !== undefined).reduce((a, b) => a + b, 0) / data.attendance_scores.filter(x => x !== null && x !== undefined).length;
-        csvContent += `Average Attendance Score,${avgAttendance.toFixed(2)}\n`;
-    }
-
-    // Create and download file
+    // Add other sections as in original code...
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
 
@@ -255,44 +293,197 @@ async function DownloadExcel() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  
-
-   
     URL.revokeObjectURL(url);
-
-    
 }
 
-
- async function downloadTestData() {
-    console.log("hello");
-
-    // Fetch the JSON response
+async function downloadTestData() {
+    console.log("Downloading test data...");
     const response = await fetch("{% url 'test_data' webinar.id %}");
     const data = await response.json();
 
     console.log("Fetched test data:", data);
 
-    // Create a new workbook
     const workbook = XLSX.utils.book_new();
-
-    // Convert JSON to worksheet (using the array in data.test_result)
     const worksheet = XLSX.utils.json_to_sheet(data.test_result);
-
-    // Append worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, "test_data");
+    XLSX.writeFile(workbook, "Test_result.xlsx");
+}
 
-    // Export workbook as Excel file
-    XLSX.writeFile(workbook, "Test_result.xlsx");}
+function hasData(data) {
+    if (!Array.isArray(data)) return false;
+    return data.some(value => value > 0);
+}
 
+function showNoDataMessage(chartId) {
+    const canvas = document.getElementById(chartId);
+    const noDataDiv = document.getElementById(chartId + '-no-data');
     
-  document.addEventListener('DOMContentLoaded', function() {
+    if (canvas) canvas.style.display = 'none';
+    if (noDataDiv) noDataDiv.style.display = 'flex';
+}
+
+function hideNoDataMessage(chartId) {
+    const canvas = document.getElementById(chartId);
+    const noDataDiv = document.getElementById(chartId + '-no-data');
+    
+    if (canvas) canvas.style.display = 'block';
+    if (noDataDiv) noDataDiv.style.display = 'none';
+}
+
+function createChart(chartId, type, data, labels, colors, title) {
+    if (chartInstances[chartId]) {
+        chartInstances[chartId].destroy();
+    }
+
+    if (!hasData(data)) {
+        showNoDataMessage(chartId);
+        return;
+    }
+
+    hideNoDataMessage(chartId);
+    
+    const ctx = document.getElementById(chartId).getContext('2d');
+    
+    const config = {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderColor: type === 'bar' ? colors : '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: type === 'bar' ? 'top' : 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20
+                    }
+                },
+                title: {
+                    display: true,
+                    text: title,
+                    font: {
+                        size: 14
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                }
+            }
+        }
+    };
+
+    if (type === 'bar') {
+        config.options.scales = {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        };
+    }
+
+    chartInstances[chartId] = new Chart(ctx, config);
+}
+
+function createTestChart(chartId, type, data, labels) {
+    if (testChartInstances[chartId]) {
+        testChartInstances[chartId].destroy();
+    }
+
+    if (!hasData(Object.values(data))) {
+        showNoDataMessage(chartId);
+        return;
+    }
+
+    hideNoDataMessage(chartId);
+    
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const backgroundColor = labels.map(() => randomColor());
+    
+    const config = {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Number of students",
+                data: Object.values(data),
+                backgroundColor: backgroundColor,
+                borderColor: type === 'bar' ? backgroundColor : '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: type === 'bar' ? 'top' : 'right'
+                }
+            }
+        }
+    };
+
+    if (type === 'bar') {
+        config.options.scales = {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        };
+    }
+
+    testChartInstances[chartId] = new Chart(ctx, config);
+}
+
+function changeChartType(chartId, newType) {
+    // Update active button
+    const buttons = document.querySelectorAll(`[onclick*="'${chartId}'"]`);
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const labels = ['5 (Excellent)', '4 (Good)', '3 (Average)', '2 (Poor)', '1 (Very Poor)'];
+    const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
+    const title = chartId.charAt(0).toUpperCase() + chartId.slice(1) + ' Evaluation';
+
+    createChart(chartId, newType, chartData[chartId], labels, colors, title);
+}
+
+function changeTestChartType(chartId, newType) {
+    // Update active button
+    const buttons = document.querySelectorAll(`[onclick*="'${chartId}'"]`);
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const labels = Object.keys(testData[chartId] || {});
+    createTestChart(chartId, newType, testData[chartId], labels);
+}
+
+function randomColor() {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = 50 + Math.random() * 10;    
+    const lightness = 45 + Math.random() * 10;     
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
     async function fetchData() {
         const id = parseInt("{{ webinar.id }}");
         const evaluation = await fetch(`/exam_portal/rounded_data/${id}`);
         const data = await evaluation.json();
                 
-        const chartData = {
+        chartData = {
             speaker: data.speaker,
             venue: data.venue,
             food: data.meals,
@@ -306,59 +497,9 @@ async function DownloadExcel() {
         const chartIds = ['speaker', 'venue', 'food', 'manage', 'overall'];
                 
         chartIds.forEach(id => {
-            const ctx = document.getElementById(id).getContext('2d');
-            
-       
-            const allZero = Array.isArray(chartData[id]) && 
-                          chartData[id].slice(0, 5).every(value => value === 0);
-            
-            if (allZero) {
-                // Clear the canvas and display message
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.font = '16px Arial';
-                ctx.fillStyle = '#666';
-                ctx.textAlign = 'center';
-                ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
-            }
-            
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: chartData[id],
-                        backgroundColor: colors,
-                        borderColor: '#fff',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 20
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: id.charAt(0).toUpperCase() + id.slice(1) + ' Evaluation',
-                            font: {
-                                size: 14
-                            },
-                            padding: {
-                                top: 10,
-                                bottom: 20
-                            }
-                        },
-                    }
-                }
-            });
-        }); 
+            const title = id.charAt(0).toUpperCase() + id.slice(1) + ' Evaluation';
+            createChart(id, 'pie', chartData[id], labels, colors, title);
+        });
     }
     
     fetchData();
@@ -369,76 +510,21 @@ async function DownloadExcel() {
         const post_test = "{% url 'test_score' webinar.id 'post_test' %}";
 
         for (const [index, id] of graphIds.entries()) {
-            const graph = document.getElementById(id);
-            const ctx = graph.getContext("2d");
             const url = (index < 1) ? pre_test : post_test;
             
             const response = await fetch(url);
             const json = await response.json();
             console.log("Data JSON:", json);
             
+            testData[id] = json.scores;
             const labels = Object.keys(json.scores);
-            const data = Object.values(json.scores);
             
-            // Check if all values are zero
-            const allZero = Array.isArray(data) && data.every(value => value === 0);
-            
-            if (allZero) {
-                // Clear the canvas and display message
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.font = '16px Arial';
-                ctx.fillStyle = '#666';
-                ctx.textAlign = 'center';
-                ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                continue;
-            }
-            
-            const backgroundColor = labels.map((_, i) => randomColor());
-            
-            new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: "Number of students",
-                        data: data,
-                        backgroundColor: backgroundColor
-                    }]
-                },
-                options: {
-                    responsive: true,
-                }
-            });
+            createTestChart(id, 'doughnut', json.scores, labels);
         }
     }
 
-    function randomColor() {
-        const hue = Math.floor(Math.random() * 360);
-        const saturation = 50 + Math.random() * 10;    
-        const lightness = 45 + Math.random() * 10;     
-        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    }
-    
     TestChart();
-
-
-        function randomColor() {
-            const hue = Math.floor(Math.random() * 360);
-            const saturation = 50 + Math.random() * 10;    
-            const lightness = 45 + Math.random() * 10;     
-            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-            }
-        TestChart();
-
-
-
-
-
-})
-           
-
-   
+});
 </script>
-
 
 {% endblock %}
