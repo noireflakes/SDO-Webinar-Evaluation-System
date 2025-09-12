@@ -67,13 +67,9 @@
     
     <section class="certificate-section">
         <div class="section-header">
-            <h3 class="section-title">Ongoing Webinars</h3>
+            <h3 class="section-title">Ongoing Events</h3>
             <div class="section-badge ongoing">Ongoing</div>
         </div>
-
-       
-      
-        
         {% if ongoing_webinars %}
           
             <div class="certificate-grid">
@@ -113,7 +109,7 @@
     <!-- Completed Webinars Section -->
     <section class="certificate-section">
         <div class="section-header">
-            <h3 class="section-title">Completed Webinars</h3>
+            <h3 class="section-title">Concluded Events</h3>
             <div class="section-badge completed">Completed</div>
         </div>
         
@@ -190,12 +186,12 @@
 
 <script>
 async function downloadCertificate(webinarId) {
-    // Add attendance check before proceeding with download
+   
     const response = await fetch(`/certificate_data/${webinarId}/`);
     const data = await response.json();
     const certData = Array.isArray(data) ? data[0] : data;
     
-    // Check if user has attendance before allowing download
+  
     if (!certData.hasAttendance) {
         alert('Sorry, you cannot download this certificate. Attendance is required.');
         return;
