@@ -70,6 +70,8 @@
             <h3 class="section-title">Ongoing Webinars</h3>
             <div class="section-badge ongoing">Ongoing</div>
         </div>
+
+       
       
         
         {% if ongoing_webinars %}
@@ -122,6 +124,7 @@
                 <div class="card-header">
                     <img src="{{ com_webinar.banner.url }}" class="card-image" alt="{{ com_webinar.title }}">
                 </div>
+                
                 <div class="card-body">
                     <h4 class="card-title">{{ com_webinar.title }}</h4>
                     <div class="card-meta">
@@ -129,12 +132,29 @@
                             <i class="far fa-calendar-check"></i> {{ com_webinar.until_date|date:"M d, Y" }}
                         </span>
                     </div>
+                    
+                    <!-- Attendance Status Display -->
+                    {% if com_webinar.attendees.attendance > 0 %}
+                        <div class="attendance-status eligible">
+                            <i class="fas fa-check-circle"></i> Eligible for certificate
+                        </div>
+                    {% else %}
+                        <div class="attendance-status not-eligible">
+                            <i class="fas fa-times-circle"></i> Not eligible - Attendance required
+                        </div>
+                    {% endif %}
                 </div>
-                <div class="card-footer">
-                    <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download" {% if com_webinar.attendees.attendance < 1 %} disabled {% endif %} >
-                        <i class="fas fa-download"></i> Download
-                    </button>
 
+                <div class="card-footer">
+                    {% if com_webinar.attendees.attendance > 0 %}
+                        <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    {% else %}
+                        <button class="btn-download disabled" disabled title="Cannot download - No attendance recorded">
+                            <i class="fas fa-ban"></i> Unavailable
+                        </button>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -170,15 +190,21 @@
 
 <script>
 async function downloadCertificate(webinarId) {
+    // Add attendance check before proceeding with download
+    const response = await fetch(`/certificate_data/${webinarId}/`);
+    const data = await response.json();
+    const certData = Array.isArray(data) ? data[0] : data;
+    
+    // Check if user has attendance before allowing download
+    if (!certData.hasAttendance) {
+        alert('Sorry, you cannot download this certificate. Attendance is required.');
+        return;
+    }
+
     const canvas = document.getElementById('certificateCanvas');
     const ctx = canvas.getContext('2d');
     let saveState;
 
-    const response = await fetch(`/certificate_data/${webinarId}/`);
-    const data = await response.json();
-
-
-    const certData = Array.isArray(data) ? data[0] : data;
     console.log(`this is the array or json ${certData}`)
     console.log(`this is the ${certData.title}`)
 
@@ -330,12 +356,7 @@ async function downloadCertificate(webinarId) {
     drawCertificate(certData);
 }
 
-
-
-
-  
-
-
- 
 </script>
+
+
 {% endblock %}
