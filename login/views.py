@@ -25,6 +25,9 @@ import logging
 
 from django.utils import timezone
 
+from django.contrib.admin.models import LogEntry, DELETION, CHANGE, ADDITION
+
+
 
 #imports models
 from django.contrib.admin.models import LogEntry
@@ -796,23 +799,59 @@ def change_password(request):
         return redirect("admin_setting")
     else:
         return redirect("user_setting")
-    
+
 @admin_required
 def log_list(request):
- 
+    
     logs = LogEntry.objects.filter(
         user__is_staff=True
-    ).select_related('user').order_by('-action_time')
+    ).select_related('user', 'content_type').order_by('-action_time')
+    
+    enhanced_logs = []
+    for log in logs:
+        log_data = {
+            'id': log.id,
+            'timestamp': log.action_time,
+            'user': log.user,
+            'action_flag': log.action_flag,
+            'action_name': log.get_action_flag_display(),
+            'content_type': log.content_type,
+            'object_id': log.object_id,
+            'object_repr': log.object_repr,
+            'change_message': log.change_message,
+        }
+        
+        # For deletions, create enhanced message
+        if log.action_flag == DELETION:
+            if log.content_type:
+                model_name = log.content_type.model.title()
+                log_data['deleted_model'] = model_name
+                log_data['deleted_id'] = log.object_id
+                
+                # Create enhanced message for deletions
+                if not log.object_repr or log.object_repr == 'None' or log.object_repr == '':
+                    log_data['enhanced_message'] = f"Deleted {model_name} (ID: {log.object_id})"
+                else:
+                    log_data['enhanced_message'] = f"Deleted {model_name}: {log.object_repr}"
+            else:
+                log_data['enhanced_message'] = f"Deleted item (ID: {log.object_id})"
+        else:
+            # For add/change operations, use existing message
+            log_data['enhanced_message'] = log.change_message or log.object_repr or "No details available"
+            
+        enhanced_logs.append(log_data)
+    
+    # Get users for the users tab
     users = User.objects.select_related('user_profile').order_by('-last_login')
-
-
     
     context = {
-        'logs': logs,
+        'logs': enhanced_logs,  # Use enhanced logs instead of raw logs
         'users': users,
     }
     
     return render(request, "login/admin_panel/admin_log.html", context)
+
+
 
 def forgot_password(request):
     if request.method == 'POST':

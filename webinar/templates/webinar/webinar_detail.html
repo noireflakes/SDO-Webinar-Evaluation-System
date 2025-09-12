@@ -6,164 +6,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<style>
-
-
-
-
-
-.date-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 8px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
-    width: 3rem;
-}
-
-.date-badge .month {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #dc2626;
-    text-transform: uppercase;
-}
-
-.date-badge .day {
-    display: block;
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-
-}
-
-.status-indicator {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-}
-
-.status-upcoming, .status-past {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-.status-ongoing{
-    background: rgb(111, 112, 207);
-    color: white;
-}
-
-.status-upcoming {
-    background: #10b981;
-    color: white;
-}
-
-.status-past {
-    background: #6b7280;
-    color: white;
-}
-
-.img-contents {
-    padding: 20px;
-}
-
-.webinar-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 12px;
-    line-height: 1.4;
-    display: -webkit-box;
-   
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.webinar-meta {
-    margin-bottom: 16px;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-
-.meta-item i {
-    margin-right: 8px;
-    width: 16px;
-    color: #9ca3af;
-}
-
-.meta-item .date-range {
-    font-weight: 500;
-    color: #374151;
-}
-
-.webinar-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .img-con {
-        height: 160px;
-    }
-    
-    .img-contents {
-        padding: 16px;
-    }
-    
-    .webinar-title {
-        font-size: 1rem;
-    }
-    
-    .webinar-actions {
-        flex-direction: column;
-    }
-    
-
-}
-
-@media (max-width: 480px) {
-    .date-badge {
-        top: 10px;
-        left: 10px;
-        padding: 6px;
-    }
-    
-    .date-badge .month {
-        font-size: 10px;
-    }
-    
-    .date-badge .day {
-        font-size: 16px;
-    }
-    
-    .status-indicator {
-        top: 10px;
-        right: 10px;
-    }
-}
-</style>
 {% endblock %}
 
 {% block body %}
 <section class="header-section">
     <div class="header-container">
-        <!-- Display dashboard-->
+        
         <p>
             {% if user.is_superuser or user.is_staff %}
                 <a href="{% url 'admin_events' %}">Admin Panel</a> 
@@ -237,7 +85,7 @@
             <span>Register Attendees</span>
         </a>
         <a class="statistics btn" href="{% url 'display_result' webinar.id %}">
-            <i class="fas fa-chart-bar"></i><span>View Statistics</span>
+            <i class="fas fa-chart-bar"></i><span>Evaluation Tool</span>
         </a>
         <a class="create-test btn" href="{% url 'create_test' webinar.id %}">
             <i class="fas fa-edit"></i><span>Create Test</span>

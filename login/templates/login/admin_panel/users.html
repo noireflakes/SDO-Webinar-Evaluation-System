@@ -152,14 +152,14 @@
     <button type="submit" class="btn btn-primary">Register User</button>
     </form>
         </div>
-                </div>
+            </div>
                 
-                <!-- Staff Registration Form (Only for Superusers) -->
-                {% if user.is_superuser %}
-                <div class="col-lg-6 mb-4">
-                    <div class="registration-form">
-                        <h3 class="form-title">Staff Registration</h3>
-                        <form action="{% url 'create_admin' %}" method="POST">
+                
+    {% if user.is_superuser %}
+            <div class="col-lg-6 mb-4">
+                <div class="registration-form">
+                    <h3 class="form-title">Staff Registration</h3>
+                <form action="{% url 'create_admin' %}" method="POST">
                             {% csrf_token %}
                         {% csrf_token %}
    
@@ -270,7 +270,7 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
+               
                 <div class="pagination-container">
                     <div class="pagination-info" id="pagination-info">
                       

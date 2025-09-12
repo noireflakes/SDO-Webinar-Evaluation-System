@@ -69,7 +69,7 @@
       </nav>
     </aside>
 
-    <div class="contents">
+    <div class="contents" >
         <div style="flex:1;" class="title-container">
             <h1>Events Management</h1>
         </div>
@@ -83,7 +83,7 @@
         {% endif %}
 
         <!-- Event Rating Comparison Section -->
-        <div class="comparison-section">
+        <div class="comparison-section" >
             <div class="comparison-header">
                 <h3>Event Rating Comparison</h3>
                 <p class="text-muted">Compare overall ratings between two events</p>
@@ -185,10 +185,10 @@
             </div>
         </div>
 
-        <!-- Include Chart.js -->
+   
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <div class="btn-container">
+            <div class="btn-container">
             <a class="create-btn" href="{% url 'make_webinar' %}">
                 Create Event 
                 <i class="bi bi-plus"></i>
@@ -197,10 +197,12 @@
 
         <!-- Search Bar -->
         <div class="search-wrapper">
+
             <div class="search-cont" tabindex="0" role="button">
                 <input type="text" name="search-Input" class="search-Input" placeholder="Search events by title or description...">
                 <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
+
         </div>
 
         <!-- Webinar List -->

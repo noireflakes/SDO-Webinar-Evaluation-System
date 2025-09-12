@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_log.css' %}"> 
 
 
+
 {% endblock %}
 
 {% block js %}  
@@ -71,9 +72,9 @@
 
     <div class="main-content">
         <h4 style="font-size:2rem;margin-bottom:0.3rem">Activity Logs</h4>
-<p style="color:#6c757d; margin-bottom:2rem; font-size:1rem;">
-    A record of all user and admin actions in the system.
-</p>
+        <p style="color:#6c757d; margin-bottom:2rem; font-size:1rem;">
+            A record of all user and admin actions in the system.
+        </p>
         <div class="table-container">
             <div class="table-header">
                 <h3><i class="fas fa-database me-2"></i>Log Audits</h3>
@@ -114,7 +115,6 @@
                                 <th style="width: 12%;">User</th>
                                 <th style="width: 10%;">Type</th>
                                 <th style="width: 10%;">Action</th>
-                          
                                 <th style="width: 28%;">Message</th>
                             </tr>
                         </thead>
@@ -194,7 +194,26 @@
 </footer>
 
 <script>
-// Convert Django data to JavaScript
+// Enhanced log processing function
+function getEnhancedMessage(log) {
+    if (log.action === 'delete') {
+        // Handle deletion cases
+        let modelName = log.contentType || 'Unknown';
+        let objectId = log.objectId || 'Unknown ID';
+        let objectRepr = log.object || '';
+        
+        if (!objectRepr || objectRepr === 'None' || objectRepr === '') {
+            return `<span class="deletion-info">Deleted <span class="model-name">${modelName}</span> <span class="object-id">(ID: ${objectId})</span></span>`;
+        } else {
+            return `<span class="deletion-info">Deleted <span class="model-name">${modelName}</span>: ${objectRepr}</span>`;
+        }
+    } else {
+        // Handle add/change cases
+        return log.message || log.object || 'No details available';
+    }
+}
+
+// Convert Django data to JavaScript with enhanced deletion info
 const logsData = [
     {% for log in logs %}
     {
@@ -206,7 +225,35 @@ const logsData = [
         action: "{% if log.action_flag == 1 %}add{% elif log.action_flag == 2 %}change{% elif log.action_flag == 3 %}delete{% endif %}",
         actionLabel: "{% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}",
         object: "{{ log.object_repr|escapejs }}",
-        message: "{{ log.get_change_message|escapejs }}"
+        message: "{{ log.get_change_message|escapejs }}",
+        // Enhanced deletion tracking data
+        contentType: "{% if log.content_type %}{{ log.content_type.model|capfirst }}{% endif %}",
+        objectId: "{{ log.object_id }}",
+        actionFlag: {{ log.action_flag }},
+        // Pre-computed enhanced message
+        enhancedMessage: {% if log.action_flag == 3 %}
+            {% if log.object_repr and log.object_repr != 'None' and log.object_repr != '' %}
+                "Deleted {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %}: {{ log.object_repr|escapejs }}"
+            {% else %}
+                "Deleted {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %} (ID: {{ log.object_id }})"
+            {% endif %}
+        {% elif log.action_flag == 1 %}
+            {% if log.object_repr and log.object_repr != 'None' and log.object_repr != '' %}
+                "Added {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %}: {{ log.object_repr|escapejs }}"
+            {% else %}
+                "Added {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %} (ID: {{ log.object_id }})"
+            {% endif %}
+        {% elif log.action_flag == 2 %}
+            {% if log.get_change_message and log.get_change_message|length > 0 %}
+                "Changed {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %}: {{ log.get_change_message|escapejs }}"
+            {% elif log.object_repr and log.object_repr != 'None' and log.object_repr != '' %}
+                "Changed {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %}: {{ log.object_repr|escapejs }}"
+            {% else %}
+                "Changed {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %} (ID: {{ log.object_id }})"
+            {% endif %}
+        {% else %}
+            "{{ log.get_change_message|escapejs }}"
+        {% endif %}
     }{% if not forloop.last %},{% endif %}
     {% empty %}
     {% endfor %}
@@ -231,7 +278,7 @@ const usersData = [
     {% endfor %}
 ];
 
-// Pagination state
+
 const tableState = {
     logs: {
         data: logsData,
@@ -248,21 +295,20 @@ const tableState = {
 };
 
 function switchTab(tabName, button) {
-    // Hide all tab contents
+
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    // Remove active class from all buttons
+   
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
-    // Show selected tab and mark button as active
+ 
     document.getElementById(tabName + '-tab').classList.add('active');
     button.classList.add('active');
     
-    // Display the table
+
     displayTable(tabName);
     setupPagination(tabName);
 }
@@ -275,7 +321,7 @@ function displayTable(tableName) {
     tableBody.innerHTML = "";
     
     if (state.filteredData.length === 0) {
-        const colSpan = tableName === 'logs' ? 6 : 6;
+        const colSpan = tableName === 'logs' ? 5 : 6;
         tableBody.innerHTML = `<tr><td colspan="${colSpan}" class="no-data">No ${tableName} available</td></tr>`;
         tableInfo.innerHTML = "Showing 0 entries";
         return;
@@ -287,6 +333,10 @@ function displayTable(tableName) {
     
     if (tableName === 'logs') {
         paginatedData.forEach(log => {
+            // Use enhanced message for better deletion tracking
+            let displayMessage = log.enhancedMessage || log.message || 'No details available';
+            let messageClass = log.action === 'delete' ? 'enhanced-deletion' : '';
+            
             let tr = `<tr>
             <td title="${new Date(log.timestamp).toLocaleString([], { 
                 year: 'numeric', 
@@ -306,14 +356,14 @@ function displayTable(tableName) {
             <td title="${log.username}">${log.username}</td>         
             <td><span class="status-badge status-${log.userType}">${log.userTypeLabel}</span></td>                        
             <td><span class="action-badge action-${log.action}">${log.actionLabel}</span></td>
-            <td class="text-truncate-custom" title="${log.message}">${log.message}</td>
+            <td class="text-truncate-custom ${messageClass}" title="${displayMessage.replace(/<[^>]*>/g, '')}">${displayMessage}</td>
                       </tr>`;
             tableBody.innerHTML += tr;
         });
     } else if (tableName === 'users') {
         paginatedData.forEach(user => {
-            let statusClass = user.isSuperuser ? 'superuser' : (user.isStaff ? 'staff' : (user.isActive ? 'active' : 'inactive'));
-            let statusText = user.isSuperuser ? 'Admin' : (user.isStaff ? 'Staff' : (user.isActive ? 'Active' : 'Inactive'));
+            let statusClass = ((user.isActive ? 'active' : 'inactive'));
+            let statusText = ((user.isActive ? 'Active' : 'Inactive'));
             let fullName = `${user.firstName} ${user.lastName}`.trim() || user.username;
             
             let tr = `<tr>
@@ -410,7 +460,9 @@ function searchTable(tableName) {
                 item.username.toLowerCase().includes(searchTerm) ||
                 item.object.toLowerCase().includes(searchTerm) ||
                 item.message.toLowerCase().includes(searchTerm) ||
-                item.actionLabel.toLowerCase().includes(searchTerm)
+                item.enhancedMessage.toLowerCase().includes(searchTerm) ||
+                item.actionLabel.toLowerCase().includes(searchTerm) ||
+                (item.contentType && item.contentType.toLowerCase().includes(searchTerm))
             );
         } else if (tableName === 'users') {
             state.filteredData = state.data.filter(item =>

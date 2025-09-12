@@ -2,6 +2,8 @@
 *{
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+    
 }
 
 
@@ -9,15 +11,19 @@ body, html{
     width: 100%;
     height: 100%;
     scrollbar-width: none;
+  
+
 }
 
 body{
-    background: linear-gradient(to bottom right, #e7e9fae8, #d6dbff);
+      background-color:#e0e3fa ;
+
 }
 
 .contents {
     padding: 1em;
     width: 100%;
+ 
 }
 
 h1{
@@ -39,7 +45,7 @@ h1{
 }
 
 .btn-container{
-    margin-top: 5%;
+
     
     display: flex;
     justify-content: right;
@@ -48,6 +54,7 @@ h1{
     background: linear-gradient(135deg, #4f46e5, #8b5cf6) ;
     padding:5px;
     width: 15%;
+    height: 30px;
     font-size: 16px;
     text-decoration: none;
     color:white;
@@ -78,9 +85,6 @@ h1{
     width: 100%;
     margin-top: 30px;
     margin-left: clamp(0.5rem, 2vw, 10rem); 
-   
-   
-    
     gap: clamp(0.5rem, 2vw, 6rem);
    
 
@@ -182,6 +186,8 @@ h1{
     border-radius: 16px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background-color: green;
+
 }
 
 .comparison-header {
@@ -494,10 +500,14 @@ h1{
     margin: 0;
 }
 
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .comparison-section {
         padding: 1rem;
+    }
+    .vs-divider{
+        display: none;
     }
     
     .event-selection-row {

@@ -11,6 +11,7 @@ from collections import Counter
 from io import BytesIO
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
+from webinar.models import Comment
 
 #decorator
 def admin_required(view_func):
@@ -52,18 +53,18 @@ def test_result(request, web_id, type, id):
 
 @admin_required
 def display_result(request, id):
-    webinar=Webinar.objects.get(id=id)
-    test_results=TestResult.objects.filter(webinar=webinar)
-    evaluations=ResponseQuestionaire.objects.filter(webinar=webinar)
-
-    evaluation_responses=[]
-    pre_test_result=[]
-    post_test_result=[]
-
-
-    return render(request, 'exam_portal/statistics.html',{
-        'webinar':webinar
-       
+    webinar = Webinar.objects.get(id=id)
+    test_results = TestResult.objects.filter(webinar=webinar)
+    evaluations = ResponseQuestionaire.objects.filter(webinar=webinar)
+    comments = Comment.objects.filter(webinar=webinar).select_related('user')  # Add this
+    
+    evaluation_responses = []
+    pre_test_result = []
+    post_test_result = []
+    
+    return render(request, 'exam_portal/statistics.html', {
+        'webinar': webinar,
+        'comments': comments  # Add this to context
     })
 
 def rounded_data(request, id):

@@ -313,7 +313,177 @@ h4{
     align-items: center;
     width: 70%;
 }
+.attendees-section, .comments-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 2rem 0;
+    padding: 1.5rem;
+}
 
+.attendees-table {
+    margin-top: 1rem;
+}
+
+.attendees-table table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.attendees-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border: none;
+    padding: 12px 16px;
+}
+
+.attendees-table td {
+    padding: 12px 16px;
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.attendance-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.attendance-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.attendance-partial {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.attendance-not-started {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.search-box {
+    position: relative;
+    max-width: 300px;
+    flex: 1;
+}
+
+.search-box input {
+    padding: 8px 12px 8px 40px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.rows-per-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rows-per-page select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pagination-footer {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.table-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.comment-carousel {
+    max-width: 100%;
+}
+
+.comment-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 0.5rem;
+    min-height: 200px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.comment-user-info h6 {
+    margin: 0;
+    color: #495057;
+}
+
+.comment-user-info small {
+    color: #6c757d;
+}
+
+.comment-text {
+    color: #495057;
+    line-height: 1.6;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    color: #6c757d;
+}
+
+.carousel-indicators button {
+    background-color: #6c757d;
+}
 
 
 

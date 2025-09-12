@@ -14,7 +14,8 @@
 html, body {
     height: 100%;
     margin: 0;
-    overflow: hidden;
+    overflow-x:hidden ;
+    overflow-y: auto;
 }
 
 body {
@@ -32,7 +33,7 @@ body {
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);
     padding: 40px;
-    min-width: 23em;
+    min-width: 21em;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -248,3 +249,23 @@ input::placeholder {
     text-decoration: underline;
     border-bottom: 1px solid black;
 }
+    .password-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        font-size: 18px;
+        user-select: none;
+    }
+    
+    .password-toggle:hover {
+        color: #333;
+    }

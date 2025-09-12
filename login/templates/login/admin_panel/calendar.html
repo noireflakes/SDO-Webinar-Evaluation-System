@@ -82,8 +82,10 @@
             {% for up_webinar in upcoming_webinars %}
               <div class="event-card">
                 <h6>{{ up_webinar.title }}</h6>
-                <p class="address">{{ up_webinar.address }}</p>
+                
+                <p class="address">{{ up_webinar.venue }}</p>
                 <p class="date">{{ up_webinar.start_date }} – {{ up_webinar.until_date }}</p>
+                <p class=" date view"><a  href="{% url 'webinar_detail' up_webinar.id %}">View Details</a></p>
               </div>
             {% endfor %}
           {% else %} 
