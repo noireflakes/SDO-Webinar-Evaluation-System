@@ -658,19 +658,6 @@ function setupAutoPasswordGeneration(firstNameInputId, passwordInputId) {
     }
 }
 
-function setupDepedIdPasswordFallback(depedIdInputId, passwordInputId) {
-    const depedIdInput = document.getElementById(depedIdInputId);
-    const passwordInput = document.getElementById(passwordInputId);
-    
-    if (depedIdInput && passwordInput) {
-        depedIdInput.addEventListener("change", () => {
-            if (passwordInput.value === '' || passwordInput.dataset.generatedFromFirstName === 'true') {
-                passwordInput.value = depedIdInput.value;
-                passwordInput.dataset.generatedFromFirstName = 'false';
-            }
-        });
-    }
-}
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -714,9 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAutoPasswordGeneration("user_firstname", "user_password");
     setupAutoPasswordGeneration("staff_firstname", "staff_password");
     
-    // DepEd ID fallback
-    setupDepedIdPasswordFallback("deped_id", "user_password");
-    setupDepedIdPasswordFallback("staff_deped_id", "staff_password");
+  
 
     // Disable autocomplete for email and password fields
     const emailFields = document.querySelectorAll('input[type="email"]');
