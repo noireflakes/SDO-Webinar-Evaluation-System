@@ -118,6 +118,7 @@ def logout_view(request):
     logout(request)
     return redirect("index")
 
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect("index")
@@ -690,65 +691,74 @@ def create_admin(request):
 @admin_required
 def delete_user(request, id):
     user=User.objects.filter(id=id)
+    
     user.delete()
+    messages.success(request, "User has been deleted")
 
     return redirect("admin_users")
+
 
 @login_required
 def edit_user(request):
     user = User.objects.get(id=request.user.id)
     profile = UserProfile.objects.get(user=user)
-    user_taken="username already taken"
-
-    redirection=["admin_panel/setting.html","user_nav/user_setting.html"]
-    redirected=""
-
+    user_taken = "username already taken"
+    
+    redirection = ["admin_panel/setting.html", "user_nav/user_setting.html"]
+    redirected = ""
+    
     if request.method == 'POST':
-        first_name=request.POST.get("first_name")
-        last_name=request.POST.get("last_name")
-            
-        user.first_name = first_name
-        user.last_name = last_name
-
-        username=request.POST.get('username')
-        if username:
-            if User.objects.filter(username=username):
+        first_name = request.POST.get("first_name")
+        if first_name and first_name.strip():
+            user.first_name = first_name.strip()
+        
+        last_name = request.POST.get("last_name")
+        if last_name and last_name.strip():
+            user.last_name = last_name.strip()
+        
+        username = request.POST.get('username')
+        if username and username.strip():
+            if User.objects.filter(username=username).exclude(id=user.id).exists():
                 if request.user.is_superuser or request.user.is_staff:
-                    redirected=redirection[0]
+                    redirected = redirection[0]
                 else:
-                    redirected=redirection[1]
-                return render(request, f"login/{redirected}",{
-                    "user_taken":user_taken
+                    redirected = redirection[1]
+                return render(request, f"login/{redirected}", {
+                    "user_taken": user_taken
                 })
-            user.username=username
-
+            user.username = username.strip()
         
         email = request.POST.get("email")
-        img = request.FILES.get("img")  
-        number = request.POST.get('number')
-        school = request.POST.get('school')
-
-        if email:
-            user.email = email
-
+        if email and email.strip():
+            user.email = email.strip()
+ 
         user.save()
-
+        
+        middle_initial = request.POST.get("middle")
+        if middle_initial and middle_initial.strip():
+            profile.middle_initial = middle_initial.strip()
+        
+        img = request.FILES.get("img")
         if img:
             profile.img = img
-        if number:
-            profile.number = number
-        if school:
-            profile.school = school
+        
+        number = request.POST.get('number')
+        if number and number.strip():
+            profile.number = number.strip()
+        
+        school = request.POST.get('school')
+        if school and school.strip():
+            profile.school = school.strip()
+        
+        
         profile.save()
-
-        messages.success(request,"Profile Successfully Applied Changes")
-
+        
+        messages.success(request, "Profile Successfully Applied Changes")
+    
     if request.user.is_superuser or request.user.is_staff:
         return redirect("admin_setting")
     else:
         return redirect("user_setting")
-
-
 
 @login_required
 def change_password(request):

@@ -138,7 +138,7 @@ def user_events_data(request):
 def register(request, id):
     webinar = get_object_or_404(Webinar, id=id)
 
-    attendees = WebinarAttendees.objects.filter(webinar=webinar)
+    attendees = WebinarAttendees.objects.filter(webinar=webinar).order_by("-id")
 
     if request.method == 'POST':
 
@@ -163,22 +163,43 @@ def register(request, id):
         attendee.save()
 
         subject = f"Registration Confirmed: {webinar.title}"
-        message = (
-            f"Hello,\n\n"
-            f"You are now registered for \"{webinar.title}\".\n\n"
-            f"📅 Date: {webinar.start_date}\n"
-            f"📍 Location: {webinar.venue}\n\n"
-            f"We look forward to seeing you there!\n\n"
-            f"Best regards,\n"
-            f"The Webinar Team"
-        )
+    
+        message = f""""
+            Hello,\n\n
+            You are now registered for \"{webinar.title}\".\n\n
+            "📅 Date: {webinar.start_date}\n"
+            "📍 Location: {webinar.venue}\n\n"
+            "We look forward to seeing you there!\n\n"
+            "Best regards,\n"
+            "The Webinar Team"
+        """
+        html_message = f"""
+<html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.5;">
+    <p>Hello,</p>
+
+    <p>You are now registered for "<strong>{webinar.title}</strong>".</p>
+
+    <p>
+      📅 <strong>Date:</strong> {webinar.start_date}<br>
+      📍 <strong>Location:</strong> {webinar.venue}
+    </p>
+
+    <p>We look forward to seeing you there!</p>
+
+    <p>Best regards,<br>
+    The Webinar Team</p>
+  </body>
+</html>
+"""
+
 
 
 
         send_email(
         to_email=email,
         subject=subject,
-        body= message
+        body= html_message
     )
 
         messages.success(request, "Registration successful!")
@@ -440,6 +461,7 @@ def delete_question(request, id):
     test=Test_Question.objects.get(id=id)
      
     test.delete()
+    
     return redirect(redirect_create_test, id=test.webinar.id)
 
 

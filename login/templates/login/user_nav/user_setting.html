@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{% static 'css/bar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/setting.css' %}">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+ <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
@@ -62,14 +63,26 @@
   <div class="settings-container">
   <h2>Account Settings</h2>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+  <div class="popup-messages" id="popupMessages">
+    {% for message in messages %}
+      {% if "expired" not in message|stringformat:"s" %}
+        <div class="popup-message {{ message.tags }}">
+          <i class="popup-message-icon fas 
+            {% if message.tags == 'error' %}fa-exclamation-triangle
+            {% elif message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'warning' %}fa-exclamation-circle
+            {% elif message.tags == 'info' %}fa-info-circle
+            {% else %}fa-exclamation-triangle{% endif %}"></i>
+          <div class="popup-message-content">{{ message }}</div>
+          <button class="popup-message-close" onclick="closeMessage(this)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
 
         <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
             <h4>Personal Information</h4>
@@ -88,6 +101,10 @@
                 <div class="form-group">
                     <label for="first_name"><i class="fas fa-id-badge me-2"></i>First Name</label>
                     <input name="first_name" id="first_name" type="text" placeholder="{{ user.first_name }}" />
+                </div>
+                <div class="form-group">
+                    <label for="middle"><i class="fas fa-id-badge me-2"></i>Middle Initial:</label>
+                    <input name="middle" id="middle" type="text" placeholder="{{ user.user_profile.middle_initial }}" />
                 </div>
                 
                 <div class="form-group">
@@ -184,6 +201,117 @@
   </div>
 </footer>
 
+<script>
+function togglePassword(fieldId, toggleBtn) {
+    const passwordField = document.getElementById(fieldId);
+    const icon = toggleBtn.querySelector('i');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function previewFile(input) {
+    const file = input.files[0];
+    const display = input.parentNode.querySelector('.file-input-display');
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (file) {
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            alert('Please select a valid image file (PNG, JPG, JPEG)');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size must be less than 5MB');
+            input.value = '';
+            return;
+        }
+        
+        display.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>${file.name}</span>
+        `;
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        display.innerHTML = `
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose new profile image</span>
+            <small class="d-block text-muted mt-1">PNG, JPG, JPEG up to 5MB</small>
+        `;
+        preview.style.display = 'none';
+    }
+}
+
+// Password validation functions
+function showPasswordError(message) {
+    const errorDiv = document.getElementById('password-mismatch-error');
+    const errorText = document.getElementById('password-error-text');
+    errorText.textContent = message;
+    errorDiv.classList.add('show');
+}
+
+function hidePasswordError() {
+    const errorDiv = document.getElementById('password-mismatch-error');
+    errorDiv.classList.remove('show');
+}
+
+function validatePasswords() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (newPassword && confirmPassword) {
+        if (newPassword !== confirmPassword) {
+            showPasswordError('New password and confirm password do not match!');
+            return false;
+        } else {
+            hidePasswordError();
+            return true;
+        }
+    }
+    return true;
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.getElementById('passwordForm');
+    const newPasswordField = document.getElementById('new_password');
+    const confirmPasswordField = document.getElementById('confirm_password');
+    
+    if (passwordForm) {
+        // Real-time validation as user types
+        newPasswordField.addEventListener('input', validatePasswords);
+        confirmPasswordField.addEventListener('input', validatePasswords);
+        
+        // Form submission validation
+        passwordForm.addEventListener('submit', function(e) {
+            if (!validatePasswords()) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+
+</script>
 
 
 {% endblock %}

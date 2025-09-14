@@ -10,14 +10,209 @@
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/setting.css' %}">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
-
-
+ <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
+ <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
 
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'js/sidebar.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block body%}
+
+<div class="topbar">
+    <div class="menu-cont">
+        <button class="nav-menu-bar" style="color:white; background: none;">
+            <i class="fas fa-bars" style="font-size: 1.5em;"></i>
+        </button>
+    </div>
+    <div class="credential-cont">        
+        <span class="username fw-semibold">{{ user.username }}</span>
+        <a class="profile">
+            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
+        </a>
+    </div>
+</div>
+
+<div class="app-container">
+    <div class="sidebar nav-sb">
+        <div class="close-cont">
+            <button class="close-sb">
+                <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
+            </button>
+        </div>
+        <ul class="sidebar-nav">
+            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificates</a>
+            <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="sb-nav-item sb-active">Settings</a>
+            <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
+            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+        </ul>
+    </div>
+
+    <aside class="d-sidebar">
+        <div class="logo">
+            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+            <h2>SDO Baliwag</h2>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'admin_events' %}" class="nav-item" >Event Management</a>
+            <a href="{% url 'admin_calendar' %}" class="nav-item" >Event Calendar</a>
+            <a href="{% url 'admin_certificate' %}" class="nav-item" >Certificates</a>
+            <a href="{% url 'admin_users' %}" class="nav-item" >Manage Users</a>
+            <a href="{% url 'admin_setting' %}" class="nav-item active">Settings</a>
+            <a href="{% url 'admin_log' %}" class="nav-item" >Activity Logs</a>
+            <a href="{% url 'logout' %}" class="nav-item" >Logout</a> 
+        </nav>
+    </aside>
+
+    <div class="settings-container">
+        <h2>Account Settings</h2>
+    {% if messages %}
+  <div class="popup-messages" id="popupMessages">
+    {% for message in messages %}
+      {% if "expired" not in message|stringformat:"s" %}
+        <div class="popup-message {{ message.tags }}">
+          <i class="popup-message-icon fas 
+            {% if message.tags == 'error' %}fa-exclamation-triangle
+            {% elif message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'warning' %}fa-exclamation-circle
+            {% elif message.tags == 'info' %}fa-info-circle
+            {% else %}fa-exclamation-triangle{% endif %}"></i>
+          <div class="popup-message-content">{{ message }}</div>
+          <button class="popup-message-close" onclick="closeMessage(this)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+        <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
+            <h4>Personal Information</h4>
+            {% csrf_token %}
+            
+            {% if user_taken %}
+                <div class="alert alert-danger">{{ user_taken }}</div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user me-2"></i>Username</label>
+                    <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="first_name"><i class="fas fa-id-badge me-2"></i>First Name</label>
+                    
+                    <input name="first_name" id="first_name" type="text" placeholder="{{ user.first_name }}" />
+                </div>
+                <div class="form-group">
+                    <label for="middle"><i class="fas fa-id-badge me-2"></i>Middle Initial:</label>
+                    <input name="middle" id="middle" type="text" placeholder="{{ user.user_profile.middle_initial }}" />
+                </div>
+
+                
+                <div class="form-group">
+                    <label for="last_name"><i class="fas fa-id-badge me-2"></i>Last Name</label>
+                    <input name="last_name" id="last_name" type="text" placeholder="{{ user.last_name }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                    <input id="email" name="email" type="email" placeholder="{{ user.email }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="number"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                    <input id="number" name="number" type="tel" placeholder="{{ user.user_profile.number }}" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="school"><i class="fas fa-school me-2"></i>School Institution</label>
+                    <input type="text" name="school" id="school" placeholder="{{ user.user_profile.school|default:'Enter school name' }}" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-image me-2"></i>Profile Picture</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="img" id="img" accept=".png,.jpg,.jpeg" onchange="previewFile(this)" />
+                </div>
+            </div>
+            
+            <input type="submit" value="Save Changes">
+        </form>
+
+        <form action="{% url 'change_password' %}" method="post" class="card" id="passwordForm">
+            {% csrf_token %}
+            <h4><i class="fas fa-lock me-2"></i>Change Password</h4>
+            
+            {% if error_password %}
+                <div class="alert alert-danger">{{ error_password }}</div>
+            {% endif %}
+            
+            <!-- Password mismatch error message -->
+            <div id="password-mismatch-error" class="password-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="password-error-text"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="current_password"><i class="fas fa-key me-2"></i>Current Password</label>
+                <div class="input-group">
+                    <input type="password" name="current_password" id="current_password" required />
+                    <button type="button" class="password-toggle" onclick="togglePassword('current_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="new_password"><i class="fas fa-lock me-2"></i>New Password</label>
+                <div class="input-group">
+                    <input type="password" name="new_password" id="new_password" required minlength="8" />
+                    <button type="button" class="password-toggle" onclick="togglePassword('new_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Password must be at least 8 characters long</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password"><i class="fas fa-check-circle me-2"></i>Confirm New Password</label>
+                <div class="input-group">
+                    <input type="password" name="confirm_password" id="confirm_password" required minlength="8" />
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <input type="submit" value="Update Password">
+        </form>
+    </div>
+</div>
+
+<footer>
+    <div class="container d-flex justify-content-between flex-wrap">
+        <div>
+            <p>Empowering organizations through effective performance evaluation</p>
+        </div>
+        <div>
+            <h6>Contact Us</h6>
+            <p>Baliwag City North Central School, Lopez Jaena St.</p>
+            <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
+        </div>
+    </div>
+</footer>
+
+
 <script>
 function togglePassword(fieldId, toggleBtn) {
     const passwordField = document.getElementById(fieldId);
@@ -128,181 +323,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %}
-
-{% block body%}
-
-<div class="topbar">
-    <div class="menu-cont">
-        <button class="nav-menu-bar" style="color:white; background: none;">
-            <i class="fas fa-bars" style="font-size: 1.5em;"></i>
-        </button>
-    </div>
-    <div class="credential-cont">        
-        <span class="username fw-semibold">{{ user.username }}</span>
-        <a class="profile">
-            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-        </a>
-    </div>
-</div>
-
-<div class="app-container">
-    <div class="sidebar nav-sb">
-        <div class="close-cont">
-            <button class="close-sb">
-                <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
-            </button>
-        </div>
-        <ul class="sidebar-nav">
-            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
-            <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Event Calendar</a>
-            <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificates</a>
-            <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
-            <a href="{% url 'admin_setting' %}" class="sb-nav-item sb-active">Settings</a>
-            <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
-            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-        </ul>
-    </div>
-
-    <aside class="d-sidebar">
-        <div class="logo">
-            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-            <h2>SDO Baliwag</h2>
-        </div>
-        <nav class="nav">
-            <a href="{% url 'admin_events' %}" class="nav-item" >Event Management</a>
-            <a href="{% url 'admin_calendar' %}" class="nav-item" >Event Calendar</a>
-            <a href="{% url 'admin_certificate' %}" class="nav-item" >Certificates</a>
-            <a href="{% url 'admin_users' %}" class="nav-item" >Manage Users</a>
-            <a href="{% url 'admin_setting' %}" class="nav-item active">Settings</a>
-            <a href="{% url 'admin_log' %}" class="nav-item" >Activity Logs</a>
-            <a href="{% url 'logout' %}" class="nav-item" >Logout</a> 
-        </nav>
-    </aside>
-
-    <div class="settings-container">
-        <h2>Account Settings</h2>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form action="{% url 'edit_user' %}" method="post" class="card" enctype="multipart/form-data">
-            <h4>Personal Information</h4>
-            {% csrf_token %}
-            
-            {% if user_taken %}
-                <div class="alert alert-danger">{{ user_taken }}</div>
-            {% endif %}
-            
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user me-2"></i>Username</label>
-                    <input name="username" id="username" type="text" placeholder="{{ user.username }}" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="first_name"><i class="fas fa-id-badge me-2"></i>First Name</label>
-                    <input name="first_name" id="first_name" type="text" placeholder="{{ user.first_name }}" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="last_name"><i class="fas fa-id-badge me-2"></i>Last Name</label>
-                    <input name="last_name" id="last_name" type="text" placeholder="{{ user.last_name }}" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
-                    <input id="email" name="email" type="email" placeholder="{{ user.email }}" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="number"><i class="fas fa-phone me-2"></i>Phone Number</label>
-                    <input id="number" name="number" type="tel" placeholder="{{ user.user_profile.number }}" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="school"><i class="fas fa-school me-2"></i>School Institution</label>
-                    <input type="text" name="school" id="school" placeholder="{{ user.user_profile.school|default:'Enter school name' }}" />
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label><i class="fas fa-image me-2"></i>Profile Picture</label>
-                <div class="file-input-wrapper">
-                    <input type="file" name="img" id="img" accept=".png,.jpg,.jpeg" onchange="previewFile(this)" />
-                </div>
-            </div>
-            
-            <input type="submit" value="Save Changes">
-        </form>
-
-        <form action="{% url 'change_password' %}" method="post" class="card" id="passwordForm">
-            {% csrf_token %}
-            <h4><i class="fas fa-lock me-2"></i>Change Password</h4>
-            
-            {% if error_password %}
-                <div class="alert alert-danger">{{ error_password }}</div>
-            {% endif %}
-            
-            <!-- Password mismatch error message -->
-            <div id="password-mismatch-error" class="password-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span id="password-error-text"></span>
-            </div>
-            
-            <div class="form-group">
-                <label for="current_password"><i class="fas fa-key me-2"></i>Current Password</label>
-                <div class="input-group">
-                    <input type="password" name="current_password" id="current_password" required />
-                    <button type="button" class="password-toggle" onclick="togglePassword('current_password', this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="new_password"><i class="fas fa-lock me-2"></i>New Password</label>
-                <div class="input-group">
-                    <input type="password" name="new_password" id="new_password" required minlength="8" />
-                    <button type="button" class="password-toggle" onclick="togglePassword('new_password', this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <small class="text-muted">Password must be at least 8 characters long</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirm_password"><i class="fas fa-check-circle me-2"></i>Confirm New Password</label>
-                <div class="input-group">
-                    <input type="password" name="confirm_password" id="confirm_password" required minlength="8" />
-                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <input type="submit" value="Update Password">
-        </form>
-    </div>
-</div>
-
-<footer>
-    <div class="container d-flex justify-content-between flex-wrap">
-        <div>
-            <p>Empowering organizations through effective performance evaluation</p>
-        </div>
-        <div>
-            <h6>Contact Us</h6>
-            <p>Baliwag City North Central School, Lopez Jaena St.</p>
-            <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
-        </div>
-    </div>
-</footer>
 
 {% endblock %}

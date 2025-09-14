@@ -341,23 +341,24 @@ p{
 .instructor-container{
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-evenly;
     align-items: center;
     margin-left: .5em;
+    
 
 }
 .instrutor-card{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    
 
 }
 
 .sp-cont-img{
-
-    width: 8em;
-    height: 8em;
+    width: clamp(5em, 10vw, 8em);
+    height: clamp(5em, 10vw, 8em);
     border-radius: 50%;
     overflow: hidden;
     margin-top: 30px;
@@ -375,14 +376,25 @@ p{
 }
 .instrutor-card h2{
     font-size: 1.5em;
+        margin: 0;
+    padding: 0;
    
 }
 .instrutor-card p{
+    margin: 0;
+    padding: 0;
     font-size: clamp(12px, 2vw, 14px);
 
 }
 .speaker-content{
-    margin-left: 10px;
+    margin-left: 1rem;
+    display: flex;
+
+    padding: 0;
+    justify-content: flex-start;
+    flex-direction: column;
+
+
 }
 a{
     text-decoration: none;
@@ -609,6 +621,9 @@ a:hover{
 
     .admin-controls{
         display: none;
+    }
+    .instructor-container{
+        flex-direction: column;
     }
     
 }

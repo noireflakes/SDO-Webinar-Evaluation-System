@@ -22,7 +22,7 @@
         <aside>
             <div class="title-container">
                 <p class="webinar-detail">
-                    <a href="{% url 'webinar_detail' webinar.id %}">Webinar detail</a> > Statistic
+                    <a href="{% url 'webinar_detail' webinar.id %}">Webinar detail</a> > Evaluation Tool
                 </p>
                 <h2>{{ webinar.title }}</h2>
                 <p class="stat">Statistic and Result</p>
@@ -31,10 +31,10 @@
     </div>
 
     <div class="main-content">
-        <h2 class="title head">Statistic Management</h2>
+        <h2 class="title head">Evaluation Management</h2>
         
         <section class="evaluation-section">
-            <h2 class="title">Evaluation result</h2>
+            <h2 class="title">Evaluation Report</h2>
             <div class="evaluation-container">
                 <!-- Chart containers remain the same as in your original code -->
                 <div class="chart-wrapper">
@@ -292,44 +292,25 @@
             </div>
         </section>
 
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-left">
-                    <img class="logo" src="{% static 'asset/logo1.png' %}" alt="">
-                    <p>School Division Office Of The City Of BALIWAG</p>
-                </div>
-                <div class="footer-links">
-                    <h4></h4>
-                    <div class="link-columns"></div>
-                </div>
-                <div class="footer-contact">
-                    <h4>Contact Us</h4>
-                    <p>Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
-                    <p>+63912376421</p>
-                    <p>sdo@deped.com</p>
-                </div>
-            </div>
-        </footer>
-    </div>
+</div>
+    
+  
+
 </div>
 <script>
     
-// Store chart instances and data globally
+
 let chartInstances = {};
 let chartData = {};
 let testChartInstances = {};
 let testData = {};
 
-// Attendees data management
+
 let attendeesData = [];
 let filteredAttendeesData = [];
 let currentAttendeesPage = 1;
 let attendeesRowsPerPage = 10;
 
-document.addEventListener("DOMContentLoaded", ()=>{
-    console.log("js is connected")
-    window.alert("js is connected")
-})
 
 
 // Your existing chart functions remain the same...
@@ -338,7 +319,6 @@ async function DownloadExcel() {
     const response = await fetch(`/exam_portal/result_data/${id}`);
     const data = await response.json();
 
-    console.log("Data fetched:", data);
 
     let csvContent = "";
 
@@ -582,7 +562,6 @@ function changeAttendeesRowsPerPage() {
     setupAttendeesPagination();
 }
 
-// Comments carousel functions
 function setupCommentsCarousel(commentsData) {
     const indicatorsContainer = document.getElementById('comment-indicators');
     const slidesContainer = document.getElementById('comment-slides');
@@ -653,7 +632,7 @@ function setupCommentsCarousel(commentsData) {
     });
 }
 
-// Chart functions (keeping your existing chart code)
+
 function hasData(data) {
     if (!Array.isArray(data)) return false;
     return data.some(value => value > 0);
@@ -798,7 +777,7 @@ function changeChartType(chartId, newType) {
     buttons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
 
-    const labels = ['5 (Excellent)', '4 (Good)', '3 (Average)', '2 (Poor)', '1 (Very Poor)'];
+    const labels = ['5 (Highly Acceptable)', '4 (Moderately Acceptable)', '3 (Acceptable)', '2 (Fairly Acceptable)', '1 (Poorly Acceptable)'];
     const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
     const title = chartId.charAt(0).toUpperCase() + chartId.slice(1) + ' Evaluation';
 
@@ -837,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function() {
             overall: data.overall
         };
                 
-        const labels = ['5 (Excellent)', '4 (Good)', '3 (Average)', '2 (Poor)', '1 (Very Poor)'];
+        const labels = ['5 (Highly Acceptable)', '4 (Moderately Acceptable)', '3 (Acceptable)', '2 (Fairly Acceptable)', '1 (Poorly Acceptable)'];
         const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
                 
         const chartIds = ['speaker', 'venue', 'food', 'manage', 'overall'];
