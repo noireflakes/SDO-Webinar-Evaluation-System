@@ -51,6 +51,7 @@ def test_result(request, web_id, type, id):
     )
     return redirect("index")
 
+
 @admin_required
 def display_result(request, id):
     webinar = Webinar.objects.get(id=id)
@@ -66,6 +67,7 @@ def display_result(request, id):
         'webinar': webinar,
         'comments': comments  # Add this to context
     })
+
 
 def rounded_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
@@ -297,6 +299,7 @@ def generate_qr(request, id, type):
         
     return redirect('display_qr', id, type)
 
+
 @admin_required
 def qr_evalution(request, id):
     webinar=get_object_or_404(Webinar, id=id)
@@ -382,6 +385,7 @@ def redirect_certificate(request, id):
             'webinar':img.webinar,
             "messages":messages
         })
+
 
 def upload_img(request, id):
     if request.method=='POST':

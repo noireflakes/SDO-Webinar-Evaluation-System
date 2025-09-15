@@ -39,3 +39,14 @@
         font-size: 1.2rem;
         color: #7f8c8d;
     }
+    .return{
+        text-decoration: none;
+        font-size: 1.5rem;
+        margin-top: 1rem;
+        color: rgba(255, 255, 255, 0.582);
+      
+    }
+    .return:hover{
+        text-decoration: underline;
+       
+    }

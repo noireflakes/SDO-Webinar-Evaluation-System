@@ -20,11 +20,16 @@ def make_webinar(request):
         description=request.POST.get('description')
         number_of_speaker=int(request.POST.get('number_of_speaker'))
         event_type=request.POST.get('event_type')
+        custom_event_type=request.POST.get('custom_event_type')
         start_date=request.POST.get('start_date')
         until_date=request.POST.get('until_date')
         time=request.POST.get('event_time')
         banner=request.FILES.get('banner')
         venue=request.POST.get('venue')
+
+        # Use custom event type if "other" is selected and custom type is provided
+        if event_type == "other" and custom_event_type:
+            event_type = custom_event_type.strip()
 
         id=request.POST.get('event_id')
         try:
@@ -101,9 +106,12 @@ def webinar_detail(request, id):
 
 
 def edit_events(request, id):
-    webinar=get_object_or_404(Webinar, id=id)
-    return render(request, "webinar/makewebinar.html",{
-        'webinar':webinar
+    webinar = get_object_or_404(Webinar, id=id)
+    speakers = webinar.speaker.all()  
+    
+    return render(request, "webinar/makewebinar.html", {
+        'webinar': webinar,
+        'speakers': speakers 
     })
 
 
@@ -318,7 +326,6 @@ def questionaire(request, id):
                 'error_message': error_message
             })
 
-    # GET request handling
     if webinar.event_type == 'recognition':
         return render(request, 'webinar/evaluation/recognition.html', {
             'webinar': webinar

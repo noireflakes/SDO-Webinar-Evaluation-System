@@ -115,10 +115,17 @@
                 <label for="event_type">Event Type:</label>
                 <select name="event_type" id="event_type" class="form-control">
                     <option value="recognition" {% if webinar.event_type == "recognition" %}selected{% endif %} >Recognition</option>
-                    <option value="workshop" {% if webinar.event_type == "recognition" %}selected{% endif %} >Workshop</option>
-                    <option value="seminar" {% if webinar.event_type == "recognition" %}selected{% endif %}>Seminar</option>
-                    <option value="seminar" {% if webinar.event_type == "recognition" %}selected{% endif %}>Other</option>
+                    <option value="workshop" {% if webinar.event_type == "workshop" %}selected{% endif %} >Workshop</option>
+                    <option value="seminar" {% if webinar.event_type == "seminar" %}selected{% endif %}>Seminar</option>
+                    <option value="other" {% if webinar.event_type == "other" or webinar.event_type and webinar.event_type not in "recognition,workshop,seminar" %}selected{% endif %}>Other</option>
                 </select>
+            </div>
+
+            <!-- Custom Event Type Input - Hidden by default -->
+            <div class="form-group" id="custom_event_type_group" style="display: none;">
+                <label for="custom_event_type">Custom Event Type:</label>
+                <input name="custom_event_type" id="custom_event_type" class="form-control" placeholder="Enter custom event type" 
+                value="{% if webinar.event_type and webinar.event_type not in 'recognition,workshop,seminar,other' %}{{ webinar.event_type }}{% endif %}">
             </div>
 
             <div class="form-group">
@@ -155,6 +162,27 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const form=document.getElementById("form")
+            const eventTypeSelect = document.getElementById("event_type");
+            const customEventTypeGroup = document.getElementById("custom_event_type_group");
+            const customEventTypeInput = document.getElementById("custom_event_type");
+
+            // Function to toggle custom event type input
+            function toggleCustomEventType() {
+                if (eventTypeSelect.value === "other") {
+                    customEventTypeGroup.style.display = "block";
+                    customEventTypeInput.required = true;
+                } else {
+                    customEventTypeGroup.style.display = "none";
+                    customEventTypeInput.required = false;
+                    customEventTypeInput.value = "";
+                }
+            }
+
+            // Initial check on page load
+            toggleCustomEventType();
+
+            // Listen for changes to event type
+            eventTypeSelect.addEventListener("change", toggleCustomEventType);
 
             form.addEventListener("change", ()=>{
                 console.log("detect change")
@@ -211,6 +239,19 @@
             const inputField = document.getElementById("number_of_speaker");
             const speakersContainer = document.getElementById("speakers_container");
 
+            // Store existing speaker data from Django template
+            const existingSpeakers = [
+                {% if webinar %}
+                    {% for speaker in speakers %}
+                    {
+                        name: "{{ speaker.name|escapejs }}",
+                        email: "{{ speaker.email|escapejs }}",
+                        img_url: "{{ speaker.img.url|escapejs }}"
+                    }{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                {% endif %}
+            ];
+
             inputField.addEventListener("input", function () {
                 speakersContainer.innerHTML = ""; 
 
@@ -221,21 +262,36 @@
                     for (let i = 0; i < numSpeakers; i++) {
                         const div = document.createElement("div");
                         div.classList.add("form-group");
+                        
+                        // Check if we have existing speaker data for this index
+                        const existingSpeaker = existingSpeakers[i] || {};
+                        
                         div.innerHTML = `
-                            <h4>Speaker </h4>
+                            <h4>Speaker ${i + 1}</h4>
                             <label for="speaker_name${i}">Name:</label>
-                            <input type="text" id="speaker_name${i}" name="speaker_name${i}"  class="form-control" required>
+                            <input type="text" id="speaker_name${i}" name="speaker_name${i}" class="form-control" required value="${existingSpeaker.name || ''}">
                             
-                            <label for="speaker_email${i}">Email:</lSabel>
-                            <input type="email" id="speaker_email${i}" name="speaker_email${i}"  class="form-control" required>
+                            <label for="speaker_email${i}">Email:</label>
+                            <input type="email" id="speaker_email${i}" name="speaker_email${i}" class="form-control" required value="${existingSpeaker.email || ''}">
 
                             <label for="speaker_photo${i}">Upload Photo:</label>
-                            <input type="file" id="speaker_photo${i}" name="speaker_photo${i}"  class="form-control" accept=".png, .jpg, .jpeg" required >
+                            ${existingSpeaker.img_url ? `
+                                <div class="current-image" style="margin-bottom: 10px;">
+                                    <p>Current image:</p>
+                                    <img src="${existingSpeaker.img_url}" alt="Current speaker photo" style="max-width: 100px; max-height: 100px; object-fit: cover; border-radius: 4px;">
+                                </div>
+                                <input type="file" id="speaker_photo${i}" name="speaker_photo${i}" class="form-control" accept=".png, .jpg, .jpeg">
+                                <small class="form-text text-muted">Leave empty to keep current image</small>
+                            ` : `
+                                <input type="file" id="speaker_photo${i}" name="speaker_photo${i}" class="form-control" accept=".png, .jpg, .jpeg" required>
+                            `}
                         `;
                         speakersContainer.appendChild(div);
                     }
                 }
             });
+            
+            // Trigger the input event to populate speaker fields on page load
             inputField.dispatchEvent(new Event("input"));
         });
     </script>

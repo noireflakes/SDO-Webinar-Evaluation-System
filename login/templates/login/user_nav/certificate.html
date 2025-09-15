@@ -113,56 +113,57 @@
             <div class="section-badge completed">Completed</div>
         </div>
         
-        {% if completed_webinars %}
-        <div class="certificate-grid">
-            {% for com_webinar in completed_webinars %}
-            <div class="certificate-card">
-                <div class="card-header">
-                    <img src="{{ com_webinar.banner.url }}" class="card-image" alt="{{ com_webinar.title }}">
+{% if completed_webinars %}
+    <div class="certificate-grid">
+        {% for com_webinar in completed_webinars %}
+        <div class="certificate-card">
+            <div class="card-header">
+                <img src="{{ com_webinar.banner.url }}" class="card-image" alt="{{ com_webinar.title }}">
+            </div>
+                             
+            <div class="card-body">
+                <h4 class="card-title">{{ com_webinar.title }}</h4>
+                <div class="card-meta">
+                    <span class="meta-date">
+                        <i class="far fa-calendar-check"></i> {{ com_webinar.until_date|date:"M d, Y" }}
+                    </span>
                 </div>
+                                     
                 
-                <div class="card-body">
-                    <h4 class="card-title">{{ com_webinar.title }}</h4>
-                    <div class="card-meta">
-                        <span class="meta-date">
-                            <i class="far fa-calendar-check"></i> {{ com_webinar.until_date|date:"M d, Y" }}
-                        </span>
+                {% if com_webinar.user_attendance > 0 %}
+                    <div class="attendance-status eligible">
+                        <i class="fas fa-check-circle"></i> Eligible for certificate
                     </div>
-                    
-                    <!-- Attendance Status Display -->
-                    {% if com_webinar.attendees.attendance > 0 %}
-                        <div class="attendance-status eligible">
-                            <i class="fas fa-check-circle"></i> Eligible for certificate
-                        </div>
-                    {% else %}
-                        <div class="attendance-status not-eligible">
-                            <i class="fas fa-times-circle"></i> Not eligible - Attendance required
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="card-footer">
-                    {% if com_webinar.attendees.attendance > 0 %}
-                        <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                    {% else %}
-                        <button class="btn-download disabled" disabled title="Cannot download - No attendance recorded">
-                            <i class="fas fa-ban"></i> Unavailable
-                        </button>
-                    {% endif %}
-                </div>
+                {% else %}
+                    <div class="attendance-status not-eligible">
+                        <i class="fas fa-times-circle"></i> Not eligible - Attendance required
+                    </div>
+                {% endif %}
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="far fa-folder-open"></i>
+             
+            <div class="card-footer">
+                {% if com_webinar.user_attendance > 0 %}
+                    <button onclick="downloadCertificate('{{ com_webinar.id }}')" class="btn-download">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                {% else %}
+                  
+                    <button class="btn-download disabled" disabled title="Cannot download - No attendance recorded">
+                        <i class="fas fa-ban"></i> Unavailable
+                    </button>
+                {% endif %}
             </div>
-            <p class="empty-text">No completed certificates available</p>
         </div>
-        {% endif %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="far fa-folder-open"></i>
+        </div>
+        <p class="empty-text">No completed certificates available</p>
+    </div>
+{% endif %}
     </section>
 </div>
 </div>
@@ -191,11 +192,7 @@ async function downloadCertificate(webinarId) {
     const data = await response.json();
     const certData = Array.isArray(data) ? data[0] : data;
     
-  
-    if (!certData.hasAttendance) {
-        alert('Sorry, you cannot download this certificate. Attendance is required.');
-        return;
-    }
+
 
     const canvas = document.getElementById('certificateCanvas');
     const ctx = canvas.getContext('2d');

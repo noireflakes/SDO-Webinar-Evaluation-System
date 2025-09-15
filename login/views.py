@@ -183,7 +183,7 @@ def generate_otp(request, user_id=None):
         
         if not current_otp:
             return render(request, 'login/otp.html', {
-                'error': 'OTP not found. Please try again.',
+                'error': 'Please click resend otp',
                 'user_id': user_id,
                 'expired': True
             })
@@ -476,27 +476,32 @@ def user_setting(request):
     return render(request, "login/user_nav/user_setting.html")
 
 
-@user_required
-def certificate(request):
-    today = timezone.now().date()
-
+@user_required 
+def certificate(request):     
+    today = timezone.now().date()      
+    
+   
     ongoing_webinars = Webinar.objects.filter(
         until_date__gt=today,
         attendees__user=request.user
-    )
+    ).prefetch_related('attendees')
+    
     completed_webinars = Webinar.objects.filter(
         until_date__lt=today,
         attendees__user=request.user
-    )
+    ).prefetch_related('attendees')
+    
 
-
-
-
+    for webinar in completed_webinars:
+        try:
+            attendance_record = webinar.attendees.get(user=request.user)
+            webinar.user_attendance = attendance_record.attendance
+        except:
+            webinar.user_attendance = 0
     
     return render(request, 'login/user_nav/certificate.html', {
-        'ongoing_webinars':ongoing_webinars,
+        'ongoing_webinars': ongoing_webinars,
         'completed_webinars': completed_webinars,
-
     })
 
 

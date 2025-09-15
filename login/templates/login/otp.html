@@ -5,6 +5,7 @@
 {% block css %}
  <link rel="stylesheet" href="{% static 'css/otp.css' %}">
  <link rel="stylesheet" href="{% static 'css/blob.css' %}">
+ 
 {% endblock %}
 
 {% block body %}
@@ -12,6 +13,9 @@
 <div class="blob one blob-yellow"><p></p></div>
 <div class="blob two blob-yellow"><p></p></div>
 <div class="blob three blob-yellow"><p></p></div>
+
+
+
 
 {% if locked_out %}
     <div class="lockout-container">
@@ -56,17 +60,16 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     {% if locked_out %}
-        // Lockout countdown timer with persistence
+        
         const lockoutTimerElement = document.getElementById("lockout-timer");
         const errorText = "{{ error }}";
         const userId = "{{ user.id }}";
         const lockoutStorageKey = `lockout_timer_${userId}`;
-        
-        // Extract minutes from error message
+       
         const minutesMatch = errorText.match(/(\d+) minutes/);
         let lockoutTimeLeft = 0;
         
-        // Check if we have a stored lockout time
+        
         const storedLockoutData = localStorage.getItem(lockoutStorageKey);
         if (storedLockoutData) {
             const lockoutData = JSON.parse(storedLockoutData);
@@ -74,10 +77,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const timeElapsed = Math.floor((currentTime - lockoutData.startTime) / 1000);
             lockoutTimeLeft = Math.max(0, lockoutData.totalTime - timeElapsed);
         } else {
-            // First time or no stored data - use the time from server
+            
             lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
             
-            // Store the lockout start time and total duration
             if (lockoutTimeLeft > 0) {
                 const lockoutData = {
                     startTime: Date.now(),
@@ -110,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }, 1000);
         } else {
-            // Lockout has already expired
+
             lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
             localStorage.removeItem(lockoutStorageKey);
             setTimeout(function() {
@@ -118,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }, 2000);
         }
     {% else %}
-        // Normal OTP timer with persistence
+      
         const timerElement = document.getElementById("timer");
         const otpSendButton = document.getElementById("otp_send_button");
         const submitButton = document.getElementById("submit-btn");
@@ -126,10 +128,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const userId = "{{ user.id }}";
         const otpStorageKey = `otp_timer_${userId}`;
         
-        let timeLeft = 300; // Default 5 minutes
+        let timeLeft = 300; 
         let isExpired = false;
         
-        // Function to disable/enable form elements
+       
         function setFormState(disabled) {
             otpInput.disabled = disabled;
             submitButton.disabled = disabled;
@@ -144,57 +146,55 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         
-        // Get OTP creation time from server
-        const otpCreatedAt = "{{ otp_created_at|default:'' }}";
+       
+        const storedOtpData = localStorage.getItem(otpStorageKey);
         let otpStartTime = Date.now();
         
-        if (otpCreatedAt) {
-            // Use server-provided OTP creation time
-            otpStartTime = new Date(otpCreatedAt).getTime();
+        if (storedOtpData) {
+        
+            const otpData = JSON.parse(storedOtpData);
+            otpStartTime = otpData.startTime;
             const currentTime = Date.now();
             const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
-            timeLeft = Math.max(0, 300 - timeElapsed);
+            timeLeft = Math.max(0, otpData.totalTime - timeElapsed);
+        } else {
+           
+            const otpCreatedAt = "{{ otp_created_at|default:'' }}";
             
-            // Store this timing in localStorage for persistence
+            if (otpCreatedAt) {
+             
+                otpStartTime = new Date(otpCreatedAt).getTime();
+                const currentTime = Date.now();
+                const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
+                timeLeft = Math.max(0, 300 - timeElapsed);
+            } else {
+                
+                otpStartTime = Date.now();
+                timeLeft = 300;
+            }
+            
+        
             const otpData = {
                 startTime: otpStartTime,
                 totalTime: 300
             };
             localStorage.setItem(otpStorageKey, JSON.stringify(otpData));
-        } else {
-            // Check if we have a stored OTP time (for cases where server data isn't available)
-            const storedOtpData = localStorage.getItem(otpStorageKey);
-            if (storedOtpData) {
-                const otpData = JSON.parse(storedOtpData);
-                const currentTime = Date.now();
-                const timeElapsed = Math.floor((currentTime - otpData.startTime) / 1000);
-                timeLeft = Math.max(0, otpData.totalTime - timeElapsed);
-            } else {
-                // Fallback: create new timer entry
-                const otpData = {
-                    startTime: Date.now(),
-                    totalTime: timeLeft
-                };
-                localStorage.setItem(otpStorageKey, JSON.stringify(otpData));
-            }
         }
         
-        // Check if already expired
+       
         if (timeLeft <= 0) {
             isExpired = true;
             setFormState(true);
-            timerElement.innerHTML = '<span style="color: red;">⚠️ OTP Expired</span>';
+            timerElement.style.display = 'none';
             otpSendButton.style.display = "block";
             submitButton.value = "OTP Expired";
         }
 
-        // Show resend button if there's an error (wrong attempt)
         const hasError = {% if error %}true{% else %}false{% endif %};
         if (hasError) {
             otpSendButton.style.display = "block";
         }
 
-        // Only start counter if not already expired
         if (!isExpired) {
             const counter = setInterval(function() {
                 if (timeLeft > 0) {
@@ -207,40 +207,38 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     clearInterval(counter);
                     isExpired = true;
-                    timerElement.innerHTML = '<span style="color: red;">⚠️ OTP Expired</span>';
+                    timerElement.style.display = 'none'; 
                     otpSendButton.style.display = "block";
                     submitButton.value = "OTP Expired";
                     
-                    // Disable form elements
+                 
                     setFormState(true);
                     
-                    // Clear the stored OTP data when expired
+          
                     localStorage.removeItem(otpStorageKey);
                 }
             }, 1000);
         }
 
-        // Auto-input handler for OTP
+
         if (otpInput) {
             otpInput.addEventListener("input", function() {
-                // Prevent input if expired
+      
                 if (isExpired) {
                     this.value = '';
                     return;
                 }
                 
-                // Only allow numbers
+   
                 this.value = this.value.replace(/[^0-9]/g, '');
                 
-                // Auto-submit when 6 digits entered
+          
                 if (this.value.length === 6 && !isExpired) {
-                    // Clear timer data on successful submission attempt
-                    localStorage.removeItem(otpStorageKey);
                     document.getElementById("form").submit();
                 }
             });
             
-            // Prevent typing when expired
+   
             otpInput.addEventListener("keydown", function(e) {
                 if (isExpired) {
                     e.preventDefault();
@@ -248,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
             
-            // Prevent pasting when expired
+
             otpInput.addEventListener("paste", function(e) {
                 if (isExpired) {
                     e.preventDefault();
@@ -256,13 +254,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
 
-            // Focus on OTP input when page loads (only if not expired)
+    
             if (!isExpired) {
                 otpInput.focus();
             }
         }
 
-        // Prevent form submission if expired
+    
         document.getElementById("form").addEventListener("submit", function(e) {
             if (isExpired) {
                 e.preventDefault();
@@ -271,15 +269,24 @@ document.addEventListener("DOMContentLoaded", function() {
         });
       
         window.addEventListener('beforeunload', function() {
+  
             const form = document.getElementById("form");
-            if (form && document.activeElement === submitButton) {
-                localStorage.removeItem(otpStorageKey);
+            if (form && document.activeElement === submitButton && !isExpired) {
+
             }
         });
+
+     
+        const resendLink = document.getElementById("otp_send_button");
+        if (resendLink) {
+            resendLink.addEventListener("click", function() {
+                localStorage.removeItem(otpStorageKey);
+            });
+        }
     {% endif %}
 });
 
-// Cleanup expired timers
+
 document.addEventListener("DOMContentLoaded", function() {
     const now = Date.now();
     const keysToRemove = [];
