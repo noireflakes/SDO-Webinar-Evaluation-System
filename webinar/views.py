@@ -471,13 +471,14 @@ def delete_question(request, id):
     
     return redirect(redirect_create_test, id=test.webinar.id)
 
-
+#3 priority
 def record_test(request, id, type):
     webinar = Webinar.objects.get(id=id)
     questions = webinar.question.filter(test_type=type)
 
     if request.method == 'POST':
         deped_id = request.POST.get("deped_id")
+
     
         try:
             profile = UserProfile.objects.get(deped_id=deped_id)
@@ -515,8 +516,14 @@ def record_test(request, id, type):
     return redirect("test_result", webinar.id, type, user.id)
 
 
-def check_attendance(request, id):
+def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)
+    
+    # Validate test_type
+    valid_test_types = ['evaluation', 'pre_test', 'post_test']
+    if test_type not in valid_test_types:
+        messages.error(request, "Invalid test type")
+        return redirect("webinar_detail", webinar.id)
 
     if request.method == 'POST':
         email = request.POST.get("email", "").strip()
@@ -527,10 +534,22 @@ def check_attendance(request, id):
             if user.check_password(password):
                 try:
                     attendee = WebinarAttendees.objects.get(webinar=webinar, user=user)
-                    if attendee.attendance > 0:
-                        messages.error(request, "You already answered the evaluation")
-                        return redirect("check_attendance", webinar.id)
+                    completion_check = {
+                        'evaluation': attendee.attendance > 0,
+                        'pre_test': attendee.pre_test_completion,
+                        'post_test': attendee.post_test_completion
+                    }
+                    
+                    if completion_check.get(test_type, False):
+                        test_name = test_type.replace('_', '-')
+                        messages.error(request, f"You already completed the {test_name}")
+                        return redirect("check_attendance", webinar.id, test_type)
 
+                    
+                    if test_type in ['pre_test', 'post_test']:
+                        return redirect("display_test", id=webinar.id, type=test_type)
+                    
+                  
                     return render(request, f'webinar/evaluation/{webinar.event_type}.html', {
                         'webinar': webinar,
                         'user': user,
@@ -538,18 +557,16 @@ def check_attendance(request, id):
 
                 except WebinarAttendees.DoesNotExist:
                     messages.error(request, "User is not on the attendance list")
-                    return redirect("check_attendance", webinar.id)
-
-   
+                    return redirect("check_attendance", webinar.id, test_type)
             else:
-
-                messages.error(request, "Incorect password")
-                return redirect("check_attendance", webinar.id)
+                messages.error(request, "Incorrect password")
+                return redirect("check_attendance", webinar.id, test_type)
 
         except User.DoesNotExist:
             messages.error(request, "No user found with that email")
-            return redirect("check_attendance", webinar.id)
+            return redirect("check_attendance", webinar.id, test_type)
 
     return render(request, "webinar/validate.html", {
-        "webinar": webinar
+        "webinar": webinar,
+        "test_type": test_type
     })

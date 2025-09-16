@@ -10,9 +10,6 @@
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_log.css' %}"> 
-
-
-
 {% endblock %}
 
 {% block js %}  
@@ -79,9 +76,11 @@
             <div class="table-header">
                 <h3><i class="fas fa-database me-2"></i>Log Audits</h3>
                 <div class="table-tabs">
-                    <button class="tab-btn active" onclick="switchTab('logs', this)">
-                        <i class="fas fa-history me-1"></i>Admin Logs
-                    </button>
+                    {% if user.is_superuser %}
+                        <button class="tab-btn active" onclick="switchTab('logs', this)">
+                            <i class="fas fa-history me-1"></i>Admin Logs
+                        </button>
+                    {% endif %}
                     <button class="tab-btn" onclick="switchTab('users', this)">
                         <i class="fas fa-users me-1"></i>Users
                     </button>
@@ -180,6 +179,7 @@
     </div>
 </div>
 
+
 <footer>
     <div class="container d-flex justify-content-between flex-wrap">
         <div>
@@ -194,6 +194,31 @@
 </footer>
 
 <script>
+// Enhanced date formatting function
+function formatDateTime(dateString) {
+    if (!dateString || dateString === 'None' || dateString === '' || dateString === null) {
+        return 'Unknown Date';
+    }
+    
+    try {
+        const date = new Date(dateString);
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            return 'Unknown Date';
+        }
+        
+        return date.toLocaleString([], { 
+            year: 'numeric', 
+            month: 'short', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    } catch (error) {
+        return 'Unknown Date';
+    }
+}
+
 // Enhanced log processing function
 function getEnhancedMessage(log) {
     if (log.action === 'delete') {
@@ -214,14 +239,16 @@ function getEnhancedMessage(log) {
 }
 
 // Convert Django data to JavaScript with enhanced deletion info
+
+
 const logsData = [
     {% for log in logs %}
     {
         id: {{ log.id }},
-        timestamp: "{{ log.action_time|date:'Y-m-d H:i:s' }}",
+        timestamp: "{{ log.timestamp|date:'F j, Y, g:i A' }}",
         username: "{{ log.user.username|escapejs }}",
         userType: "{% if log.user.is_superuser %}superuser{% elif log.user.is_staff %}staff{% else %}user{% endif %}",
-        userTypeLabel: "{% if log.user.is_superuser %} Admin{% elif log.user.is_staff %}Staff{% else %}User{% endif %}",
+        userTypeLabel: "{% if log.user.is_superuser %}Admin{% elif log.user.is_staff %}Staff{% else %}User{% endif %}",
         action: "{% if log.action_flag == 1 %}add{% elif log.action_flag == 2 %}change{% elif log.action_flag == 3 %}delete{% endif %}",
         actionLabel: "{% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}",
         object: "{{ log.object_repr|escapejs }}",
@@ -270,14 +297,13 @@ const usersData = [
         isActive: {{ user_item.is_active|yesno:"true,false" }},
         isStaff: {{ user_item.is_staff|yesno:"true,false" }},
         isSuperuser: {{ user_item.is_superuser|yesno:"true,false" }},
-        dateJoined: "{{ user_item.date_joined|date:'Y-m-d H:i:s' }}",
-        lastLogin: "{{ user_item.last_login|date:'Y-m-d H:i:s'|default:'Never' }}",
+        dateJoined: "{% if user_item.date_joined %}{{ user_item.date_joined|date:'c' }}{% else %}{% endif %}",
+        lastLogin: "{% if user_item.last_login %}{{ user_item.last_login|date:'c' }}{% else %}Never{% endif %}",
         profileImg: "{% if user_item.user_profile.img %}{{ user_item.user_profile.img.url }}{% else %}{% static 'asset/default-avatar.png' %}{% endif %}"
     }{% if not forloop.last %},{% endif %}
     {% empty %}
     {% endfor %}
 ];
-
 
 const tableState = {
     logs: {
@@ -295,12 +321,10 @@ const tableState = {
 };
 
 function switchTab(tabName, button) {
-
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
     
-   
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -308,7 +332,6 @@ function switchTab(tabName, button) {
     document.getElementById(tabName + '-tab').classList.add('active');
     button.classList.add('active');
     
-
     displayTable(tabName);
     setupPagination(tabName);
 }
@@ -337,27 +360,17 @@ function displayTable(tableName) {
             let displayMessage = log.enhancedMessage || log.message || 'No details available';
             let messageClass = log.action === 'delete' ? 'enhanced-deletion' : '';
             
+            // Format the timestamp with validation
+            let formattedTimestamp = log.timestamp
+            
+            
             let tr = `<tr>
-            <td title="${new Date(log.timestamp).toLocaleString([], { 
-                year: 'numeric', 
-                month: 'short', 
-                day: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            })}">
-              ${new Date(log.timestamp).toLocaleString([], { 
-                year: 'numeric', 
-                month: 'short', 
-                day: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </td>                        
-            <td title="${log.username}">${log.username}</td>         
-            <td><span class="status-badge status-${log.userType}">${log.userTypeLabel}</span></td>                        
-            <td><span class="action-badge action-${log.action}">${log.actionLabel}</span></td>
-            <td class="text-truncate-custom ${messageClass}" title="${displayMessage.replace(/<[^>]*>/g, '')}">${displayMessage}</td>
-                      </tr>`;
+                <td title="${formattedTimestamp}">${formattedTimestamp}</td>                        
+                <td title="${log.username}">${log.username}</td>         
+                <td><span class="status-badge status-${log.userType}">${log.userTypeLabel}</span></td>                        
+                <td><span class="action-badge action-${log.action}">${log.actionLabel}</span></td>
+                <td class="text-truncate-custom ${messageClass}" title="${displayMessage.replace(/<[^>]*>/g, '')}">${displayMessage}</td>
+            </tr>`;
             tableBody.innerHTML += tr;
         });
     } else if (tableName === 'users') {
@@ -365,6 +378,10 @@ function displayTable(tableName) {
             let statusClass = ((user.isActive ? 'active' : 'inactive'));
             let statusText = ((user.isActive ? 'Active' : 'Inactive'));
             let fullName = `${user.firstName} ${user.lastName}`.trim() || user.username;
+            
+            // Format dates with validation
+            let formattedJoinDate = formatDateTime(user.dateJoined);
+            let formattedLastLogin = user.lastLogin !== 'Never' ? formatDateTime(user.lastLogin) : 'Never';
             
             let tr = `<tr>
                         <td>${user.id}</td>
@@ -378,8 +395,8 @@ function displayTable(tableName) {
                         </td>
                         <td title="${user.email}">${user.email}</td>
                         <td><span class="status-badge status-${statusClass}">${statusText}</span></td>
-                        <td title="${user.dateJoined}">${new Date(user.dateJoined).toLocaleDateString()}</td>
-                        <td title="${user.lastLogin}">${user.lastLogin !== 'Never' ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
+                        <td title="${formattedJoinDate}">${formattedJoinDate}</td>
+                        <td title="${formattedLastLogin}">${formattedLastLogin}</td>
                       </tr>`;
             tableBody.innerHTML += tr;
         });

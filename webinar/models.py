@@ -65,7 +65,9 @@ class WebinarAttendees(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendees", null=True, blank=True)
     deped_id=models.CharField(max_length=80, null=True)
     email=models.EmailField()
-    attendance=models.IntegerField(default=0)  
+    attendance=models.IntegerField(default=0) 
+    pre_test_completion=models.BooleanField(default=False) 
+    post_test_completion=models.BooleanField(default=False) 
 
     def __str__(self):
         return f"{self.webinar}-{self.user}"

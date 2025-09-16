@@ -12,6 +12,7 @@ from io import BytesIO
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from webinar.models import Comment
+from django.contrib import messages 
 
 #decorator
 def admin_required(view_func):
@@ -280,7 +281,7 @@ def generate_qr(request, id, type):
     if not qr:
         
         webinar=Webinar.objects.get(id=id)
-        url_path=f'{url}/webinar/check_attendance/{id}'
+        url_path=f'{url}/webinar/check_attendance/{id}/{type}'
         qr = qrcode.make(url_path)
         
         # Save to database
@@ -306,7 +307,7 @@ def qr_evalution(request, id):
     type=webinar.event_type
     qr=EvalQR.objects.filter(test__id=id, type=type)
     
-    url=f"https://sdo-webinar-evaluation-system.xyz/webinar/check_attendance/{webinar.id}/"
+    url=f"https://sdo-webinar-evaluation-system.xyz/webinar/check_attendance/{webinar.id}/evaluation/"
 
     if not qr:
         
@@ -343,16 +344,31 @@ def display_qr(request, id, type):
         
         
 def display_test(request, id, type):
-    webinar=Webinar.objects.get(id=id)
+    webinar = get_object_or_404(Webinar, id=id)
+    
+    # Get user from session
+    user_email = request.session.get('test_user_email')
+    if not user_email:
+        messages.error(request, "Please authenticate first")
+        return redirect("check_attendance", webinar.id, type)
+    
+    try:
+        user = User.objects.get(email=user_email)
+        attendee = WebinarAttendees.objects.get(webinar=webinar, user=user)
+    except (User.DoesNotExist, WebinarAttendees.DoesNotExist):
+        messages.error(request, "Authentication error. Please login again.")
+        return redirect("check_attendance", webinar.id, type)
 
-    question=webinar.question.filter(test_type=type)
+    questions = webinar.question.filter(test_type=type)
     
     return render(request, "exam_portal/display_test.html", {
-        "questions":question,
-        "id":id,
-        "type":type
+        "questions": questions,
+        "webinar": webinar,
+        "user": user,       
+        "attendee": attendee,   
+        "id": id,
+        "type": type
     })
-
 
 @admin_required
 def create_certificate(request,id):

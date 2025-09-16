@@ -357,7 +357,7 @@ async function DownloadExcel() {
 
     // Add attendees data
     csvContent += "\n=== ATTENDEES DATA ===\n";
-    csvContent += "Email,DepEd ID,Attendance Score,Completion Time\n";
+    csvContent += "Email,DepEd ID,Attendance Score\n";
     
     const maxAttendanceLength = Math.max(
         data.attendance_emails?.length || 0,
@@ -375,7 +375,7 @@ async function DownloadExcel() {
 
     // Add comments data
     csvContent += "\n=== COMMENTS DATA ===\n";
-    csvContent += "Email,DepEd ID,Comment,Timestamp\n";
+    csvContent += "Email,DepEd ID,Comment\n";
     
     const maxCommentsLength = Math.max(
         data.comment_emails?.length || 0,
@@ -619,12 +619,7 @@ function setupCommentsCarousel(commentsData) {
                 <div class="comment-text">
                     ${comment.text || 'No comment text available'}
                 </div>
-                <div class="comment-footer mt-3">
-                    <small class="text-muted">
-                        <i class="fas fa-clock me-1"></i>
-                        ${comment.timestamp || 'No timestamp'}
-                    </small>
-                </div>
+
             </div>
         `;
         
@@ -827,7 +822,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialize test charts
+    
     async function TestChart() {
         const graphIds = ['pre-test', 'post-test'];
         const pre_test = "{% url 'test_score' webinar.id 'pre_test' %}";
@@ -847,13 +842,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize attendees and comments data
+    
     async function fetchAttendeesAndComments() {
         const id = parseInt("{{ webinar.id }}");
         const response = await fetch(`/exam_portal/result_data/${id}`);
         const data = await response.json();
         
-        // Setup attendees data
+        
         attendeesData = [];
         const maxLength = Math.max(
             data.attendance_emails?.length || 0,
@@ -866,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 email: data.attendance_emails?.[i] || '',
                 deped_id: data.attendance_deped_ids?.[i] || '',
                 attendance: data.attendance_scores?.[i] || 0,
-                completion_time: null // You may need to add this to your backend data
+                completion_time: null 
             });
         }
         
@@ -895,7 +890,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupCommentsCarousel(commentsData);
     }
     
-    // Initialize all components
+    
     fetchData();
     TestChart();
     fetchAttendeesAndComments();

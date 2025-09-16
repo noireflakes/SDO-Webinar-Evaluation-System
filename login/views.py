@@ -357,7 +357,26 @@ def generate_otp(request, user_id=None):
             result = send_email(
                 to_email=user.email,
                 subject="OTP code From SDO",
-                body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
+                body=f"""<body style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
+                <p>Dear { user.username },</p>
+
+                <p>
+                    To confirm your login, please use the One-Time Password (otp) provided below:
+                </p>
+
+                <p style="font-size: 20px; font-weight: bold; letter-spacing: 2px;">
+                    { otp_code }
+                </p>
+
+                <p>
+                    For your security, do not share this code with anyone. This code is valid for one-time use only.
+                </p>
+
+                <p>
+                    Thank you,<br>
+                    SDO Baliwag
+                </p>
+                </body>"""
             )
         
             request.session[session_key] = True
@@ -415,7 +434,31 @@ def resend_otp(request, user_id):
     result = send_email(
         to_email=user.email,
         subject="OTP code From SDO - Resent",
-        body=f'Enter this code to confirm your login: {otp_code}\n\nThis code will expire in 5 minutes.'
+            body=f"""
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; margin: 0; padding: 20px; background-color: #f9f9f9;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+        
+        <p style="font-size: 16px;">Dear <strong>{ user.username }</strong>,</p>
+
+        <p style="font-size: 15px;">
+          To confirm your login, please use the One-Time Password (OTP) provided below:
+        </p>
+
+        <p style="font-size: 24px; font-weight: bold; letter-spacing: 3px; text-align: center; color: #2c3e50; margin: 20px 0;">
+          { otp_code }
+        </p>
+
+        <p style="font-size: 14px; color: #555;">
+          ⚠️ This code will expire in <strong>5 minutes</strong>. For your security, do not share this code with anyone.
+        </p>
+
+        <p style="font-size: 15px; margin-top: 30px;">
+          Thank you,<br>
+          <strong>SDO Baliwag</strong>
+        </p>
+      </div>
+    </body>
+    """
     )
     
     # Clear and reset the session flag
@@ -843,16 +886,15 @@ def log_list(request):
             else:
                 log_data['enhanced_message'] = f"Deleted item (ID: {log.object_id})"
         else:
-            # For add/change operations, use existing message
+   
             log_data['enhanced_message'] = log.change_message or log.object_repr or "No details available"
             
         enhanced_logs.append(log_data)
     
-    # Get users for the users tab
     users = User.objects.select_related('user_profile').order_by('-last_login')
     
     context = {
-        'logs': enhanced_logs,  # Use enhanced logs instead of raw logs
+        'logs': enhanced_logs,  
         'users': users,
     }
     
@@ -987,11 +1029,11 @@ def get_completed_events(request):
     Only returns events that have evaluations and are past their until_date.
     """
     try:
-        now = timezone.now().date()  # use date since until_date is a DateField
+        now = timezone.now().date()  
 
         completed_webinars = Webinar.objects.filter(
-            until_date__lt=now,          # must be completed
-            evaluation__isnull=False     # has at least one evaluation
+            until_date__lt=now,          
+            evaluation__isnull=False     
         ).annotate(
             response_count=Count('evaluation', distinct=True)
         ).filter(
