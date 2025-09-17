@@ -257,7 +257,12 @@ async function downloadCertificate(webinarId) {
 
         const title = certData.title;
         const subtitle = CheckValue(certData.subtitle);
-        const name = "{{ user.first_name }} {{ user.last_name }}";
+       let name = "{{ user.first_name }} {{ user.last_name }}";  
+
+        if ("{{ user.user_profile.middle_initial|default:'' }}") {
+        name = "{{ user.first_name }} {{ user.user_profile.middle_initial }} {{ user.last_name }}";
+        }
+        
         const host = CheckValue(certData.host);
         console.log(`this is title: ${title}`)
     
