@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <form method="post" action="{% url 'record_test' id type %}" class="form">
+    <form method="post" action="{% url 'record_test' webinar.id type %}" class="form">
         {% csrf_token %}
         
         <!-- Hidden email input - gets value from session or context -->

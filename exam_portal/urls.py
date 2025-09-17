@@ -13,7 +13,7 @@ urlpatterns = [
     path("generate_qr/<int:id>/<str:type>/", views.generate_qr , name="generate_qr"),
     path("qr_evalution/<int:id>/", views.qr_evalution, name="qr_evalution"),
     path("display_qr/<int:id>/<str:type>/", views.display_qr , name="display_qr"),
-    path("display_test/<int:id>/<str:type>/", views.display_test , name="display_test"),
+    path("display_test/<int:id>/<str:type>/<int:user_id>", views.display_test , name="display_test"),
 
 
     path("create_certificate/<int:id>/", views.create_certificate, name="create_certificate"),

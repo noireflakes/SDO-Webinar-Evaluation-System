@@ -343,23 +343,36 @@ def display_qr(request, id, type):
     })
         
         
-def display_test(request, id, type):
+
+def display_test(request, id, type, user_id):
     webinar = get_object_or_404(Webinar, id=id)
+    user = get_object_or_404(User, id=user_id)
     
-    # Get user from session
-    user_email = request.session.get('test_user_email')
-    if not user_email:
-        messages.error(request, "Please authenticate first")
-        return redirect("check_attendance", webinar.id, type)
+  
+    valid_test_types = ['pre_test', 'post_test']
+    if type not in valid_test_types:
+        messages.error(request, "Invalid test type")
+        return redirect("webinar_detail", webinar.id)
     
     try:
-        user = User.objects.get(email=user_email)
         attendee = WebinarAttendees.objects.get(webinar=webinar, user=user)
-    except (User.DoesNotExist, WebinarAttendees.DoesNotExist):
-        messages.error(request, "Authentication error. Please login again.")
+        
+        if type == 'pre_test' and attendee.pre_test_completion:
+            messages.error(request, "You already completed the pre-test")
+            return redirect("check_attendance", webinar.id, type)
+        elif type == 'post_test' and attendee.post_test_completion:
+            messages.error(request, "You already completed the post-test")
+            return redirect("check_attendance", webinar.id, type)
+            
+    except WebinarAttendees.DoesNotExist:
+        messages.error(request, "User is not on the attendance list")
         return redirect("check_attendance", webinar.id, type)
 
     questions = webinar.question.filter(test_type=type)
+    
+    if not questions.exists():
+        messages.error(request, f"No questions found for {type.replace('_', '-')}")
+        return redirect("check_attendance", webinar.id, type)
     
     return render(request, "exam_portal/display_test.html", {
         "questions": questions,
@@ -369,6 +382,7 @@ def display_test(request, id, type):
         "id": id,
         "type": type
     })
+
 
 @admin_required
 def create_certificate(request,id):

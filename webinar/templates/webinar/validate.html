@@ -31,7 +31,7 @@
 
     <div class="login-text">Open Evaluation</div>
     
-    <form method="post" action="{% url 'check_attendance' webinar.id %}">
+    <form method="post" action="{% url 'check_attendance' webinar.id test_type %}">
         {% csrf_token %}
 
         <label class="name">Email: <br>

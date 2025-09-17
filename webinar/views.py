@@ -519,7 +519,6 @@ def record_test(request, id, type):
 def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)
     
-    # Validate test_type
     valid_test_types = ['evaluation', 'pre_test', 'post_test']
     if test_type not in valid_test_types:
         messages.error(request, "Invalid test type")
@@ -545,11 +544,11 @@ def check_attendance(request, id, test_type='evaluation'):
                         messages.error(request, f"You already completed the {test_name}")
                         return redirect("check_attendance", webinar.id, test_type)
 
-                    
+                 
                     if test_type in ['pre_test', 'post_test']:
-                        return redirect("display_test", id=webinar.id, type=test_type)
+                        return redirect("display_test", id=webinar.id, type=test_type, user_id=user.id)
                     
-                  
+                 
                     return render(request, f'webinar/evaluation/{webinar.event_type}.html', {
                         'webinar': webinar,
                         'user': user,
