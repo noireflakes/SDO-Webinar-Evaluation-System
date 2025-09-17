@@ -475,49 +475,56 @@ def delete_question(request, id):
 def record_test(request, id, type):
     webinar = Webinar.objects.get(id=id)
     questions = webinar.question.filter(test_type=type)
-
-    if request.method == 'POST':
-        deped_id = request.POST.get("deped_id")
-
     
+    if request.method == 'POST':
+        email = request.POST.get("email")
+        
         try:
-            profile = UserProfile.objects.get(deped_id=deped_id)
-            user = profile.user
-
+            user = User.objects.get(email=email)
             if not webinar.attendees.filter(user=user).exists():
                 return redirect("webinar_detail", id)
             
             responses = []
             for key, value in request.POST.items():
                 if key.startswith('user_input_'):
-                    q_id = key.split('_')[-1]  
+                    q_id = key.split('_')[-1]
+                    
                     try:
                         question = Test_Question.objects.get(id=q_id)
-
-                    
+                        
                         responses.append(TestResponse(
                             user=user,
                             question=question,
                             user_input=value,
-                           
                         ))
-
                     except Test_Question.DoesNotExist:
-                        continue  
-
+                        continue
+            
             if responses:
                 TestResponse.objects.bulk_create(responses)
+                
+              
+                attendee = webinar.attendees.get(user=user)
+                if type == 'pre_test':
+                    attendee.pre_test_completion = True
+                elif type == 'post_test':
+                    attendee.post_test_completion = True
+                attendee.save()
+            
             return redirect("test_result", webinar.id, type, user.id)
-        except UserProfile.DoesNotExist:
+            
+        except User.DoesNotExist: 
             return redirect("display_test", id, type)
-        
-
-        
+    
     return redirect("test_result", webinar.id, type, user.id)
-
 
 def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)
+    
+    # Check if evaluation is closed
+    if webinar.close_evaluation:
+        messages.error(request, "The evaluation is closed")
+        return redirect("webinar_detail", webinar.id)
     
     valid_test_types = ['evaluation', 'pre_test', 'post_test']
     if test_type not in valid_test_types:
@@ -543,12 +550,10 @@ def check_attendance(request, id, test_type='evaluation'):
                         test_name = test_type.replace('_', '-')
                         messages.error(request, f"You already completed the {test_name}")
                         return redirect("check_attendance", webinar.id, test_type)
-
-                 
+                    
                     if test_type in ['pre_test', 'post_test']:
                         return redirect("display_test", id=webinar.id, type=test_type, user_id=user.id)
                     
-                 
                     return render(request, f'webinar/evaluation/{webinar.event_type}.html', {
                         'webinar': webinar,
                         'user': user,

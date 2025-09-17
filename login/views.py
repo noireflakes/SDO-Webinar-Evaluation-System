@@ -138,7 +138,7 @@ def login_view(request):
         if user:
             request.session['user_id'] = user.id
             
-            # Check if device is trusted
+            
             hash = create_device_hash(request)
             if TrustedDevice.objects.filter(user=user, hash=hash).exists():
                 login(request, user)
@@ -158,10 +158,9 @@ def generate_otp(request, user_id=None):
     
     user = get_object_or_404(User, id=user_id)
     
-    # Check for existing OTP record
+    
     current_otp = Otp.objects.filter(user=user).first()
     
-    # Check if user is locked out
     if current_otp and current_otp.is_locked_out():
         remaining_seconds = current_otp.get_lockout_remaining_seconds()
         remaining_minutes = remaining_seconds // 60
@@ -173,11 +172,11 @@ def generate_otp(request, user_id=None):
             'user_id': user_id
         })
     
-    # Clear expired lockout
+   
     if current_otp and current_otp.lockout_until and not current_otp.is_locked_out():
         current_otp.clear_lockout()
    
-    # Handle OTP verification (POST request)
+    
     if request.method == 'POST':
         user_otp = (request.POST.get('otp') or '').strip()
         
@@ -387,10 +386,7 @@ def generate_otp(request, user_id=None):
 
 
 def resend_otp(request, user_id):
-    """
-    Handle explicit resend OTP requests
-    Generates new OTP and sends email immediately
-    """
+
     if not user_id:
         return redirect('login')
     
@@ -601,7 +597,7 @@ def admin_users(request):
         'all_users': users  
     })
 
-#create user and edit credential
+
 @admin_required
 def register_user(request):
     today = timezone.now().date()

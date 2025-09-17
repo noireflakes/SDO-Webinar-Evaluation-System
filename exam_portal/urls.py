@@ -8,6 +8,7 @@ urlpatterns = [
     path("display_result/<int:id>/", views.display_result , name="display_result"),
     path("test_score/<int:id>/<str:type>/", views.test_score, name="test_score"),
     path("test_data/<int:id>/", views.test_data, name="test_data"),
+    path("attendees_data/<int:id>/", views.attendees_data, name="attendance_data"),
    
    
     path("generate_qr/<int:id>/<str:type>/", views.generate_qr , name="generate_qr"),

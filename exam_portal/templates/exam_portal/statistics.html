@@ -8,8 +8,144 @@
 <link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
 <link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
 
-{% endblock %}
+<style>
+/* Toggle Switch Styles */
+.view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.toggle-label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Badge styles for completion status */
+.completion-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 70px;
+    display: inline-block;
+}
+
+.completion-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.completion-not-completed {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* FIXED: Table column visibility - Initial state hides test columns */
+.test-column {
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.timestamp-column {
+    transition: all 0.3s ease;
+}
+
+/* Show test columns when toggle is active */
+.show-all-tests .test-column {
+    display: table-cell;
+}
+
+/* Hide timestamp column when showing all tests */
+.show-all-tests .timestamp-column {
+    display: none;
+}
+
+.overall-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.progress-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.progress-icon {
+    font-size: 12px;
+}
+
+.progress-icon.completed {
+    color: #28a745;
+}
+
+.progress-icon.not-completed {
+    color: #dc3545;
+}
+</style>
+
+{% endblock %}
 
 {% block body %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -215,7 +351,7 @@
             </button>
         </section>
 
-        <!-- NEW: Attendees Section -->
+        <!-- FIXED: Attendees Section -->
         <section class="attendees-section">
             <h2 class="title">
                 <i class="fas fa-users me-2"></i>Attendees Management
@@ -225,6 +361,13 @@
                 <div class="search-box">
                     <i class="fas fa-search text-muted"></i>
                     <input type="text" id="attendees-search" placeholder="Search attendees..." onkeyup="searchAttendees()">
+                </div>
+                <div class="view-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="show-all-toggle" onchange="toggleAttendanceView()">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">Show All Tests</span>
                 </div>
                 <div class="rows-per-page">
                     <span>Show:</span>
@@ -246,9 +389,10 @@
                                 <th style="width: 5%;">ID</th>
                                 <th style="width: 20%;">Email</th>
                                 <th style="width: 15%;">DepEd ID</th>
-                                <th style="width: 15%;">Status</th>
-                                <th style="width: 20%;">Progress</th>
-                                <th style="width: 25%;">Completion Time</th>
+                                <th style="width: 15%;">Evaluation</th>
+                                <th class="test-column" style="width: 12%;">Pre-test</th>
+                                <th class="test-column" style="width: 12%;">Post-test</th>
+                                <th class="timestamp-column" style="width: 21%;">Evaluation Time</th>
                             </tr>
                         </thead>
                         <tbody id="attendees-table-body">
@@ -266,7 +410,7 @@
             </div>
         </section>
 
-        <!-- NEW: Comments Carousel Section -->
+        <!-- Comments Carousel Section -->
         <section class="comments-section">
             <h2 class="title">
                 <i class="fas fa-comments me-2"></i>Participant Comments
@@ -274,11 +418,11 @@
             
             <div id="commentsCarousel" class="carousel slide comment-carousel" data-bs-ride="carousel">
                 <div class="carousel-indicators" id="comment-indicators">
-                    <!-- Dynamic indicators will be added here -->
+                   
                 </div>
                 
                 <div class="carousel-inner" id="comment-slides">
-                    <!-- Dynamic slides will be added here -->
+                   
                 </div>
                 
                 <button class="carousel-control-prev" type="button" data-bs-target="#commentsCarousel" data-bs-slide="prev">
@@ -292,33 +436,26 @@
             </div>
         </section>
 
+    </div>
 </div>
-    
-  
 
-</div>
 <script>
-    
-
 let chartInstances = {};
 let chartData = {};
 let testChartInstances = {};
 let testData = {};
 
-
 let attendeesData = [];
 let filteredAttendeesData = [];
 let currentAttendeesPage = 1;
 let attendeesRowsPerPage = 10;
-
-
+let showAllTests = false;
 
 // Your existing chart functions remain the same...
 async function DownloadExcel() {
     const id = parseInt("{{ webinar.id }}");
     const response = await fetch(`/exam_portal/result_data/${id}`);
     const data = await response.json();
-
 
     let csvContent = "";
 
@@ -357,20 +494,11 @@ async function DownloadExcel() {
 
     // Add attendees data
     csvContent += "\n=== ATTENDEES DATA ===\n";
-    csvContent += "Email,DepEd ID,Attendance Score\n";
+    csvContent += "Email,DepEd ID,Attendance Score,Pre-test Completed,Post-test Completed\n";
     
-    const maxAttendanceLength = Math.max(
-        data.attendance_emails?.length || 0,
-        data.attendance_deped_ids?.length || 0,
-        data.attendance_scores?.length || 0
-    );
-
-    for (let i = 0; i < maxAttendanceLength; i++) {
-        const email = data.attendance_emails?.[i] ?? "";
-        const depedId = data.attendance_deped_ids?.[i] ?? "";
-        const score = data.attendance_scores?.[i] ?? "";
-        
-        csvContent += `${email},${depedId},${score},\n`;
+    for (let attendee of attendeesData) {
+        const escapedEmail = attendee.email.includes(',') ? `"${attendee.email}"` : attendee.email;
+        csvContent += `${escapedEmail},${attendee.deped_id || ''},${attendee.attendance},${attendee.pre_test_completion ? 'Yes' : 'No'},${attendee.post_test_completion ? 'Yes' : 'No'}\n`;
     }
 
     // Add comments data
@@ -421,7 +549,23 @@ async function downloadTestData() {
     XLSX.writeFile(workbook, "Test_result.xlsx");
 }
 
-// Attendees table functions
+// FIXED: Toggle function for showing all tests or evaluation only
+function toggleAttendanceView() {
+    const toggle = document.getElementById('show-all-toggle');
+    const tableContainer = document.querySelector('.attendees-table');
+    
+    showAllTests = toggle.checked;
+    
+    if (showAllTests) {
+        tableContainer.classList.add('show-all-tests');
+    } else {
+        tableContainer.classList.remove('show-all-tests');
+    }
+    
+    displayAttendeesTable();
+}
+
+// FIXED: Updated attendees table functions
 function displayAttendeesTable() {
     const tableBody = document.getElementById('attendees-table-body');
     const tableInfo = document.getElementById('attendees-table-info');
@@ -429,7 +573,8 @@ function displayAttendeesTable() {
     tableBody.innerHTML = "";
     
     if (filteredAttendeesData.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No attendees data available</td></tr>';
+        const colspan = showAllTests ? "7" : "5";
+        tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">No attendees data available</td></tr>`;
         tableInfo.innerHTML = "Showing 0 entries";
         return;
     }
@@ -439,39 +584,52 @@ function displayAttendeesTable() {
     let paginatedData = filteredAttendeesData.slice(start, end);
     
     paginatedData.forEach((attendee, index) => {
-        let statusClass, statusText, progressBar;
+        let evaluationCompleted = attendee.attendance >= 1;
+        let evaluationStatus = evaluationCompleted ? 'Completed' : 'Not Started';
+        let evaluationClass = evaluationCompleted ? 'completion-completed' : 'completion-not-completed';
         
-        if (attendee.attendance >= 80) {
-            statusClass = 'attendance-completed';
-            statusText = 'Completed';
-        } else if (attendee.attendance > 0) {
-            statusClass = 'attendance-partial';
-            statusText = 'In Progress';
-        } else {
-            statusClass = 'attendance-not-started';
-            statusText = 'Not Started';
+        let preTestBadge = `<span class="completion-badge ${attendee.pre_test_completion ? 'completion-completed' : 'completion-not-completed'}">
+                              ${attendee.pre_test_completion ? 'Completed' : 'Not Done'}
+                           </span>`;
+        
+        let postTestBadge = `<span class="completion-badge ${attendee.post_test_completion ? 'completion-completed' : 'completion-not-completed'}">
+                               ${attendee.post_test_completion ? 'Completed' : 'Not Done'}
+                            </span>`;
+        
+        let evaluationTime = 'Not completed';
+        
+        if (attendee.evaluation_timestamp) {
+            try {
+                const date = new Date(attendee.evaluation_timestamp);
+                if (!isNaN(date.getTime())) {
+                    evaluationTime = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                } else {
+                    console.warn('Invalid date for attendee:', attendee.email, attendee.evaluation_timestamp);
+                    evaluationTime = evaluationCompleted ? 'Completed (invalid date)' : 'Not completed';
+                }
+            } catch (error) {
+                console.error('Error parsing timestamp for attendee:', attendee.email, error);
+                evaluationTime = evaluationCompleted ? 'Completed (date error)' : 'Not completed';
+            }
+        } else if (evaluationCompleted) {
+            evaluationTime = 'Completed (no timestamp)';
         }
-        
-        progressBar = `
-            <div class="progress" style="height: 20px;">
-                <div class="progress-bar bg-${attendee.attendance >= 80 ? 'success' : attendee.attendance > 0 ? 'warning' : 'danger'}" 
-                     role="progressbar" 
-                     style="width: ${attendee.attendance}%"
-                     aria-valuenow="${attendee.attendance}" 
-                     aria-valuemin="0" 
-                     aria-valuemax="100">
-                    ${attendee.attendance}%
-                </div>
-            </div>
-        `;
         
         let tr = `<tr>
                     <td>${start + index + 1}</td>
                     <td title="${attendee.email}">${attendee.email}</td>
                     <td>${attendee.deped_id || 'N/A'}</td>
-                    <td><span class="attendance-badge ${statusClass}">${statusText}</span></td>
-                    <td>${progressBar}</td>
-                    <td>${attendee.completion_time || 'Not completed'}</td>
+                    <td><span class="completion-badge ${evaluationClass}">${evaluationStatus}</span></td>
+                    <td class="test-column">${preTestBadge}</td>
+                    <td class="test-column">${postTestBadge}</td>
+                    <td class="timestamp-column" title="${evaluationTime}">${evaluationTime}</td>
                   </tr>`;
         tableBody.innerHTML += tr;
     });
@@ -619,7 +777,6 @@ function setupCommentsCarousel(commentsData) {
                 <div class="comment-text">
                     ${comment.text || 'No comment text available'}
                 </div>
-
             </div>
         `;
         
@@ -627,10 +784,19 @@ function setupCommentsCarousel(commentsData) {
     });
 }
 
-
 function hasData(data) {
     if (!Array.isArray(data)) return false;
-    return data.some(value => value > 0);
+    return data.some(value => value !== undefined && value !== null && value > 0);
+}
+
+function cleanChartData(data) {
+    if (!Array.isArray(data)) return [];
+    return data.map(value => {
+        if (value === undefined || value === null || isNaN(value)) {
+            return 0;
+        }
+        return value;
+    });
 }
 
 function showNoDataMessage(chartId) {
@@ -654,7 +820,10 @@ function createChart(chartId, type, data, labels, colors, title) {
         chartInstances[chartId].destroy();
     }
 
-    if (!hasData(data)) {
+    // Clean the data first to remove undefined/null values
+    const cleanedData = cleanChartData(data);
+
+    if (!hasData(cleanedData)) {
         showNoDataMessage(chartId);
         return;
     }
@@ -663,14 +832,27 @@ function createChart(chartId, type, data, labels, colors, title) {
     
     const ctx = document.getElementById(chartId).getContext('2d');
     
+    // Filter out labels and data where values are 0 (cleaned undefined values)
+    const filteredData = [];
+    const filteredLabels = [];
+    const filteredColors = [];
+    
+    cleanedData.forEach((value, index) => {
+        if (value > 0) {
+            filteredData.push(value);
+            filteredLabels.push(labels[index]);
+            filteredColors.push(colors[index]);
+        }
+    });
+    
     const config = {
         type: type,
         data: {
-            labels: labels,
+            labels: filteredLabels,
             datasets: [{
-                data: data,
-                backgroundColor: colors,
-                borderColor: type === 'bar' ? colors : '#fff',
+                data: filteredData,
+                backgroundColor: filteredColors,
+                borderColor: type === 'bar' ? filteredColors : '#fff',
                 borderWidth: 1
             }]
         },
@@ -780,7 +962,6 @@ function changeChartType(chartId, newType) {
 }
 
 function changeTestChartType(chartId, newType) {
-    // Update active button
     const buttons = document.querySelectorAll(`[onclick*="'${chartId}'"]`);
     buttons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
@@ -822,7 +1003,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    
     async function TestChart() {
         const graphIds = ['pre-test', 'post-test'];
         const pre_test = "{% url 'test_score' webinar.id 'pre_test' %}";
@@ -842,34 +1022,111 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+const loadingStyle = `
+<style id="loading-styles">
+.attendees-section {
+    position: relative;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    min-height: 300px;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.attendees-table.loading {
+    opacity: 0.3;
+    pointer-events: none;
+}
+</style>
+`;
+
+// Add loading styles to the page
+document.head.insertAdjacentHTML('beforeend', loadingStyle);
+
+// Updated fetchAttendeesAndComments function with better loading states
+async function fetchAttendeesAndComments() {
+    const id = parseInt("{{ webinar.id }}");
     
-    async function fetchAttendeesAndComments() {
-        const id = parseInt("{{ webinar.id }}");
-        const response = await fetch(`/exam_portal/result_data/${id}`);
-        const data = await response.json();
+    // Show loading state
+    showLoadingState();
+    
+    try {
+        // Fetch attendees data with test completion status
+        console.log("Fetching attendees data from:", `/exam_portal/attendees_data/${id}`);
+        const attendeesResponse = await fetch(`/exam_portal/attendees_data/${id}`);
         
-        
-        attendeesData = [];
-        const maxLength = Math.max(
-            data.attendance_emails?.length || 0,
-            data.attendance_deped_ids?.length || 0,
-            data.attendance_scores?.length || 0
-        );
-        
-        for (let i = 0; i < maxLength; i++) {
-            attendeesData.push({
-                email: data.attendance_emails?.[i] || '',
-                deped_id: data.attendance_deped_ids?.[i] || '',
-                attendance: data.attendance_scores?.[i] || 0,
-                completion_time: null 
-            });
+        if (!attendeesResponse.ok) {
+            console.error("Failed to fetch attendees data:", attendeesResponse.status, attendeesResponse.statusText);
+            // Fall back to original method if new endpoint fails
+            const response = await fetch(`/exam_portal/result_data/${id}`);
+            const data = await response.json();
+            
+            attendeesData = [];
+            const maxLength = Math.max(
+                data.attendance_emails?.length || 0,
+                data.attendance_deped_ids?.length || 0,
+                data.attendance_scores?.length || 0
+            );
+            
+            for (let i = 0; i < maxLength; i++) {
+                attendeesData.push({
+                    email: data.attendance_emails?.[i] || '',
+                    deped_id: data.attendance_deped_ids?.[i] || '',
+                    attendance: data.attendance_scores?.[i] || 0,
+                    pre_test_completion: false,
+                    post_test_completion: false,
+                    evaluation_timestamp: null
+                });
+            }
+        } else {
+            const attendeesData_raw = await attendeesResponse.json();
+            console.log("Received attendees data:", attendeesData_raw);
+            attendeesData = attendeesData_raw.attendees || [];
         }
         
+        console.log("Final attendeesData:", attendeesData);
         filteredAttendeesData = [...attendeesData];
+        
+        // Hide loading state and display table
+        hideLoadingState();
         displayAttendeesTable();
         setupAttendeesPagination();
         
-        // Setup comments data
+    } catch (error) {
+        console.error("Error fetching attendees data:", error);
+        hideLoadingState();
+        showErrorState();
+    }
+    
+    // Fetch comments data
+    try {
+        const response = await fetch(`/exam_portal/result_data/${id}`);
+        const data = await response.json();
+        
         const commentsData = [];
         const maxCommentsLength = Math.max(
             data.comment_emails?.length || 0,
@@ -888,15 +1145,80 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         setupCommentsCarousel(commentsData);
+    } catch (error) {
+        console.error("Error fetching comments data:", error);
+    }
+}
+
+// Function to show loading state
+function showLoadingState() {
+    const attendeesSection = document.querySelector('.attendees-section');
+    const attendeesTable = document.querySelector('.attendees-table');
+    
+    if (attendeesSection && !attendeesSection.querySelector('.loading-overlay')) {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div>
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 15px; color: #666;">Loading attendees data...</p>
+            </div>
+        `;
+        attendeesSection.appendChild(loadingOverlay);
     }
     
+    if (attendeesTable) {
+        attendeesTable.classList.add('loading');
+    }
+}
+
+// Function to hide loading state
+function hideLoadingState() {
+    const loadingOverlay = document.querySelector('.loading-overlay');
+    const attendeesTable = document.querySelector('.attendees-table');
+    
+    if (loadingOverlay) {
+        loadingOverlay.remove();
+    }
+    
+    if (attendeesTable) {
+        attendeesTable.classList.remove('loading');
+    }
+    
+    // Remove loading styles after use
+    const loadingStyles = document.getElementById('loading-styles');
+    if (loadingStyles) {
+        setTimeout(() => loadingStyles.remove(), 500);
+    }
+}
+
+// Function to show error state
+function showErrorState() {
+    const tableBody = document.getElementById('attendees-table-body');
+    const tableInfo = document.getElementById('attendees-table-info');
+    
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Failed to load attendees data. Please refresh the page and try again.
+                </td>
+            </tr>
+        `;
+    }
+    
+    if (tableInfo) {
+        tableInfo.innerHTML = "Failed to load data";
+    }
+}
     
     fetchData();
     TestChart();
     fetchAttendeesAndComments();
 });
 
-</script>
 
+</script>
 
 {% endblock %}

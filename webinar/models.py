@@ -15,6 +15,7 @@ class Webinar(models.Model):
     time = models.TimeField(max_length=20)
     banner = models.ImageField(storage=MediaCloudinaryStorage(), upload_to='banner')
     venue = models.CharField(max_length=500)
+    close_evaluation=models.BooleanField(default=False) 
 
     def save(self, *args, **kwargs):
         if self.pk:

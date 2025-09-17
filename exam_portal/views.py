@@ -58,7 +58,7 @@ def display_result(request, id):
     webinar = Webinar.objects.get(id=id)
     test_results = TestResult.objects.filter(webinar=webinar)
     evaluations = ResponseQuestionaire.objects.filter(webinar=webinar)
-    comments = Comment.objects.filter(webinar=webinar).select_related('user')  # Add this
+    comments = Comment.objects.filter(webinar=webinar).select_related('user')
     
     evaluation_responses = []
     pre_test_result = []
@@ -66,9 +66,36 @@ def display_result(request, id):
     
     return render(request, 'exam_portal/statistics.html', {
         'webinar': webinar,
-        'comments': comments  # Add this to context
+        'comments': comments
     })
 
+@admin_required
+def attendees_data(request, id):
+    webinar = get_object_or_404(Webinar, id=id)
+    
+    attendees = WebinarAttendees.objects.filter(webinar=webinar).select_related('user')
+    
+    attendees_list = []
+    for attendee in attendees:
+       
+        questionnaire_response = ResponseQuestionaire.objects.filter(
+            webinar=webinar,
+            user=attendee.user
+        ).first()
+        
+        attendees_list.append({
+            'email': attendee.email,
+            'deped_id': attendee.deped_id or '',
+            'attendance': attendee.attendance,
+            'pre_test_completion': attendee.pre_test_completion,
+            'post_test_completion': attendee.post_test_completion,
+            'user_id': attendee.user.id if attendee.user else None,
+            'evaluation_timestamp': questionnaire_response.timestamp if questionnaire_response else None,
+        })
+    
+    return JsonResponse({
+        'attendees': attendees_list
+    })
 
 def rounded_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)
