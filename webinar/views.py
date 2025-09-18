@@ -13,6 +13,17 @@ from login.email_service import send_email
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
+
 #create events
 def make_webinar(request):
     if request.method=='POST':
@@ -471,7 +482,6 @@ def delete_question(request, id):
     
     return redirect(redirect_create_test, id=test.webinar.id)
 
-#3 priority
 def record_test(request, id, type):
     webinar = Webinar.objects.get(id=id)
     questions = webinar.question.filter(test_type=type)
@@ -518,10 +528,11 @@ def record_test(request, id, type):
     
     return redirect("test_result", webinar.id, type, user.id)
 
+
 def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)
     
-    # Check if evaluation is closed
+    
     if webinar.close_evaluation:
         messages.error(request, "The evaluation is closed")
         return redirect("webinar_detail", webinar.id)
@@ -574,3 +585,5 @@ def check_attendance(request, id, test_type='evaluation'):
         "webinar": webinar,
         "test_type": test_type
     })
+
+

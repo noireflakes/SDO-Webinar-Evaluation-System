@@ -44,7 +44,7 @@
    <aside class="d-sidebar">
       <div class="logo">
         <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-        <h2>SDO Baliwag</h2>
+        <h2 class="name">SDO Baliwag</h2>
       </div>
       <nav class="nav">
           <a href="{% url 'user_dashboard' %}" class="nav-item ">Dashboard</a>
@@ -88,7 +88,7 @@
                     </div>
                     <div class="card-footer">
                     <a  class="btn-download" href="{% url 'webinar_detail' on_webinar.id %}" >
-                        <i class="fas fa-download"></i> Details 
+                        <i class="fas fa-clipboard-list"></i> View Details 
                     </a>
 
         

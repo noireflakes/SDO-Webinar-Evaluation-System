@@ -75,6 +75,8 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 30px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.103);
     
 }
 
@@ -88,6 +90,7 @@
     color: #1f1f1f;
     margin: 0;
     font-weight: 600;
+    font-family: 'poppins';
 }
 
 /* Navigation */

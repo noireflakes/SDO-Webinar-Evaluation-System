@@ -27,7 +27,15 @@ from django.utils import timezone
 
 from django.contrib.admin.models import LogEntry, DELETION, CHANGE, ADDITION
 
-
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
 
 #imports models
 from django.contrib.admin.models import LogEntry
@@ -651,24 +659,88 @@ def register_user(request):
         to_email=f"{user.email}",
         subject="Welcome! Your Account Has Been Created",
         body=f"""
-            Hi {user.first_name},
+<body style="margin:0;padding:0;background-color:#dfe6f;font-family:Arial, sans-serif;color:#222;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:24px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08)">
+      
+          <tr>
+            <td style="padding:24px 28px;background:#865dee;color:#ffffff;">
+              <h1 style="margin:0;font-size:20px;font-weight:700;">Welcome to the SD0</h1>
+            </td>
+          </tr>
 
-            We're happy to let you know that your account has been successfully created by our team.
 
-            You can now log in and start exploring the system:
-            🔐 Email: {user.email}
-                username:{user.username}
-                first name: {user.first_name}
-                last name: {user.last_name}
-                deped id:{profile.deped_id}
-            🔑 Temporary Password: {password}
+            <td style="padding:24px 28px;">
+              <p style="margin:0 0 12px 0;font-size:15px;">Hi <strong>{user.first_name}</strong>,</p>
 
-            If have any questions, feel free to contact us.
+              <p style="margin:0 0 16px 0;font-size:15px;line-height:1.5;">
+                We're happy to let you know that your account has been successfully created by our team.
+              </p>
 
-            Welcome aboard!
+              <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;margin:16px 0 20px 0;border-collapse:collapse;">
+                <tr>
+                  <td style="padding:10px;border:1px solid #eef2f6;border-radius:6px;background:#fafbfd;">
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>🔐 Email:</strong> {user.email}</p>
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>Username:</strong> {user.username}</p>
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>First Name:</strong> {user.first_name}</p>
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>Last Name:</strong> {user.last_name}</p>
+                    <p style="margin:0;font-size:14px;"><strong>DepEd ID:</strong> {profile.deped_id}</p>
+                  </td>
+                </tr>
+              </table>
 
-            Best regards,  
-            The A"""
+              <p style="margin:0 0 12px 0;font-size:15px;">
+                <strong>🔑 Temporary Password:</strong>
+                <span style="display:inline-block;margin-left:8px;padding:6px 10px;background:#f1f5ff;border-radius:6px;border:1px dashed #cfe0ff;font-family:monospace;">
+                  {password}
+                </span>
+              </p>
+
+              <p style="margin:12px 0;font-size:14px;color:#555;">
+                <em>For your security, please change your temporary password upon your first login.</em>
+              </p>
+
+              <p style="margin:18px 0;font-size:15px;">
+                If you have any questions or need assistance, feel free to contact our support team.
+              </p>
+
+              <div style="text-align:left;margin-top:8px;">
+                <a href="https://sdo-webinar-evaluation-system.xyz/login" style="display:inline-block;padding:10px 16px;text-decoration:none;border-radius:6px;background:#0b69ff;color:#fff;font-weight:600;">Log in to your account</a>
+              </div>
+
+              <p style="margin:22px 0 0 0;font-size:15px;">
+                Welcome aboard — and thank you for joining us!
+              </p>
+
+              <p style="margin:18px 0 0 0;font-size:14px;color:#555;">
+                Best regards,<br/>
+                The Team
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:16px 28px;background:#f7f9fb;color:#8a95a6;font-size:12px;text-align:center;">
+              This is an automated message. Please do not reply to this email.
+            </td>
+          </tr>
+        </table>
+
+        <!-- Small legal -->
+        <div style="max-width:600px;margin:12px 0 0 0;color:#97a0ad;font-size:12px;">
+          <p style="margin:0;">If you didn't expect this email, please contact support immediately.</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+
+
+        """
+
         )
         messages.success(request,"Successfully registered")
         return redirect('admin_users')
@@ -921,15 +993,71 @@ def forgot_password(request):
                 to_email=email,
                 subject="Password Reset - SDO",
                 body=f"""
-                Hello {user.first_name or user.username},
-                
-                You requested a password reset. Click the link below to reset your password:
-        
-                {reset_link}
-    
-                This link will expire in 1 hour.
 
-                If you didn't request this, ignore this email.
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial, sans-serif;color:#222;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:24px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08)">
+          
+          <!-- Header -->
+          <tr>
+            <td style="padding:20px 28px;background:#0b69ff;color:#ffffff;">
+              <h1 style="margin:0;font-size:20px;font-weight:700;">Password Reset Request</h1>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:24px 28px;">
+              <p style="margin:0 0 12px 0;font-size:15px;">Dear <strong>{user.first_name or user.username}</strong>,</p>
+
+              <p style="margin:0 0 16px 0;font-size:15px;line-height:1.5;">
+                We received a request to reset the password for your account. To proceed, please click the button below:
+              </p>
+
+              <div style="margin:24px 0;text-align:center;">
+                <a href="{reset_link}" 
+                   style="display:inline-block;padding:12px 20px;text-decoration:none;
+                          border-radius:6px;background:#0b69ff;color:#fff;font-weight:600;">
+                   Reset Password
+                </a>
+              </div>
+
+              <p style="margin:16px 0;font-size:14px;line-height:1.5;">
+                If the button doesn’t work, you can also copy and paste this link into your browser:
+              </p>
+
+              <p style="margin:0 0 16px 0;font-size:13px;word-break:break-all;color:#0b69ff;">
+                {reset_link}
+              </p>
+
+              <p style="margin:0 0 12px 0;font-size:14px;color:#555;">
+                <em>Please note that this link will expire in 1 hour for security purposes.</em>
+              </p>
+
+              <p style="margin:18px 0 0 0;font-size:14px;">
+                If you did not request a password reset, please ignore this email. Your account will remain secure.
+              </p>
+
+              <p style="margin:22px 0 0 0;font-size:14px;">
+                Thank you,<br/>
+                The SDO Team
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:16px 28px;background:#f7f9fb;color:#8a95a6;font-size:12px;text-align:center;">
+              This is an automated message, please do not reply.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
                 """
             )
             
@@ -963,7 +1091,7 @@ def reset_password(request, token):
                 messages.error(request, 'Passwords do not match.')
                 return render(request, 'login/reset_password.html', {'token': token})
             
-            # Reset password
+            
             user = reset_obj.user
             user.set_password(new_password)
             user.save()
@@ -1256,4 +1384,183 @@ def get_event_statistics(request, event_id):
         logger.error(f"Error fetching event statistics for {event_id}: {str(e)}")
         return JsonResponse({'error': 'Failed to fetch event statistics'}, status=500)
     
+@login_required
+@staff_member_required
+@require_http_methods(["POST"])
+def update_user(request):
+    """
+    Handle user information updates via AJAX
+    """
+    try:
+        # Get JSON data from request body
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return JsonResponse({
+                'success': False, 
+                'message': 'User ID is required'
+            }, status=400)
+        
+        # Get the user to be edited
+        user_to_edit = get_object_or_404(User, id=user_id)
+        
+        # Permission checks
+        if not request.user.is_superuser:
+            # Regular staff can only edit regular users, not staff or admins
+            if user_to_edit.is_staff or user_to_edit.is_superuser:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'You do not have permission to edit this user'
+                }, status=403)
+        
+        # Prevent users from removing their own superuser status
+        if (request.user.id == user_to_edit.id and 
+            request.user.is_superuser and 
+            data.get('role') != 'admin'):
+            return JsonResponse({
+                'success': False,
+                'message': 'You cannot remove your own admin privileges'
+            }, status=403)
+        
+        # Update basic user information
+        user_to_edit.username = data.get('username', user_to_edit.username)
+        user_to_edit.email = data.get('email', user_to_edit.email)
+        user_to_edit.first_name = data.get('first_name', user_to_edit.first_name)
+        user_to_edit.last_name = data.get('last_name', user_to_edit.last_name)
+        
+        # Update role if user has permission
+        if request.user.is_superuser:
+            role = data.get('role')
+            if role == 'admin':
+                user_to_edit.is_superuser = True
+                user_to_edit.is_staff = True
+            elif role == 'staff':
+                user_to_edit.is_superuser = False
+                user_to_edit.is_staff = True
+            else:  # regular user
+                user_to_edit.is_superuser = False
+                user_to_edit.is_staff = False
+        
+        # Update status
+        status = data.get('status')
+        if status == 'inactive':
+            user_to_edit.is_active = False
+        else:
+            user_to_edit.is_active = True
+        
+        # Save user changes
+        user_to_edit.save()
+        
+        # Update user profile if it exists
+        if hasattr(user_to_edit, 'user_profile'):
+            profile = user_to_edit.user_profile
+            profile.deped_id = data.get('deped_id', profile.deped_id)
+            if data.get('birth_date'):
+                profile.birthday = data.get('birth_date')
+            profile.save()
+        
+        # Log the action (optional)
+        messages.success(request, f'User {user_to_edit.username} updated successfully!')
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'User updated successfully',
+            'user': {
+                'id': user_to_edit.id,
+                'username': user_to_edit.username,
+                'email': user_to_edit.email,
+                'first_name': user_to_edit.first_name,
+                'last_name': user_to_edit.last_name,
+                'is_superuser': user_to_edit.is_superuser,
+                'is_staff': user_to_edit.is_staff,
+                'is_active': user_to_edit.is_active
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid JSON data'
+        }, status=400)
+    except User.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'User not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'An error occurred: {str(e)}'
+        }, status=500)
 
+
+# Alternative: Form-based view (if you prefer traditional form submission)
+@login_required
+@staff_member_required
+@require_http_methods(["POST"])
+def update_user_form(request):
+    """
+    Handle user updates via traditional form submission
+    """
+    user_id = request.POST.get('user_id')
+    
+    if not user_id:
+        messages.error(request, 'User ID is required')
+        return redirect('admin_users')
+    
+    try:
+        user_to_edit = get_object_or_404(User, id=user_id)
+        
+    
+        if not request.user.is_superuser:
+            if user_to_edit.is_staff or user_to_edit.is_superuser:
+                messages.error(request, 'You do not have permission to edit this user')
+                return redirect('admin_users')
+        
+       
+        if (request.user.id == user_to_edit.id and 
+            request.user.is_superuser and 
+            request.POST.get('role') != 'admin'):
+            messages.error(request, 'You cannot remove your own admin privileges')
+            return redirect('admin_users')
+        
+     
+        user_to_edit.username = request.POST.get('username', user_to_edit.username)
+        user_to_edit.email = request.POST.get('email', user_to_edit.email)
+        user_to_edit.first_name = request.POST.get('first_name', user_to_edit.first_name)
+        user_to_edit.last_name = request.POST.get('last_name', user_to_edit.last_name)
+        
+  
+        if request.user.is_superuser:
+            role = request.POST.get('role')
+            if role == 'admin':
+                user_to_edit.is_superuser = True
+                user_to_edit.is_staff = True
+            elif role == 'staff':
+                user_to_edit.is_superuser = False
+                user_to_edit.is_staff = True
+            else:
+                user_to_edit.is_superuser = False
+                user_to_edit.is_staff = False
+        
+   
+        status = request.POST.get('status')
+        user_to_edit.is_active = status == 'active'
+        
+        user_to_edit.save()
+        
+        if hasattr(user_to_edit, 'user_profile'):
+            profile = user_to_edit.user_profile
+            profile.deped_id = request.POST.get('deped_id', profile.deped_id)
+            birth_date = request.POST.get('birth_date')
+            if birth_date:
+                profile.birthday = birth_date
+            profile.save()
+        
+        messages.success(request, f'User {user_to_edit.username} updated successfully!')
+        
+    except Exception as e:
+        messages.error(request, f'Error updating user: {str(e)}')
+    
+    return redirect('admin_users')

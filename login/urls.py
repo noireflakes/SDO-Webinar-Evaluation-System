@@ -46,6 +46,10 @@ urlpatterns=[
     path('api/event-details/<int:event_id>/', views.get_event_details, name='api_event_details'),
     path('api/event-statistics/<int:event_id>/', views.get_event_statistics, name='api_event_statistics'),
     path('api/event-data/<int:id>/', views.cal_event_data, name='cal_event_data'),
+
+
+    path('update-user/', views.update_user, name='update_user'),
+    path('update-user-form/', views.update_user_form, name='update_user_form'),
     
     
 

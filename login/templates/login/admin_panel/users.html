@@ -10,11 +10,137 @@
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_panel_css/users.css' %}">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
- <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
+<link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
 
+<style>
+.modal-header {
+    background: linear-gradient(135deg, #5a60f2 0%, #4a52e3 100%);
+    border-bottom: none;
+}
 
+.modal-header h5 {
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
 
+.user-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
 
+.user-detail-row:last-child {
+    border-bottom: none;
+}
+
+.user-detail-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 100px;
+}
+
+.user-detail-value {
+    color: #212529;
+    flex: 1;
+    text-align: right;
+}
+
+.edit-form-group {
+    margin-bottom: 1rem;
+}
+
+.edit-form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.edit-form-group input,
+.edit-form-group select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.edit-form-group input:focus,
+.edit-form-group select:focus {
+    border-color: #5a60f2;
+    box-shadow: 0 0 0 0.2rem rgba(90, 96, 242, 0.25);
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #218838 0%, #1a9870 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    color: white;
+}
+
+.btn-view {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    color: white;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+}
+
+.btn-view:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    color: white;
+}
+
+.confirmation-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.alert-warning {
+    border-left: 4px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+}
+
+.btn-success-gradient {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-success-gradient:hover {
+    background: linear-gradient(135deg, #218838 0%, #1a9870 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+</style>
 {% endblock %}
 
 {% block js %}
@@ -90,7 +216,6 @@
     {% endfor %}
   </div>
 {% endif %}
-
 
         
         <!-- Registration Section -->
@@ -291,14 +416,13 @@
 <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-white " style="background-color: #5a60f2;">
+            <div class="modal-header text-white">
                 <h5 class="modal-title" id="viewUserModalLabel">
                     <i class="fas fa-user me-2"></i>User Details
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-    
                 <div class="row">
                     <div class="col-md-6">
                         <div class="user-detail-row">
@@ -339,7 +463,133 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+                {% if user.is_superuser %}
+                    <button type="button" class="btn btn-edit" id="editUserBtn">
+                        <i class="fas fa-edit me-1"></i>Edit User
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white">
+                <h5 class="modal-title" id="editUserModalLabel">
+                    <i class="fas fa-user-edit me-2"></i>Edit User Information
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="editUserId" name="user_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="edit-form-group">
+                                <label for="editUsername">Username</label>
+                                <input type="text" class="form-control" id="editUsername" name="username" required>
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editEmail">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" required>
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editFirstName">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="first_name" required>
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editLastName">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="last_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="edit-form-group">
+                                <label for="editDepedId">DepEd ID</label>
+                                <input type="text" class="form-control" id="editDepedId" name="deped_id">
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editBirthDate">Birth Date</label>
+                                <input type="date" class="form-control" id="editBirthDate" name="birth_date">
+                            </div>
+                            
+                            <div class="edit-form-group" id="roleEditGroup">
+                                <label for="editRole">Role</label>
+                                <select class="form-control" id="editRole" name="role">
+                                    <option value="user">User</option>
+                                    <option value="staff">Staff</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editStatus">Status</label>
+                                <select class="form-control" id="editStatus" name="status">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Note:</strong> Please review all changes carefully before saving. This action will update the user's information in the system.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-success-gradient" id="saveUserChangesBtn">
+                    <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Confirmation Modal -->
+<div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveConfirmModalLabel">
+                    <i class="fas fa-save me-2"></i>Confirm Changes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-question-circle text-warning confirmation-icon"></i>
+                <h6 class="mb-3">Are you sure you want to save these changes?</h6>
+                <p class="text-muted">
+                    You are about to update the information for user: <strong id="saveUserName"></strong>
+                </p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This action will immediately update the user's information in the database.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-success-gradient" id="confirmSaveBtn">
+                    <i class="fas fa-save me-1"></i>Yes, Save Changes
+                </button>
             </div>
         </div>
     </div>
@@ -414,6 +664,7 @@ let currentPage = 1;
 let filteredUserData = [...userData]; 
 let currentSearchTerm = '';
 let currentRoleFilter = '';
+let currentEditingUser = null;
 
 // Helper functions
 function getPositionBadge(user) {
@@ -449,6 +700,8 @@ function viewUserDetails(userId) {
     const user = userData.find(u => u.id === userId);
     if (!user) return;
     
+    currentEditingUser = user;
+    
     // Populate modal with user data
     document.getElementById('modalUsername').textContent = user.username;
     document.getElementById('modalEmail').textContent = user.email;
@@ -463,6 +716,171 @@ function viewUserDetails(userId) {
     // Show the modal
     const viewModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
     viewModal.show();
+}
+
+function openEditModal() {
+    if (!currentEditingUser) return;
+    
+    const user = currentEditingUser;
+    
+    // Populate edit form
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUsername').value = user.username;
+    document.getElementById('editEmail').value = user.email;
+    document.getElementById('editFirstName').value = user.first_name || '';
+    document.getElementById('editLastName').value = user.last_name || '';
+    document.getElementById('editDepedId').value = user.deped_id || '';
+    document.getElementById('editBirthDate').value = user.birth_date || '';
+    
+    // Set role
+    let role = 'user';
+    if (user.is_superuser) role = 'admin';
+    else if (user.is_staff) role = 'staff';
+    document.getElementById('editRole').value = role;
+    
+    // Set status (assuming active for now)
+    document.getElementById('editStatus').value = 'active';
+    
+    // Hide role edit for superusers editing themselves or if current user is not superuser
+    const currentUserIsSuperuser = {{ user.is_superuser|yesno:"true,false" }};
+    const editingCurrentUser = user.id === {{ user.id }};
+    
+    if (!currentUserIsSuperuser || (user.is_superuser && editingCurrentUser)) {
+        document.getElementById('roleEditGroup').style.display = 'none';
+    } else {
+        document.getElementById('roleEditGroup').style.display = 'block';
+    }
+    
+    // Close view modal and open edit modal
+    bootstrap.Modal.getInstance(document.getElementById('viewUserModal')).hide();
+    
+    setTimeout(() => {
+        const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        editModal.show();
+    }, 300);
+}
+
+function showSaveConfirmation() {
+    if (!currentEditingUser) return;
+    
+   
+    document.getElementById('saveUserName').textContent = currentEditingUser.username;
+    
+    
+    bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+    
+    setTimeout(() => {
+        const confirmModal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
+        confirmModal.show();
+    }, 300);
+}
+
+function saveUserChanges() {
+    const form = document.getElementById('editUserForm');
+    const formData = new FormData(form);
+    
+
+    const jsonData = {};
+    formData.forEach((value, key) => {
+        jsonData[key] = value;
+    });
+
+    const confirmBtn = document.getElementById('confirmSaveBtn');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+    confirmBtn.disabled = true;
+ 
+    fetch('/update-user/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify(jsonData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+     
+            const userId = parseInt(jsonData.user_id);
+            const userIndex = userData.findIndex(u => u.id === userId);
+            
+            if (userIndex !== -1) {
+                userData[userIndex].username = jsonData.username;
+                userData[userIndex].email = jsonData.email;
+                userData[userIndex].first_name = jsonData.first_name;
+                userData[userIndex].last_name = jsonData.last_name;
+                userData[userIndex].deped_id = jsonData.deped_id || '';
+                userData[userIndex].birth_date = jsonData.birth_date || '';
+                
+                const role = jsonData.role;
+                userData[userIndex].is_superuser = role === 'admin';
+                userData[userIndex].is_staff = role === 'staff' || role === 'admin';
+            }
+            
+        
+            filterUsers();
+            
+            // Show success message
+            showSuccessMessage(data.message || 'User updated successfully!');
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
+            currentEditingUser = null;
+            
+        } else {
+            // Show error message
+            showErrorMessage(data.message || 'Error updating user');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorMessage('Network error occurred. Please try again.');
+    })
+    .finally(() => {
+        // Reset button state
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+    });
+}
+
+function showErrorMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+function showSuccessMessage(message) {
+    // Create a temporary success message
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
 }
 
 function displayTable(page) {
@@ -616,6 +1034,7 @@ function generateAndSetPassword(user) {
     
     passwordInput.value = generatePassword(12); 
 }
+
 function clearPassword(user) {
     if (user==="user"){
         const passwordInput = document.getElementById("user_password");
@@ -658,10 +1077,7 @@ function setupAutoPasswordGeneration(firstNameInputId, passwordInputId) {
     }
 }
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
-
     displayTable(currentPage);
     setupPagination();
 
@@ -693,6 +1109,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Event listeners for edit functionality
+    const editUserBtn = document.getElementById('editUserBtn');
+    const saveUserChangesBtn = document.getElementById('saveUserChangesBtn');
+    const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+    
+    if (editUserBtn) {
+        editUserBtn.addEventListener('click', openEditModal);
+    }
+    
+    if (saveUserChangesBtn) {
+        saveUserChangesBtn.addEventListener('click', showSaveConfirmation);
+    }
+    
+    if (confirmSaveBtn) {
+        confirmSaveBtn.addEventListener('click', saveUserChanges);
+    }
+
     // Password toggles
     setupPasswordToggle("togglePassword", "user_password", "togglePasswordIcon");
     setupPasswordToggle("toggleStaffPassword", "staff_password", "toggleStaffPasswordIcon");
@@ -700,8 +1133,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto password generation
     setupAutoPasswordGeneration("user_firstname", "user_password");
     setupAutoPasswordGeneration("staff_firstname", "staff_password");
-    
-  
 
     // Disable autocomplete for email and password fields
     const emailFields = document.querySelectorAll('input[type="email"]');
