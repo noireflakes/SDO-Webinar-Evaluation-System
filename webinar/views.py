@@ -207,7 +207,7 @@ def register(request, id):
     <p>We look forward to seeing you there!</p>
 
     <p>Best regards,<br>
-    The Webinar Team</p>
+     The SDO Baliwag</p>
   </body>
 </html>
 """
@@ -249,107 +249,131 @@ def validation(request, id):
     })
 
 #questionaire
-def questionaire(request, id):
-    webinar = get_object_or_404(Webinar, id=id)
+from django.utils import timezone
 
-    speaker = []
-    venue = []
-    meals = []
-    manage = []
-    all_responses = {
-        "speaker": speaker,
-        "venue": venue,
-        "meals": meals,
-        "manage": manage
-    }
+def questionaire(request, id):     
+    webinar = get_object_or_404(Webinar, id=id)      
+    speaker = []     
+    venue = []     
+    meals = []     
+    manage = []     
+    all_responses = {         
+        "speaker": speaker,         
+        "venue": venue,         
+        "meals": meals,         
+        "manage": manage     
+    }      
 
-    if request.method == 'POST':
-        sex = request.POST.get('sex')
-        email = request.POST.get('email')
-        try:
-            user = get_object_or_404(User, email=email)
-            attendee = get_object_or_404(WebinarAttendees, user=user, webinar=webinar)
-            
-            if attendee.attendance < 1:
-            
-                if request.POST.get('comment'):
-                    Comment.objects.create(
-                        webinar=webinar,
-                        user=user,
-                        text=request.POST.get('comment')
-                    )
-
-         
-                for key, value in request.POST.items():
-                    if key.startswith('speaker'):
-                        speaker.append(value)
-                    elif key.startswith('venue'):
-                        venue.append(value)
-                    elif key.startswith('meals'):
-                        meals.append(value)
-                    elif key.startswith("manage"):
-                        manage.append(value)
-
-                for category, response in all_responses.items():
-                    if response:  
-                    
-                        while len(response) < 5:
-                            response.append(None)
-
-                        ResponseQuestionaire.objects.create(
-                            webinar=webinar,
-                            user=user,
-                            type=category,
-                            q1=response[0],
-                            q2=response[1],
-                            q3=response[2],
-                            q4=response[3],
-                            q5=response[4],
-                            sex=sex
-                        )
-
-                attendee.attendance = 1
+    if request.method == 'POST':         
+        sex = request.POST.get('sex')         
+        email = request.POST.get('email')         
+        try:             
+            user = get_object_or_404(User, email=email)             
+            attendee = get_object_or_404(WebinarAttendees, user=user, webinar=webinar)                          
+            if attendee.attendance < 1:                              
+                if request.POST.get('comment'):                     
+                    Comment.objects.create(                         
+                        webinar=webinar,                         
+                        user=user,                         
+                        text=request.POST.get('comment')                     
+                    )                            
+                
+                for key, value in request.POST.items():                     
+                    if key.startswith('speaker'):                         
+                        speaker.append(value)                     
+                    elif key.startswith('venue'):                         
+                        venue.append(value)                     
+                    elif key.startswith('meals'):                         
+                        meals.append(value)                     
+                    elif key.startswith("manage"):                         
+                        manage.append(value)                  
+                
+                for category, response in all_responses.items():                     
+                    if response:                                                
+                        while len(response) < 5:                             
+                            response.append(None)                          
+                        ResponseQuestionaire.objects.create(                             
+                            webinar=webinar,                             
+                            user=user,                             
+                            type=category,                             
+                            q1=response[0],                             
+                            q2=response[1],                             
+                            q3=response[2],                             
+                            q4=response[3],                             
+                            q5=response[4],                             
+                            sex=sex                         
+                        )                  
+                
+                attendee.attendance = 1                 
                 attendee.save()
+                
+                # Send completion email only if event is ongoing or past
+                current_date = timezone.now().date()
+                if webinar.start_date <= current_date:
+                    subject = f"Congratulations! You've completed {webinar.title}"
+                    html_message = f"""
+                    <html>
+                      <body style="font-family: Arial, sans-serif; line-height: 1.5;">
+                        <p>Hello <strong>{user.first_name or user.username}</strong>,</p>
+                        
+                        <p>🎉 <strong>Congratulations!</strong> You have successfully completed the evaluation for "<strong>{webinar.title}</strong>".</p>
+                        
+                        <p>
+                          📅 <strong>Event Date:</strong> {webinar.start_date}<br>
+                          📍 <strong>Location:</strong> {webinar.venue}<br>
+                          ✅ <strong>Status:</strong> Completed
+                        </p>
+                        
+                        <p>Thank you for your participation and valuable feedback. Your input helps us improve future events.</p>
+                        
+                        <p>We hope you found the event informative and valuable!</p>
+                        
+                        <p>Best regards,<br>
+                        The SDO Baliwag</p>
+                      </body>
+                    </html>
+                    """
+                    
+                    send_email(
+                        to_email=email,
+                        subject=subject,
+                        body=html_message
+                    )                  
+                
+                return redirect("index")              
+            else:                 
+                error_message = "You already answered"                 
+                messages.error(request, "You already answered")                 
+                return redirect("index")          
+        except User.DoesNotExist:               
+            error_message = "Invalid id please recheck your Deped id"                          
+            if webinar.event_type == 'recognition':                 
+                return render(request, 'webinar/evaluation/recognition.html', {                     
+                    'webinar': webinar,                     
+                    'error_message': error_message                 
+                })             
+            elif webinar.event_type == 'seminar':                 
+                return render(request, 'webinar/evaluation/seminar.html', {                     
+                    'webinar': webinar,                     
+                    'error_message': error_message                 
+                })                          
+            return render(request, 'webinar/evaluation/workshop.html', {                 
+                'webinar': webinar,                 
+                'error_message': error_message             
+            })      
 
-                return redirect("index")
-
-            else:
-                error_message = "You already answered"
-                messages.error(request, "You already answered")
-                return redirect("index")
-
-        except User.DoesNotExist:  
-            error_message = "Invalid id please recheck your Deped id"
-            
-            if webinar.event_type == 'recognition':
-                return render(request, 'webinar/evaluation/recognition.html', {
-                    'webinar': webinar,
-                    'error_message': error_message
-                })
-            elif webinar.event_type == 'seminar':
-                return render(request, 'webinar/evaluation/seminar.html', {
-                    'webinar': webinar,
-                    'error_message': error_message
-                })
-            
-            return render(request, 'webinar/evaluation/workshop.html', {
-                'webinar': webinar,
-                'error_message': error_message
-            })
-
-    if webinar.event_type == 'recognition':
-        return render(request, 'webinar/evaluation/recognition.html', {
-            'webinar': webinar
-        })
-    elif webinar.event_type == 'seminar':
-        return render(request, 'webinar/evaluation/seminar.html', {
-            'webinar': webinar
-        })
+    if webinar.event_type == 'recognition':         
+        return render(request, 'webinar/evaluation/recognition.html', {             
+            'webinar': webinar         
+        })     
+    elif webinar.event_type == 'seminar':         
+        return render(request, 'webinar/evaluation/seminar.html', {             
+            'webinar': webinar         
+        })          
     
-    return render(request, 'webinar/evaluation/workshop.html', {
-        'webinar': webinar
+    return render(request, 'webinar/evaluation/workshop.html', {         
+        'webinar': webinar     
     })
-
 
 def create_test(request, id):
     webinar = get_object_or_404(Webinar, id=id)
@@ -573,8 +597,6 @@ def toggle_evaluation_ajax(request, webinar_id):
     })
 
 
-from django.utils import timezone
-from datetime import timedelta
 
 def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)

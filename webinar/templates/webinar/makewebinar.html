@@ -80,14 +80,14 @@
             
 
             {% if webinar %}
-                <h3>Edit Webinar</h3>
+                <h3>Edit Event</h3>
 
                 <div class="form-group" style="display: none">
                     <label for="title">Webinar Id:</label>
                     <input name="event_id" id="event_id" type="hidden" class="form-control" value="{{ webinar.id }}">
                 </div>
             {% else %}
-                <h3>Create Webinar</h3>
+                <h3>Create Event</h3>
             {% endif %}
 
             <div class="form-group">

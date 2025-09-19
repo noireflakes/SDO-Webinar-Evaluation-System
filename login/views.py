@@ -756,7 +756,7 @@ def register_user(request):
       
           <tr>
             <td style="padding:24px 28px;background:#865dee;color:#ffffff;">
-              <h1 style="margin:0;font-size:20px;font-weight:700;">Welcome to the SD0</h1>
+              <h1 style="margin:0;font-size:20px;font-weight:700;">Welcome to the SDO</h1>
             </td>
           </tr>
 
@@ -850,6 +850,7 @@ def generete_authorization_key(request):
     )
     return redirect('admin_users')
             
+
 @admin_required
 def create_admin(request):
     if request.method == 'POST':

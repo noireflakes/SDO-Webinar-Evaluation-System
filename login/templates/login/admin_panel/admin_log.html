@@ -1,3 +1,4 @@
+
 {% extends "login/layout.html" %}
 
 {% load static %}
@@ -76,63 +77,21 @@
             <div class="table-header">
                 <h3><i class="fas fa-database me-2"></i>Log Audits</h3>
                 <div class="table-tabs">
+                    <!-- Changed: Users tab is now first and has active class -->
+                    <button class="tab-btn active" onclick="switchTab('users', this)">
+                        <i class="fas fa-users me-1"></i>Users
+                    </button>
                     {% if user.is_superuser %}
-                        <button class="tab-btn active" onclick="switchTab('logs', this)">
+                        <!-- Changed: Admin Logs tab is now second and doesn't have active class -->
+                        <button class="tab-btn" onclick="switchTab('logs', this)">
                             <i class="fas fa-history me-1"></i>Admin Logs
                         </button>
                     {% endif %}
-                    <button class="tab-btn" onclick="switchTab('users', this)">
-                        <i class="fas fa-users me-1"></i>Users
-                    </button>
                 </div>
             </div>
 
-            <!-- Admin Logs Tab -->
-            <div id="logs-tab" class="tab-content active">
-                <div class="table-controls">
-                    <div class="search-box">
-                        <i class="fas fa-search text-muted"></i>
-                        <input type="text" id="logs-search" placeholder="Search logs..." onkeyup="searchTable('logs')">
-                    </div>
-                    <div class="rows-per-page">
-                        <span>Show:</span>
-                        <select id="logs-rows-select" onchange="changeRowsPerPage('logs')">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span>entries</span>
-                    </div>
-                </div>
-
-                <div class="table-content">
-                    <table class="table custom-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 15%;">Timestamp</th>
-                                <th style="width: 12%;">User</th>
-                                <th style="width: 10%;">Type</th>
-                                <th style="width: 10%;">Action</th>
-                                <th style="width: 28%;">Message</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logs-table-body">
-                            <!-- Dynamic content -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination-footer">
-                    <div class="table-info" id="logs-table-info"></div>
-                    <nav>
-                        <ul class="pagination mb-0" id="logs-pagination"></ul>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- Users Tab -->
-            <div id="users-tab" class="tab-content">
+            <!-- Changed: Users Tab is now first and has active class -->
+            <div id="users-tab" class="tab-content active">
                 <div class="table-controls">
                     <div class="search-box">
                         <i class="fas fa-search text-muted"></i>
@@ -171,6 +130,50 @@
                     <div class="table-info" id="users-table-info"></div>
                     <nav>
                         <ul class="pagination mb-0" id="users-pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Changed: Admin Logs Tab is now second and doesn't have active class -->
+            <div id="logs-tab" class="tab-content">
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search text-muted"></i>
+                        <input type="text" id="logs-search" placeholder="Search logs..." onkeyup="searchTable('logs')">
+                    </div>
+                    <div class="rows-per-page">
+                        <span>Show:</span>
+                        <select id="logs-rows-select" onchange="changeRowsPerPage('logs')">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
+                </div>
+
+                <div class="table-content">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Timestamp</th>
+                                <th style="width: 12%;">User</th>
+                                <th style="width: 10%;">Type</th>
+                                <th style="width: 10%;">Action</th>
+                                <th style="width: 28%;">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-footer">
+                    <div class="table-info" id="logs-table-info"></div>
+                    <nav>
+                        <ul class="pagination mb-0" id="logs-pagination"></ul>
                     </nav>
                 </div>
             </div>
@@ -505,12 +508,12 @@ function changeRowsPerPage(tableName) {
     setupPagination(tableName);
 }
 
-// Initialize on page load
+// Changed: Initialize users tab first on page load
 document.addEventListener('DOMContentLoaded', function() {
-    displayTable('logs');
-    setupPagination('logs');
     displayTable('users');
     setupPagination('users');
+    displayTable('logs');
+    setupPagination('logs');
 });
 </script>
 

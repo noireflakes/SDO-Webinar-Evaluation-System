@@ -79,7 +79,7 @@ a{
 .events-section h2, .history-section h2{
     font-size: clamp(20px, 4vw, 2em);
     font-weight: 550;
-    margin-top: 80px;
+
     margin-left: 30px;
     margin-bottom: 30px;
 }

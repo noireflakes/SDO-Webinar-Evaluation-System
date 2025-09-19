@@ -462,23 +462,38 @@ async function DownloadExcel() {
         data.manage?.length || 0
     );
 
-    for (let i = 0; i < maxEvalLength; i++) {
-        const email = data.email?.[i] ?? "";
-        const schoolId = data.deped_id?.[i] ?? "";
-        const sex = data.sex?.[i] ?? "";
-        const timestamp = data.timestamp?.[i] ?? "";
-        const speaker = data.speaker?.[i] ?? "";
-        const venue = data.venue?.[i] ?? "";
-        const meal = data.meal?.[i] ?? "";
-        const manage = data.manage?.[i] ?? "";
+   for (let i = 0; i < maxEvalLength; i++) {
+    const email = data.email?.[i] ?? "";
+    const schoolId = data.deped_id?.[i] ?? "";
+    const sex = data.sex?.[i] ?? "";
+    const timestamp = data.timestamp?.[i] ?? "";
+    const speaker = data.speaker?.[i] ?? "";
+    const venue = data.venue?.[i] ?? "";
+    const meal = data.meal?.[i] ?? "";
+    const manage = data.manage?.[i] ?? "";
 
-        const escapedEmail = email.includes(',') ? `"${email}"` : email;
-        const escapedSchoolId = schoolId.includes(',') ? `"${schoolId}"` : schoolId;
-        const escapedSex = sex.includes(',') ? `"${sex}"` : sex;
-        const escapedTimestamp = timestamp.includes(',') ? `"${timestamp}"` : timestamp;
+    const escapedEmail = email.includes(",") ? `"${email}"` : email;
+    const escapedSchoolId = schoolId.includes(",") ? `"${schoolId}"` : schoolId;
+    const escapedSex = sex.includes(",") ? `"${sex}"` : sex;
 
-        csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${speaker},${venue},${meal},${manage}\n`;
+    // Format timestamp
+    let formattedTimestamp = timestamp;
+    if (timestamp) {
+        const date = new Date(timestamp);
+        const options = { 
+            month: "long", 
+            day: "numeric", 
+            hour: "numeric", 
+            minute: "2-digit", 
+            hour12: true 
+        };
+        formattedTimestamp = date.toLocaleString("en-US", options);
     }
+
+    const escapedTimestamp = formattedTimestamp.includes(",") ? `"${formattedTimestamp}"` : formattedTimestamp;
+
+    csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${speaker},${venue},${meal},${manage}\n`;
+}
 
     // Add attendees data
     csvContent += "\n=== ATTENDEES DATA ===\n";
