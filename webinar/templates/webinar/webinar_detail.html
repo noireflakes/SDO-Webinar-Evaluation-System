@@ -44,6 +44,9 @@
     <!-- Content Container -->
     <div class="img-contents">
         <div class="content">
+        <div class="meta-item d-flex align-items-center rounded shadow-sm" >
+        <span class="event-type" style="background: linear-gradient(135deg, #6f42c1, #6610f2); color:white; padding: 5px; padding-right:10px; padding-left: 10px; border-radius: 20px;">{{ webinar.event_type }}</span>
+        </div>
         
             <h5 class="webinar-title">{{ webinar.title }}</h5>
             
@@ -62,6 +65,7 @@
                     <i class="bi bi-clock"></i>
                     <span class="time">{{ webinar.time|time:"h:i A" }}</span>
                 </div>
+    
                 
                 <!-- Venue -->
                 <div class="meta-item">

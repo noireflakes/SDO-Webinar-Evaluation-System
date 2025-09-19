@@ -522,20 +522,278 @@ async function DownloadExcel() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    showToast('Evaluation Report has been Dowloaded Successful', 'success');
 }
 
+
 async function downloadTestData() {
-    console.log("Downloading test data...");
-    const event_id = {{ webinar.id|escapejs }};
-    const response = await fetch(`/exam_portal/result_data/${event_id}`);
-    const data = await response.json();
+ 
+    
+    try {
+        const webinarId = {{ webinar.id|escapejs }};
+        
 
-    console.log("Fetched test data:", data);
 
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(data.test_result);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "test_data");
-    XLSX.writeFile(workbook, "Test_result.xlsx");
+        const response = await fetch(`/exam_portal/test_data/${webinarId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        
+        if (!data.test_result || data.test_result.length === 0) {
+            showToast('No test data available to download', 'error');
+            return;
+        }
+        
+
+        const allTestData = data.test_result;
+        const preTestData = allTestData.filter(item => item.test_type === 'pre_test');
+        const postTestData = allTestData.filter(item => item.test_type === 'post_test');
+
+        
+   
+        const preTestAverage = preTestData.length > 0 ? 
+            (preTestData.reduce((sum, item) => sum + item.score, 0) / preTestData.length).toFixed(2) : 0;
+        const postTestAverage = postTestData.length > 0 ? 
+            (postTestData.reduce((sum, item) => sum + item.score, 0) / postTestData.length).toFixed(2) : 0;
+            
+  
+        
+  
+        const workbook = XLSX.utils.book_new();
+        
+
+        const preTestSheetData = [];
+        
+
+        preTestSheetData.push({
+            'Email': 'PRE-TEST RESULTS',
+            'DepEd ID': '',
+            'Score': ''
+        });
+        
+        preTestSheetData.push({
+            'Email': '',
+            'DepEd ID': '',
+            'Score': ''
+        });
+        
+        if (preTestData.length > 0) {
+            // Add data rows
+            preTestData.forEach(item => {
+                preTestSheetData.push({
+                    'Email': item.user,
+                    'DepEd ID': item.deped_id || 'N/A',
+                    'Score': item.score
+                });
+            });
+            
+            
+            preTestSheetData.push({
+                'Email': '',
+                'DepEd ID': '',
+                'Score': ''
+            });
+            
+          
+            preTestSheetData.push({
+                'Email': '',
+                'DepEd ID': 'AVERAGE:',
+                'Score': parseFloat(preTestAverage)
+            });
+        } else {
+        
+            preTestSheetData.push({
+                'Email': 'No pre-test data available',
+                'DepEd ID': '',
+                'Score': ''
+            });
+        }
+        
+        const preTestWS = XLSX.utils.json_to_sheet(preTestSheetData);
+        
+       
+        preTestWS['!cols'] = [
+            { wch: 35 },
+            { wch: 15 },
+            { wch: 10 }  
+        ];
+        
+        XLSX.utils.book_append_sheet(workbook, preTestWS, "Pre-Test Results");
+        
+        // Create Post-Test sheet
+        const postTestSheetData = [];
+        
+        // Add title row
+        postTestSheetData.push({
+            'Email': 'POST-TEST RESULTS',
+            'DepEd ID': '',
+            'Score': ''
+        });
+        
+        // Add empty row for spacing
+        postTestSheetData.push({
+            'Email': '',
+            'DepEd ID': '',
+            'Score': ''
+        });
+        
+        if (postTestData.length > 0) {
+        
+            postTestData.forEach(item => {
+                postTestSheetData.push({
+                    'Email': item.user,
+                    'DepEd ID': item.deped_id || 'N/A',
+                    'Score': item.score
+                });
+            });
+            
+            postTestSheetData.push({
+                'Email': '',
+                'DepEd ID': '',
+                'Score': ''
+            });
+            
+       
+            postTestSheetData.push({
+                'Email': '',
+                'DepEd ID': 'AVERAGE:',
+                'Score': parseFloat(postTestAverage)
+            });
+        } else {
+        
+            postTestSheetData.push({
+                'Email': 'No post-test data available',
+                'DepEd ID': '',
+                'Score': ''
+            });
+        }
+        
+        const postTestWS = XLSX.utils.json_to_sheet(postTestSheetData);
+        
+       
+        postTestWS['!cols'] = [
+            { wch: 35 }, 
+            { wch: 15 }, 
+            { wch: 10 }  
+        ];
+        
+        XLSX.utils.book_append_sheet(workbook, postTestWS, "Post-Test Results");
+        
+   
+        if (workbook.SheetNames.length === 0) {
+            const emptyData = [{
+                'Email': 'No test data available',
+                'DepEd ID': '',
+                'Score': ''
+            }];
+            const emptyWS = XLSX.utils.json_to_sheet(emptyData);
+            XLSX.utils.book_append_sheet(workbook, emptyWS, "No Data");
+        }
+        
+  
+        const now = new Date();
+        const timestamp = now.toISOString().split('T')[0]; 
+        const filename = `Test_Results_Webinar_${webinarId}_${timestamp}.xlsx`;
+        
+      
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('Test results downloaded successfully!', 'success');
+        console.log("Test data download completed");
+        
+    } catch (error) {
+        console.error('Error downloading test data:', error);
+        showToast('Failed to download test results. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        const downloadBtn = document.querySelector('.test-section .btn-download');
+        if (downloadBtn) {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+        }
+    }
+}
+
+// Helper function to create test summary
+function createTestSummary(testData) {
+    if (!testData || testData.length === 0) return [];
+    
+    const summary = [];
+    const testTypes = ['pre_test', 'post_test'];
+    
+    testTypes.forEach(testType => {
+        const typeData = testData.filter(item => item.test_type === testType);
+        
+        if (typeData.length > 0) {
+            const scores = typeData.map(item => item.score);
+            const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+            const maxScore = Math.max(...scores);
+            const minScore = Math.min(...scores);
+            const passCount = scores.filter(score => score >= 70).length;
+            const passRate = ((passCount / scores.length) * 100).toFixed(1);
+            
+            summary.push({
+                'Test Type': testType === 'pre_test' ? 'Pre-Test' : 'Post-Test',
+                'Total Participants': typeData.length,
+                'Average Score': `${avgScore}%`,
+                'Highest Score': `${maxScore}%`,
+                'Lowest Score': `${minScore}%`,
+                'Pass Rate (≥70%)': `${passRate}% (${passCount}/${scores.length})`
+            });
+        }
+    });
+    
+    return summary;
+}
+
+// Helper function to create comparison data between pre and post tests
+function createComparisonData(preTestData, postTestData) {
+    if (!preTestData.length || !postTestData.length) return [];
+    
+    const comparisonData = [];
+    
+    // Create maps for easier lookup
+    const preTestMap = new Map(preTestData.map(item => [item.user, item]));
+    const postTestMap = new Map(postTestData.map(item => [item.user, item]));
+    
+    // Find users who took both tests
+    const commonUsers = [...preTestMap.keys()].filter(user => postTestMap.has(user));
+    
+    commonUsers.forEach(userEmail => {
+        const preTest = preTestMap.get(userEmail);
+        const postTest = postTestMap.get(userEmail);
+        
+        const preScore = preTest.score;
+        const postScore = postTest.score;
+        const improvement = postScore - preScore;
+        const improvementText = improvement > 0 ? `+${improvement}` : `${improvement}`;
+        
+        let status = 'No Change';
+        if (improvement > 0) status = 'Improved';
+        else if (improvement < 0) status = 'Declined';
+        
+        comparisonData.push({
+            'Email': userEmail,
+            'DepEd ID': preTest.deped_id || 'N/A',
+            'Pre-Test Score': `${preScore}%`,
+            'Post-Test Score': `${postScore}%`,
+            'Improvement': `${improvementText}%`,
+            'Status': status
+        });
+    });
+    
+    // Sort by improvement (descending)
+    comparisonData.sort((a, b) => {
+        const aImprovement = parseFloat(a.Improvement.replace('%', ''));
+        const bImprovement = parseFloat(b.Improvement.replace('%', ''));
+        return bImprovement - aImprovement;
+    });
+    
+    return comparisonData;
 }
 
 function toggleAttendanceView() {

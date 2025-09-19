@@ -905,6 +905,24 @@ def edit_user(request):
     redirected = ""
     
     if request.method == 'POST':
+        has_data = any(
+            request.POST.get(field, "").strip()
+            for field in ["first_name", "last_name", "username", "email", "middle", "number", "school"]
+        ) or bool(request.FILES.get("img"))
+
+        
+        if not has_data:
+            messages.error(request, "Please fill out the form before submitting")
+            if request.user.is_superuser or request.user.is_staff:
+                return redirect("admin_setting")
+            else:
+                return redirect("user_setting")
+
+
+        
+
+
+
         first_name = request.POST.get("first_name")
         if first_name and first_name.strip():
             user.first_name = first_name.strip()
@@ -946,7 +964,7 @@ def edit_user(request):
         school = request.POST.get('school')
         if school and school.strip():
             profile.school = school.strip()
-        
+    
         
         profile.save()
         
@@ -956,6 +974,7 @@ def edit_user(request):
         return redirect("admin_setting")
     else:
         return redirect("user_setting")
+
 
 @login_required
 def change_password(request):
@@ -1477,11 +1496,9 @@ def get_event_statistics(request, event_id):
 @staff_member_required
 @require_http_methods(["POST"])
 def update_user(request):
-    """
-    Handle user information updates via AJAX
-    """
+
     try:
-        # Get JSON data from request body
+        
         data = json.loads(request.body)
         user_id = data.get('user_id')
         
@@ -1584,7 +1601,7 @@ def update_user(request):
         }, status=500)
 
 
-# Alternative: Form-based view (if you prefer traditional form submission)
+
 @login_required
 @staff_member_required
 @require_http_methods(["POST"])

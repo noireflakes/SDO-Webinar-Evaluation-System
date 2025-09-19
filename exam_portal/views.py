@@ -13,6 +13,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from webinar.models import Comment
 from django.contrib import messages 
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.cache import never_cache
+
 
 #decorator
 def admin_required(view_func):
@@ -267,20 +270,46 @@ def result_data(request, id):
     return JsonResponse(response_data)
 
 
+@require_http_methods(["GET"])
+@never_cache
 def test_data(request, id):
-    webinar=get_object_or_404(Webinar, id=id)
-    test_result=[]
-    results=webinar.test_result.all()
-    
-    for result in results:
-        test_result.append({
-            "user":result.user.email,
-            "deped_id":result.user.user_profile.deped_id,
-            "test_type":result.test,
-            "score":result.score
+ 
+    try:
+        webinar = get_object_or_404(Webinar, id=id)
+        test_result = []
+        results = webinar.test_result.all()
+        
+        
+        for result in results:
+        
+            deped_id = None
+            try:
+                if hasattr(result.user, 'user_profile') and result.user.user_profile:
+                    deped_id = result.user.user_profile.deped_id
+            except AttributeError:
+                deped_id = None
+            
+            test_result.append({
+                "user": result.user.email,
+                "deped_id": deped_id,
+                "test_type": result.test,  
+                "score": result.score,
+                "date_taken": result.created_at.isoformat() if hasattr(result, 'created_at') else None,
+                "user_id": result.user.id  
+            })
+            print(f"This is the result{test_result}")
+        
+        return JsonResponse({
+            "test_result": test_result,
+            "webinar_title": webinar.title,
+            "total_results": len(test_result)
         })
     
-    return JsonResponse({"test_result":test_result})
+    except Exception as e:
+        return JsonResponse({
+            "error": f"Failed to fetch test data: {str(e)}",
+            "test_result": []
+        }, status=500)
 
 
 def test_score(request, id, type):

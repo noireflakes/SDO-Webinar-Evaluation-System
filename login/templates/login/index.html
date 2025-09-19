@@ -55,21 +55,21 @@
       <li><a class="sb-nav-item" href="#guidelines">Guidelines</a></li>
       <li><a class="sb-nav-item" href="#aboutus-section">About us</a></li>
       {% if user.is_authenticated %}
-        <li ><a href="{% url 'logout' %}">Logout</a></li>
+        <li ><a class="login-btn" href="{% url 'logout' %}">Logout</a></li>
       {% else %}
-        <li  ><a  href="{% url 'login' %}">Login</a></li>
+        <li  ><a class="login-btn" href="{% url 'login' %}">Login</a></li>
       {% endif %}
     </ul>
 
   </div>
 
-  <!-- Need Assistance Button -->
+
   <button class="assistance-btn" onclick="openAssistanceModal()">
     <i class="fas fa-question-circle"></i>
     Need Assistance
   </button>
 
-  <!-- Assistance Modal -->
+  <!-- assistance modal -->
   <div class="modal-overlay" id="assistanceModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -114,7 +114,30 @@
   </div>
 
   <section id="header-section">
-    {% if messages %}
+
+
+
+    <div class="header-container" style="background-image: url('{% static 'asset/hero_bg.jpg' %}');">
+        <div class="background-overlay"></div>
+
+    
+        <div class="header-contents">
+          <h2>Empowering Excellence in Education Through Streamlined Events & Evaluations</h2>
+          
+          <div class="container">
+            <p>This platform enhances event management with efficient attendance tracking, insightful
+              participant feedback collection, and seamless certificate generation</p>
+            
+            <div class="header-button">
+              <a href="#aboutus-section"><button >Learn More</button></a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+          {% if messages %}
   <div class="popup-messages" id="popupMessages">
     {% for message in messages %}
       {% if "expired" not in message|stringformat:"s" %}
@@ -134,28 +157,6 @@
     {% endfor %}
   </div>
   {% endif %}
-
-    <!-- Header BG -->
-    <div class="header-container" style="background-image: url('{% static 'asset/hero_bg.jpg' %}');">
-        <div class="background-overlay"></div>
-
-        <!-- Header Contents -->
-        <div class="header-contents">
-          <h2>Empowering Excellence in Education Through Streamlined Events & Evaluations</h2>
-          
-          <div class="container">
-            <p>This platform enhances event management with efficient attendance tracking, insightful
-              participant feedback collection, and seamless certificate generation</p>
-            
-            <div class="header-button">
-              <a href="#aboutus-section"><button >Learn More</button></a>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
 
   </section>
 

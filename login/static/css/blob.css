@@ -5,20 +5,18 @@ body{
 .blob {
     position: absolute;
 
-    width: 300px;
-    height: 300px;
+    width: 90rem;
+    height: 90rem;
     
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     animation: blobMorph 8s infinite ease-in-out;
 }
 
 
-.blob-purple{
-    background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-}
+
 
 .blob-yellow{
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.089) 65%, white) ;
+     background: rgb(134, 93, 238) ;
 
 }
 @keyframes blobMorph {

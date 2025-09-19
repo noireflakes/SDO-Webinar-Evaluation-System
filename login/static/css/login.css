@@ -19,36 +19,52 @@ html, body {
 }
 
 body {
-    background-color: #865dee;
+    background: linear-gradient(135deg, rgb(134, 93, 238), rgb(180, 130, 255));
+
+
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .login {
-    background-color: var(--white);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(76, 67, 206, 0.15);
-    padding: 40px;
-    min-width: 21em;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-
+  background-color: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(76, 67, 206, 0.2),
+              0 6px 10px rgba(0, 0, 0, 0.1); 
+  padding: 40px;
+  min-width: 25em;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+ 
+  transition: all 0.3s ease;
 }
 
+/* Gradient bar at top */
 .login::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
+
+/* Hover effect: lift + glow */
+.login:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(76, 67, 206, 0.25),
+              0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
 
 /* Header */
 .login-text {
@@ -151,7 +167,8 @@ input::placeholder {
 
 /* Submit Button */
 .submit-button {
-    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+    background: linear-gradient(135deg, rgb(134, 93, 238), rgb(180, 130, 255));
+
     color: white;
     border: none;
     padding: 14px;

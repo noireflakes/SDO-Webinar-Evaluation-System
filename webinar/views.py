@@ -38,7 +38,7 @@ def make_webinar(request):
         banner=request.FILES.get('banner')
         venue=request.POST.get('venue')
 
-        # Use custom event type if "other" is selected and custom type is provided
+        #process other events
         if event_type == "other" and custom_event_type:
             event_type = custom_event_type.strip()
 
@@ -64,14 +64,14 @@ def make_webinar(request):
                 img = request.FILES.get(f'speaker_photo{i}')
 
                 if i < len(speakers):
-                    # Update existing speaker
+        
                     speaker = speakers[i]
                     if name: speaker.name = name
                     if email: speaker.email = email
                     if img: speaker.img = img
                     speaker.save()
                 else:
-                    # Add new speaker
+                    
                     if name or email or img:
                         Speaker.objects.create(
                             webinar=webinar,
@@ -81,14 +81,14 @@ def make_webinar(request):
                         )
 
         except Webinar.DoesNotExist:
-            #save event info
+        
             webinar=Webinar(title=title,
             description=description, number_of_speaker=number_of_speaker, event_type=event_type,
             start_date=start_date, until_date=until_date, time=time, banner=banner,
             venue=venue)
             webinar.save()
 
-            #save speakers
+      
             for i in range(number_of_speaker):
                 speaker_name=request.POST.get(f'speaker_name{i}')
                 speaker_email=request.POST.get(f'speaker_email{i}')
@@ -581,7 +581,7 @@ def check_attendance(request, id, test_type='evaluation'):
 
     if webinar.close_evaluation:
         test_name = test_type.replace('_', ' ').title()
-        messages.error(request, f"The {test_name} is closed for this webinar.")
+      
         return render(request, "webinar/validate.html", {
             "webinar": webinar,
             "test_type": test_type,
