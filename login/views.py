@@ -99,28 +99,117 @@ def create_device_hash(request):
 
     return hash
 
+#need assistance
+
+@require_http_methods(["POST"])
+def send_assistance(request):
+    try:
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        # Validate required fields
+        if not all([name, email, subject, message]):
+            return JsonResponse({'success': False, 'error': 'All fields are required'})
+        
+        # Send email to admin
+        admin_email = getattr(settings, 'ADMIN_EMAIL', 'admin@example.com')
+        
+        result = send_email(
+            to_email=admin_email,
+            subject=f"Assistance Required: {subject}",
+            body=f"""
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h2 style="color: #007bff; margin-top: 0;">New Assistance Request</h2>
+                </div>
+                
+                <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px;">
+                    <p><strong>Name:</strong> {name}</p>
+                    <p><strong>Email:</strong> {email}</p>
+                    <p><strong>Subject:</strong> {subject}</p>
+                    
+                    <div style="margin-top: 20px;">
+                        <p><strong>Message:</strong></p>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin-top: 10px;">
+                            {message}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: center; color: #6c757d; font-size: 14px;">
+                    <p>This message was sent from the School Division Office platform.</p>
+                </div>
+            </body>
+            """
+        )
+        
+        if not result:
+            return JsonResponse({'success': False, 'error': 'Failed to send message to admin'})
+        
+        # Send confirmation email to user
+        confirmation_result = send_email(
+            to_email=email,
+            subject="We've received your assistance request",
+            body=f"""
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: #28a745; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <h2 style="margin: 0;">Request Received Successfully!</h2>
+                </div>
+                
+                <p>Dear <strong>{name}</strong>,</p>
+                
+                <p>Thank you for contacting us. We have received your assistance request regarding "<strong>{subject}</strong>".</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 0;"><strong>What happens next?</strong></p>
+                    <ul style="margin-top: 10px;">
+                        <li>Our team will review your message within 24 hours</li>
+                        <li>We'll respond to your email with a solution or further questions</li>
+                        <li>For urgent matters, please call our office directly</li>
+                    </ul>
+                </div>
+                
+                <p>If you have any additional information to add to your request, please reply to this email.</p>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                    <p>Best regards,<br>
+                    <strong>School Division Office of Baliwag</strong></p>
+                </div>
+            </body>
+            """
+        )
+        
+        return JsonResponse({'success': True})
+        
+    except Exception as e:
+        print(f"Error sending assistance email: {e}")
+        return JsonResponse({'success': False, 'error': 'Failed to send message'})
+    
 
 #login handler
 def index(request):
-    webinar=Webinar.objects.all()
+    # Get upcoming webinars
     upcoming_webinars = Webinar.objects.filter(
-        start_date__gte=timezone.now()  
-    ).order_by('start_date')[:3]
-
-    print(settings.EMAIL_HOST_USER)
-    print(settings.EMAIL_HOST)
+        start_date__gte=timezone.now().date()
+    ).order_by('start_date')[:6]
+    
+    
+    if not upcoming_webinars.exists():
+        upcoming_webinars = Webinar.objects.all().order_by('-start_date')[:6]
+    
 
     if request.user.is_authenticated:
-        
         if request.user.is_superuser or request.user.is_staff:
             return redirect('admin_events')
         else:
             return redirect('user_dashboard')
-
-    return render(request, 'login/index.html',{
-        'webinars':upcoming_webinars
+    
+    return render(request, 'login/index.html', {
+        'webinars': upcoming_webinars,
+        'today': timezone.now().date(),
     })
-
 
 def logout_view(request):
     logout(request)

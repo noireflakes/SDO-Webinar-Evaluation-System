@@ -50,12 +50,8 @@ urlpatterns=[
 
     path('update-user/', views.update_user, name='update_user'),
     path('update-user-form/', views.update_user_form, name='update_user_form'),
+    path('send-assistance/', views.send_assistance, name='send_assistance'),
     
-    
-
-
-
-    
-
+        
     
 ]

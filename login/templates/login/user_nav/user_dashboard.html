@@ -1,3 +1,4 @@
+
 {% extends "login/layout.html" %}
 
 {% load static %}
@@ -6,148 +7,438 @@
 <link rel="stylesheet" href="{% static 'css/bar.css' %}"> 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+  body{
+      background-color:#ebedfc ;
+}
+
+
+.search-container {
+    margin-top: 10rem;
+
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    
+
+    
+}
+
+.search-input-group {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-input {
+    border: 2px solid #e2e8f0;
+    border-radius: 25px;
+    padding: 0.8rem 3rem 0.8rem 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+.search-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 20px;
+    padding: 0.6rem 1.2rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.clear-search {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.clear-search.show {
+    opacity: 1;
+}
+
+.clear-search:hover {
+    color: #ef4444;
+}
+
+/* Filter Tags */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.filter-tag {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.filter-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+.filter-tag.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Pagination Styling */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.pagination .page-link {
+    border: none;
+    border-radius: 10px;
+    margin: 0 0.2rem;
+    padding: 0.6rem 1rem;
+    color: #667eea;
+
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.pagination .page-link:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.pagination .page-item.disabled .page-link {
+
+    color: #cbd5e1;
+    cursor: not-allowed;
+}
+
+/* Results Info */
+.results-info {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.results-count {
+  
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* No Results State */
+.no-results {
+    text-align: center;
+    padding: 3rem 2rem;
+
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.no-results i {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+}
+
+.no-results h3 {
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    color: #94a3b8;
+}
+
+
+.messages-container {
+    width: 70%;
+    height: 400px;
+    padding: 50px;
+    border-radius: 20px;
+
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+    margin: 0 auto;
+}
+
+.messages-container::before {
+    content: '📅';
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+@media screen and (max-width: 700px) {
+    .search-input-group {
+        max-width: 100%;
+    }
+    
+    .filter-tags {
+        justify-content: flex-start;
+    }
+    
+    .webinar-card {
+        width: 90%;
+        max-width: none;
+        margin: 20px auto;
+    }
+    
+    .messages-container {
+        width: 90%;
+        padding: 30px 20px;
+        height: auto;
+        min-height: 300px;
+    }
+    
+    .pagination-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
 
 {% endblock %}
+
 {% block js %}
-  <script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
+
 {% block title %}<title>User Dashboard</title>{% endblock %}
 
 {% block body %}
-  <div class="topbar">
-        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
-        <div class="credential-cont">        
-          <span class="username fw-semibold">{{ user.username }}</span>
-          <a class="profile">
+<div class="topbar">
+    <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;"><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
+    <div class="credential-cont">        
+        <span class="username fw-semibold">{{ user.username }}</span>
+        <a class="profile">
             <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-          </a>
-        </div>
-   
-  </div>
-  <div class="app-container">
+        </a>
+    </div>
+</div>
 
+<div class="app-container">
     <!-- Sidebar -->
-  <div class="sidebar nav-sb">
-    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
-
-    <ul class="sidebar-nav">
-          <a href="{% url 'user_dashboard' %}" class="sb-nav-item sb-active">Dashboard</a>
-          <a href="{% url 'calendar' %}" class="sb-nav-item">Upcoming Events</a>
-          <a href="{% url 'certificate' %}" class="sb-nav-item">Certificates</a>
-          <a href="{% url 'user_setting' %}" class="sb-nav-item">Settings</a>
-          <a href="{% url 'logout' %}" class="sb-nav-item">Logout </a> 
-    </ul>
-
-  </div>
-
-
-
-    <aside class="d-sidebar">
-      <div class="logo">
-        <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-        <h2 class="name">SDO Baliwag</h2>
-      </div>
-      <nav class="nav">
-          <a href="{% url 'user_dashboard' %}" class="nav-item active">Dashboard</a>
-          <a href="{% url 'calendar' %}" class="nav-item">Upcoming Events</a>
-          <a href="{% url 'certificate' %}" class="nav-item">Certificates</a>
-          <a href="{% url 'user_setting' %}" class="nav-item">Settings</a>
-          <a class="nav-item" href="{% url 'logout' %}">Logout </a> 
-      </nav>
-
-    </aside>
-
-    <div class="main-content" >
-      <section class="title-container">
-        <h2>Dashboard</h2>
-        <p>Views Events and details</p>
-        {% if messages %}
-          {% for message in messages %}
-            {% if "expired" not in message|stringformat:"s" %}
-              <div class="alert alert-danger">{{ message }}</div>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-
-      </section>
-
-    <section class="events-section">
-        <h2>Your Events</h2>
-        <div class="events-container" >
-          {% if  upcoming_webinars %}
-            
-            {% for up_webinar in upcoming_webinars   %}
-                  <div class="webinar-card" >
-                      <div class="img-container">
-                          <img class="webinar-img" src="{{ up_webinar.webinar.banner.url }}" alt="">
-                      </div>
-                      <div class="webinar-contents">
-                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ up_webinar.webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ up_webinar.webinar.time|time:"h:i A" }}  </p></div>
-                          <h2 class="webinar-title">{{ up_webinar.webinar.title }}</h2>
-                          <p>{{ up_webinar.webinar.description|truncatewords:16  }}</p>
-                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' up_webinar.webinar.id %}">View Details</a></div>
-                      </div>
-                    </div>
-
-            {% endfor %}
-
-          {% else %}
-            <div class="messages-container">
-              <h2> {{ upcoming_message }} </h2>
-            </div>
-
-          {% endif %}
-
-
-
-            
-            
-        </div>
-    </section>
-    <section class="history-section">
-      <h2>Past Events</h2>
-
-      <div class="past-container">
-          {% if  past_webinars %}
-            
-            {% for pt_webinar in past_webinars   %}
-                  <div class="webinar-card" >
-                      <div class="img-container">
-                          <img class="webinar-img" src="{{ pt_webinar.webinar.banner.url }}" alt="">
-                      </div>
-                      <div class="webinar-contents">
-                        
-                        <div class="date-time-cont" ><p><i class="bi bi-calendar"></i> {{ pt_webinar.webinar.start_date }}</p><p><i class="bi bi-clock"></i> {{ pt_webinar.time|time:"h:i A" }}  </p></div>
-                        <p style="color: red; text-align: left; width: 100%; margin-top: 5px;">Completed</p>
-                        <h2 class="webinar-title">{{ pt_webinar.webinar.title }}</h2>
-                        
-                          
-                          <p>{{ pt_webinar.webinar.description|truncatewords:16  }}</p>
-                      <div class="webinar-btn"> <a class="webinar-detail" href="{% url 'webinar_detail' pt_webinar.webinar.id %}">View Details</a></div>
-                      </div>
-                    </div>
-
-            {% endfor %}
-
-          {% else %}
-            <div class="messages-container">
-              <h2> {{ past_message }} </h2>
-            </div>
-
-          {% endif %}
-
-
-      </div>
-
-
-
-    </section>
+    <div class="sidebar nav-sb">
+        <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
+        <ul class="sidebar-nav">
+            <a href="{% url 'user_dashboard' %}" class="sb-nav-item sb-active">Dashboard</a>
+            <a href="{% url 'calendar' %}" class="sb-nav-item">Upcoming Events</a>
+            <a href="{% url 'certificate' %}" class="sb-nav-item">Certificates</a>
+            <a href="{% url 'user_setting' %}" class="sb-nav-item">Settings</a>
+            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a> 
+        </ul>
     </div>
 
-</div>
-</div>
-    
+    <aside class="d-sidebar">
+        <div class="logo">
+            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+            <h2 class="name">SDO Baliwag</h2>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'user_dashboard' %}" class="nav-item active">Dashboard</a>
+            <a href="{% url 'calendar' %}" class="nav-item">Upcoming Events</a>
+            <a href="{% url 'certificate' %}" class="nav-item">Certificates</a>
+            <a href="{% url 'user_setting' %}" class="nav-item">Settings</a>
+            <a class="nav-item" href="{% url 'logout' %}">Logout</a> 
+        </nav>
+    </aside>
 
+    <div class="main-content">
+        <section class="title-container">
+            <h2>Dashboard</h2>
+            <p>Views Events and details</p>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "expired" not in message|stringformat:"s" %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </section>
+
+        <!-- Search Container -->
+        <div class="search-container">
+            <div class="search-input-group">
+                <input type="text" class="form-control search-input" id="eventSearch" placeholder="Search events by title, description, or date...">
+                <button class="clear-search" id="clearSearch" type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+                <button class="search-btn" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <div class="filter-tags">
+                <button class="filter-tag active" data-filter="all">All Events</button>
+                <button class="filter-tag" data-filter="upcoming">Upcoming</button>
+                <button class="filter-tag" data-filter="past">Past Events</button>
+            </div>
+        </div>
+
+        <section class="events-section">
+            <h2>Next Events</h2>
+>
+      
+
+            <div class="events-container" id="upcomingEventsContainer">
+              
+                {% if upcoming_webinars %}
+                    {% for up_webinar in upcoming_webinars %}
+                        <div class="webinar-card" data-title="{{ up_webinar.webinar.title|lower }}" data-description="{{ up_webinar.webinar.description|lower }}" data-date="{{ up_webinar.webinar.start_date }}" data-type="upcoming">
+                            <div class="img-container">
+                                <img class="webinar-img" src="{{ up_webinar.webinar.banner.url }}" alt="">
+                            </div>
+                            <div class="webinar-contents">
+                                <div class="date-time-cont">
+                                    <p><i class="bi bi-calendar"></i> {{ up_webinar.webinar.start_date }}</p>
+                                    <p><i class="bi bi-clock"></i> {{ up_webinar.webinar.time|time:"h:i A" }}</p>
+                                </div>
+                                <h2 class="webinar-title">{{ up_webinar.webinar.title }}</h2>
+                                <p>{{ up_webinar.webinar.description|truncatewords:16 }}</p>
+                                <div class="webinar-btn">
+                                    <a class="webinar-detail" href="{% url 'webinar_detail' up_webinar.webinar.id %}">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="messages-container" id="upcomingNoEvents">
+                        <h2>{{ upcoming_message }}</h2>
+                    </div>
+                {% endif %}
+            </div>
+
+   
+            <div class="pagination-container" id="upcomingPagination" style="display: none;">
+                <nav aria-label="Upcoming Events Pagination">
+                    <ul class="pagination" id="upcomingPaginationList">
+                     
+                    </ul>
+                </nav>
+            </div>
+
+            
+            <div class="no-results" id="upcomingNoResults" style="display: none;">
+                <i class="bi bi-search"></i>
+                <h3>No events found</h3>
+                <p>Try adjusting your search terms or filters</p>
+            </div>
+        </section>
+
+        <section class="history-section">
+            <h2>Previous Events</h2>
+            
+            
+
+
+            <div class="past-container" id="pastEventsContainer">
+                {% if past_webinars %}
+                    {% for pt_webinar in past_webinars %}
+                        <div class="webinar-card" data-title="{{ pt_webinar.webinar.title|lower }}" data-description="{{ pt_webinar.webinar.description|lower }}" data-date="{{ pt_webinar.webinar.start_date }}" data-type="past">
+                            <div class="img-container">
+                                <img class="webinar-img" src="{{ pt_webinar.webinar.banner.url }}" alt="">
+                            </div>
+                            <div class="webinar-contents">
+                                <div class="date-time-cont">
+                                    <p><i class="bi bi-calendar"></i> {{ pt_webinar.webinar.start_date }}</p>
+                                    <p><i class="bi bi-clock"></i> {{ pt_webinar.time|time:"h:i A" }}</p>
+                                </div>
+                                <p class="status-completed">Completed</p>
+                                <h2 class="webinar-title">{{ pt_webinar.webinar.title }}</h2>
+                                <p>{{ pt_webinar.webinar.description|truncatewords:16 }}</p>
+                                <div class="webinar-btn">
+                                    <a class="webinar-detail" href="{% url 'webinar_detail' pt_webinar.webinar.id %}">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="messages-container" id="pastNoEvents">
+                        <h2>{{ past_message }}</h2>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination for Past Events -->
+            <div class="pagination-container" id="pastPagination" style="display: none;">
+                <nav aria-label="Past Events Pagination">
+                    <ul class="pagination" id="pastPaginationList">
+                        <!-- Pagination will be generated by JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- No Search Results -->
+            <div class="no-results" id="pastNoResults" style="display: none;">
+                <i class="bi bi-search"></i>
+                <h3>No events found</h3>
+                <p>Try adjusting your search terms or filters</p>
+            </div>
+        </section>
+    </div>
+</div>
 
 <footer>
     <div class="container d-flex justify-content-between flex-wrap">
@@ -163,16 +454,608 @@
 </footer>
 
 <script>
-  
-  setTimeout(function () {
+// Auto-hide alerts after 15 seconds
+setTimeout(function () {
     document.querySelectorAll('.alert').forEach(function(el) {
-      el.style.display = 'none';
+        el.style.display = 'none';
     });
-  }, 15000); 
+}, 15000);
+
+// Search and Pagination Functionality
+class EventManager {
+    constructor() {
+        this.currentFilter = 'all';
+        this.currentPage = {
+            upcoming: 1,
+            past: 1
+        };
+        this.itemsPerPage = 6;
+        this.searchTerm = '';
+        
+        this.upcomingEvents = Array.from(document.querySelectorAll('#upcomingEventsContainer .webinar-card'));
+        this.pastEvents = Array.from(document.querySelectorAll('#pastEventsContainer .webinar-card'));
+        
+        this.initializeEventListeners();
+        this.updateDisplay();
+    }
+    
+    initializeEventListeners() {
+        // Search functionality
+        const searchInput = document.getElementById('eventSearch');
+        const clearSearch = document.getElementById('clearSearch');
+        
+        searchInput.addEventListener('input', (e) => {
+            this.searchTerm = e.target.value.toLowerCase();
+            this.currentPage = { upcoming: 1, past: 1 };
+            this.updateDisplay();
+            this.toggleClearButton();
+        });
+        
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            this.searchTerm = '';
+            this.currentPage = { upcoming: 1, past: 1 };
+            this.updateDisplay();
+            this.toggleClearButton();
+        });
+        
+        // Filter functionality
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                this.currentFilter = e.target.dataset.filter;
+                this.currentPage = { upcoming: 1, past: 1 };
+                this.updateDisplay();
+            });
+        });
+    }
+    
+    toggleClearButton() {
+        const clearButton = document.getElementById('clearSearch');
+        if (this.searchTerm) {
+            clearButton.classList.add('show');
+        } else {
+            clearButton.classList.remove('show');
+        }
+    }
+    
+    filterEvents(events, type) {
+        return events.filter(event => {
+            const title = event.dataset.title || '';
+            const description = event.dataset.description || '';
+            const date = event.dataset.date || '';
+            
+            const matchesSearch = !this.searchTerm || 
+                title.includes(this.searchTerm) || 
+                description.includes(this.searchTerm) || 
+                date.includes(this.searchTerm);
+            
+            const matchesFilter = this.currentFilter === 'all' || 
+                (this.currentFilter === 'upcoming' && type === 'upcoming') ||
+                (this.currentFilter === 'past' && type === 'past');
+            
+            return matchesSearch && matchesFilter;
+        });
+    }
+    
+    paginateEvents(events, page) {
+        const startIndex = (page - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        return events.slice(startIndex, endIndex);
+    }
+    
+    createPagination(totalItems, currentPage, type) {
+        const totalPages = Math.ceil(totalItems / this.itemsPerPage);
+        const paginationContainer = document.getElementById(`${type}PaginationList`);
+        
+        if (totalPages <= 1) {
+            document.getElementById(`${type}Pagination`).style.display = 'none';
+            return;
+        }
+        
+        document.getElementById(`${type}Pagination`).style.display = 'flex';
+        paginationContainer.innerHTML = '';
+        
+        // Previous button
+        const prevItem = document.createElement('li');
+        prevItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prevItem.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><i class="bi bi-chevron-left"></i></a>`;
+        prevItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage > 1) {
+                this.currentPage[type] = currentPage - 1;
+                this.updateDisplay();
+            }
+        });
+        paginationContainer.appendChild(prevItem);
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            pageItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.currentPage[type] = i;
+                this.updateDisplay();
+            });
+            paginationContainer.appendChild(pageItem);
+        }
+        
+// Next button
+        const nextItem = document.createElement('li');
+        nextItem.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        nextItem.innerHTML = `<a class="page-link" href="#" aria-label="Next"><i class="bi bi-chevron-right"></i></a>`;
+        nextItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage < totalPages) {
+                this.currentPage[type] = currentPage + 1;
+                this.updateDisplay();
+            }
+        });
+        paginationContainer.appendChild(nextItem);
+    }
+    
+    updateDisplay() {
+        // Filter and paginate upcoming events
+        const filteredUpcoming = this.filterEvents(this.upcomingEvents, 'upcoming');
+        const paginatedUpcoming = this.paginateEvents(filteredUpcoming, this.currentPage.upcoming);
+        
+        // Filter and paginate past events
+        const filteredPast = this.filterEvents(this.pastEvents, 'past');
+        const paginatedPast = this.paginateEvents(filteredPast, this.currentPage.past);
+        
+        // Update upcoming events display
+        this.displayEvents('upcoming', filteredUpcoming, paginatedUpcoming);
+        this.createPagination(filteredUpcoming.length, this.currentPage.upcoming, 'upcoming');
+        this.updateResultsCount('upcoming', filteredUpcoming.length, paginatedUpcoming.length);
+        
+        // Update past events display
+        this.displayEvents('past', filteredPast, paginatedPast);
+        this.createPagination(filteredPast.length, this.currentPage.past, 'past');
+        this.updateResultsCount('past', filteredPast.length, paginatedPast.length);
+        
+        // Show/hide sections based on filter
+        this.toggleSectionVisibility();
+    }
+    
+    displayEvents(type, filteredEvents, paginatedEvents) {
+        const container = document.getElementById(`${type}EventsContainer`);
+        const noResults = document.getElementById(`${type}NoResults`);
+        const noEventsMessage = document.getElementById(`${type}NoEvents`);
+        
+        // Hide all events first
+        const allEvents = container.querySelectorAll('.webinar-card');
+        allEvents.forEach(event => {
+            event.style.display = 'none';
+            event.style.animation = 'none';
+        });
+        
+        // Hide no events message
+        if (noEventsMessage) {
+            noEventsMessage.style.display = 'none';
+        }
+        
+        if (filteredEvents.length === 0 && this.searchTerm) {
+            // Show no search results
+            noResults.style.display = 'block';
+        } else if (paginatedEvents.length === 0 && filteredEvents.length === 0) {
+            // Show original no events message
+            if (noEventsMessage) {
+                noEventsMessage.style.display = 'block';
+            }
+            noResults.style.display = 'none';
+        } else {
+            // Show paginated events with animation
+            noResults.style.display = 'none';
+            paginatedEvents.forEach((event, index) => {
+                event.style.display = 'block';
+                event.style.animation = `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`;
+            });
+        }
+    }
+    
+    updateResultsCount(type, totalFiltered, currentlyShowing) {
+        const countElement = document.getElementById(`${type}Count`);
+        const resultsElement = document.getElementById(`${type}ResultsCount`);
+        
+        if (countElement && resultsElement) {
+            countElement.textContent = currentlyShowing;
+            
+            if (this.searchTerm && totalFiltered > 0) {
+                resultsElement.innerHTML = `Found <span id="${type}Count">${totalFiltered}</span> ${type} events, showing ${currentlyShowing}`;
+            } else if (this.searchTerm && totalFiltered === 0) {
+                resultsElement.innerHTML = `No ${type} events found`;
+            } else {
+                resultsElement.innerHTML = `Showing <span id="${type}Count">${currentlyShowing}</span> ${type} events`;
+            }
+        }
+    }
+    
+    toggleSectionVisibility() {
+        const upcomingSection = document.querySelector('.events-section');
+        const pastSection = document.querySelector('.history-section');
+        
+        if (this.currentFilter === 'upcoming') {
+            upcomingSection.style.display = 'block';
+            pastSection.style.display = 'none';
+        } else if (this.currentFilter === 'past') {
+            upcomingSection.style.display = 'none';
+            pastSection.style.display = 'block';
+        } else {
+            upcomingSection.style.display = 'block';
+            pastSection.style.display = 'block';
+        }
+    }
+}
+
+// Initialize the EventManager when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    new EventManager();
+    
+    // Add smooth scrolling for pagination
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.pagination .page-link')) {
+            setTimeout(() => {
+                const activeSection = document.querySelector('.events-section:not([style*="display: none"]), .history-section:not([style*="display: none"])');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    });
+    
+    // Add loading animation for search
+    const searchInput = document.getElementById('eventSearch');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        
+        // Add loading state
+        this.classList.add('searching');
+        
+        searchTimeout = setTimeout(() => {
+            this.classList.remove('searching');
+        }, 500);
+    });
+    
+    // Keyboard navigation for accessibility
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('eventSearch').focus();
+        }
+    });
+    
+    // Add search input animations
+    const searchInputGroup = document.querySelector('.search-input-group');
+    const searchInputEl = document.getElementById('eventSearch');
+    
+    searchInputEl.addEventListener('focus', () => {
+        searchInputGroup.classList.add('focused');
+    });
+    
+    searchInputEl.addEventListener('blur', () => {
+        searchInputGroup.classList.remove('focused');
+    });
+});
+
+// Add additional CSS for enhanced search experience
+const additionalStyles = `
+<style>
+.search-input.searching {
+    background-image: linear-gradient(45deg, transparent 25%, rgba(102, 126, 234, 0.1) 25%, rgba(102, 126, 234, 0.1) 50%, transparent 50%, transparent 75%, rgba(102, 126, 234, 0.1) 75%);
+    background-size: 20px 20px;
+    animation: searchLoading 1s linear infinite;
+}
+
+@keyframes searchLoading {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 20px 0;
+    }
+}
+
+.search-input-group.focused {
+    transform: scale(1.02);
+}
+
+.search-input-group.focused .search-input {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Enhanced pagination styles */
+.pagination .page-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.pagination .page-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.pagination .page-link:hover::before {
+    left: 100%;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .filter-tags {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .filter-tag {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    .results-count {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+/* Loading states */
+.webinar-card.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.webinar-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    border-radius: inherit;
+}
+
+/* Enhanced no results state */
+.no-results {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.no-results i {
+    animation: pulse 2s infinite;
+}
+
+/* Improved focus styles for accessibility */
+.search-input:focus,
+.filter-tag:focus,
+.pagination .page-link:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .search-container,
+    .pagination-container,
+    .filter-tags {
+        display: none;
+    }
+    
+    .webinar-card {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+`;
+
+// Inject additional styles
+document.head.insertAdjacentHTML('beforeend', additionalStyles);
+
+// Add search suggestions functionality (optional enhancement)
+class SearchSuggestions {
+    constructor() {
+        this.suggestions = [];
+        this.isVisible = false;
+        this.currentIndex = -1;
+        
+        this.init();
+    }
+    
+    init() {
+        // Extract keywords from all events
+        const allEvents = [
+            ...document.querySelectorAll('#upcomingEventsContainer .webinar-card'),
+            ...document.querySelectorAll('#pastEventsContainer .webinar-card')
+        ];
+        
+        const keywords = new Set();
+        allEvents.forEach(event => {
+            const title = event.dataset.title || '';
+            const description = event.dataset.description || '';
+            
+            // Extract words and add to suggestions
+            title.split(' ').forEach(word => {
+                if (word.length > 2) keywords.add(word);
+            });
+            
+            description.split(' ').forEach(word => {
+                if (word.length > 2) keywords.add(word);
+            });
+        });
+        
+        this.suggestions = Array.from(keywords).sort();
+        this.createSuggestionsContainer();
+        this.bindEvents();
+    }
+    
+    createSuggestionsContainer() {
+        const container = document.querySelector('.search-input-group');
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.id = 'searchSuggestions';
+        suggestionsDiv.className = 'search-suggestions';
+        suggestionsDiv.innerHTML = '<ul class="suggestions-list"></ul>';
+        container.appendChild(suggestionsDiv);
+        
+        // Add CSS for suggestions
+        const suggestionStyles = `
+        <style>
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: 5px;
+        }
+        
+        .suggestions-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .suggestions-list li {
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+        
+        .suggestions-list li:hover,
+        .suggestions-list li.highlighted {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .suggestions-list li:last-child {
+            border-bottom: none;
+        }
+        </style>
+        `;
+        
+        document.head.insertAdjacentHTML('beforeend', suggestionStyles);
+    }
+    
+    bindEvents() {
+        const searchInput = document.getElementById('eventSearch');
+        const suggestionsContainer = document.getElementById('searchSuggestions');
+        const suggestionsList = document.querySelector('.suggestions-list');
+        
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query.length < 2) {
+                this.hideSuggestions();
+                return;
+            }
+            
+            const filteredSuggestions = this.suggestions
+                .filter(suggestion => suggestion.toLowerCase().includes(query))
+                .slice(0, 5);
+            
+            if (filteredSuggestions.length > 0) {
+                this.showSuggestions(filteredSuggestions, suggestionsList);
+            } else {
+                this.hideSuggestions();
+            }
+        });
+        
+        searchInput.addEventListener('keydown', (e) => {
+            const suggestions = document.querySelectorAll('.suggestions-list li');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.currentIndex = Math.min(this.currentIndex + 1, suggestions.length - 1);
+                this.highlightSuggestion(suggestions);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.currentIndex = Math.max(this.currentIndex - 1, -1);
+                this.highlightSuggestion(suggestions);
+            } else if (e.key === 'Enter' && this.currentIndex >= 0) {
+                e.preventDefault();
+                const selectedSuggestion = suggestions[this.currentIndex];
+                if (selectedSuggestion) {
+                    searchInput.value = selectedSuggestion.textContent;
+                    this.hideSuggestions();
+                    // Trigger search
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            } else if (e.key === 'Escape') {
+                this.hideSuggestions();
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-input-group')) {
+                this.hideSuggestions();
+            }
+        });
+    }
+    
+    showSuggestions(suggestions, container) {
+        container.innerHTML = suggestions
+            .map(suggestion => `<li>${suggestion}</li>`)
+            .join('');
+        
+        // Add click listeners to suggestions
+        container.querySelectorAll('li').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                document.getElementById('eventSearch').value = item.textContent;
+                this.hideSuggestions();
+                // Trigger search
+                document.getElementById('eventSearch').dispatchEvent(new Event('input'));
+            });
+        });
+        
+        document.getElementById('searchSuggestions').style.display = 'block';
+        this.isVisible = true;
+        this.currentIndex = -1;
+    }
+    
+    hideSuggestions() {
+        document.getElementById('searchSuggestions').style.display = 'none';
+        this.isVisible = false;
+        this.currentIndex = -1;
+    }
+    
+    highlightSuggestion(suggestions) {
+        suggestions.forEach((item, index) => {
+            if (index === this.currentIndex) {
+                item.classList.add('highlighted');
+            } else {
+                item.classList.remove('highlighted');
+            }
+        });
+    }
+}
+
+// Initialize search suggestions (optional)
+// document.addEventListener('DOMContentLoaded', function() {
+//     new SearchSuggestions();
+// });
 </script>
-
-
-
-
 
 {% endblock %}

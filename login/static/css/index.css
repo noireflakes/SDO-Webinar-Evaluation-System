@@ -256,7 +256,7 @@ a{
 
 /* Webinar Card */
 .webinar-card {
-    max-width: 18rem;
+    max-width: 20rem;
     background: rgba(255, 255, 255, 0.377);
     border-radius: 5px;
     overflow: hidden;
@@ -265,6 +265,7 @@ a{
     margin: 20px;
     position: relative;
     border: 1px solid #eaeaea;
+    padding-bottom:1rem;
 }
 
 .webinar-card .banner-container {
@@ -507,7 +508,538 @@ svg {
 button {
     transform-style: preserve-3d;
 }
+ .assistance-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
+  .assistance-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  }
+
+  /* Enhanced Events Section Styles */
+  .events-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  .events-subtitle {
+    color: #6b7280;
+    font-size: clamp(14px, 2.5vw, 18px);
+    margin-top: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 0 2rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  /* Enhanced Webinar Card */
+  .webinar-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .webinar-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(76, 67, 206, 0.15);
+    border-color: rgba(76, 67, 206, 0.3);
+  }
+
+  .webinar-card .banner-container {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .webinar-card .webinar-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .webinar-card:hover .webinar-banner {
+    transform: scale(1.1);
+  }
+
+  /* Event Badge */
+  .event-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--bright_purple), #8b5cf6);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 12px rgba(76, 67, 206, 0.4);
+  }
+
+  /* Event Overlay */
+  .event-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .webinar-card:hover .event-overlay {
+    opacity: 1;
+  }
+
+  .quick-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .quick-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    color: var(--bright_purple);
+  }
+
+  .quick-btn:hover {
+    background: var(--bright_purple);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  /* Enhanced Content */
+  .webinar-card .webinar-contents {
+    padding: 24px;
+  }
+
+  .event-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .event-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .event-meta i {
+    color: var(--bright_purple);
+  }
+
+  .webinar-card .webinar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .webinar-description {
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Event Footer */
+  .event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-badge.upcoming {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  .status-badge.today {
+    background: rgba(249, 115, 22, 0.1);
+    color: #ea580c;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+  }
+
+  .status-badge.past {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+  }
+
+  /* Enhanced Button */
+  .webinar-card .webinar-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    
+    
+   
+   
+
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(76, 67, 206, 0.3);
+  }
+
+  .webinar-card .webinar-detail:hover {
+    background: linear-gradient(135deg, #3e36c4, #7a4ce6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 67, 206, 0.4);
+  }
+
+  .webinar-detail i {
+    transition: transform 0.3s ease;
+  }
+
+  .webinar-detail:hover i {
+    transform: translateX(3px);
+  }
+
+  /* No Events State */
+  .no-events {
+    text-align: center;
+    padding: 4rem 2rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  .no-events-icon {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+
+  .no-events h3 {
+    font-size: 1.5rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .no-events p {
+    color: #6b7280;
+    font-size: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Modal Styles */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+  }
+
+  .modal-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .close-modal {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+  }
+
+  .close-modal:hover {
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 25px;
+  }
+
+  .btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-cancel:hover {
+    background: #e0e0e0;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Success Message */
+  .success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .assistance-btn {
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      font-size: 14px;
+    }
+
+    .modal-content {
+      padding: 20px;
+      margin: 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+    }
+
+    .events-container {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .events-header {
+      margin-bottom: 2rem;
+    }
+
+    .webinar-card {
+      max-width: 100%;
+    }
+
+    .webinar-card .banner-container {
+      height: 180px;
+    }
+
+    .event-meta {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .event-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .webinar-card .webinar-detail {
+      align-self: stretch;
+      justify-content: center;
+    }
+
+    .no-events {
+      padding: 2rem 1rem;
+    }
+
+    .no-events-icon {
+      font-size: 3rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .webinar-card .webinar-contents {
+      padding: 20px;
+    }
+
+    .webinar-card .webinar-title {
+      font-size: 1.1rem;
+    }
+
+    .event-badge {
+      font-size: 11px;
+      padding: 6px 10px;
+    }
+
+    .quick-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
+    }
+  }
 /* Footer */
 .footer {
     background-color: #101828;

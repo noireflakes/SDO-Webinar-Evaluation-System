@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{% static 'css/blob.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+<link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
 {% endblock %}
 
 {% block js %}
@@ -17,7 +18,6 @@
 {% endblock %}
 
 {% block body%}
-
 
   <!-- desktop navbar  -->
   <div class="nav-cont">
@@ -63,17 +63,77 @@
 
   </div>
 
+  <!-- Need Assistance Button -->
+  <button class="assistance-btn" onclick="openAssistanceModal()">
+    <i class="fas fa-question-circle"></i>
+    Need Assistance
+  </button>
 
+  <!-- Assistance Modal -->
+  <div class="modal-overlay" id="assistanceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Need Assistance?</h2>
+        <button class="close-modal" onclick="closeAssistanceModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
+      <div class="success-message" id="successMessage">
+        Your message has been sent successfully! We'll get back to you soon.
+      </div>
+
+      <form id="assistanceForm" method="post" action="{% url 'send_assistance' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="name">Your Name *</label>
+          <input type="text" id="name" name="name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Your Email *</label>
+          <input type="email" id="email" name="email" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="subject">Subject *</label>
+          <input type="text" id="subject" name="subject" class="form-input" required placeholder="Brief description of your concern">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="message">Your Concern *</label>
+          <textarea id="message" name="message" class="form-textarea" required placeholder="Please describe your concern in detail..."></textarea>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn-cancel" onclick="closeAssistanceModal()">Cancel</button>
+          <button type="submit" class="btn-submit">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <section id="header-section">
     {% if messages %}
-      {% for message in messages %}
-        <div class="error-message alert alert-{{ message.tags }}">
-            {{ message }}
+  <div class="popup-messages" id="popupMessages">
+    {% for message in messages %}
+      {% if "expired" not in message|stringformat:"s" %}
+        <div class="popup-message {{ message.tags }}">
+          <i class="popup-message-icon fas 
+            {% if message.tags == 'error' %}fa-exclamation-triangle
+            {% elif message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'warning' %}fa-exclamation-circle
+            {% elif message.tags == 'info' %}fa-info-circle
+            {% else %}fa-exclamation-triangle{% endif %}"></i>
+          <div class="popup-message-content">{{ message }}</div>
+          <button class="popup-message-close" onclick="closeMessage(this)">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-      {% endfor %}
-    {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
 
     <!-- Header BG -->
     <div class="header-container" style="background-image: url('{% static 'asset/hero_bg.jpg' %}');">
@@ -102,29 +162,61 @@
 
   <!-- Events Section  --> 
   <section id="events-section" class="events-section" >
-    <h2 class="title"> Events & Announcements</h2>
-
-    <div class="events-container">
-      <!-- Events Render --> 
-      {% for webinar in webinars %}
-        <div class="webinar-card" >
-          <div class="banner-container">
-            <img class="webinar-banner" src="{{ webinar.banner.url }}" alt="">
-          </div>
-          <div class="webinar-contents">
-            <h2 class="webinar-title">{{ webinar.title }}</h2>      
-            <p>{{ webinar.description|truncatewords:16  }}</p>
-            <div class="webinar-button"> <a class="webinar-detail"href="{% url 'webinar_detail' webinar.id %}">Details</a></div>
-          </div>
-        </div>
-      {% endfor %}
+    <div class="events-header">
+      <h2 class="title">Upcoming Events & Announcements</h2>
+      <p class="events-subtitle" style="color: rgba(29, 29, 29, 0.623);">Stay updated with our latest educational events and important announcements</p>
     </div>
+
+    {% if webinars %}
+      <div class="events-container">
+        <!-- Events Render --> 
+        {% for webinar in webinars %}
+          <div class="webinar-card" data-aos="fade-up" >
+            <div class="banner-container">
+              <img class="webinar-banner" src="{{ webinar.banner.url }}" alt="{{ webinar.title }}">
+              <div class="event-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span>{{ webinar.start_date|date:"M d" }}</span>
+              </div>
+
+            </div>
+            
+            <div class="webinar-contents">
+              
+              
+              <h3 class="webinar-title">{{ webinar.title }}</h3>      
+              
+              <p class="webinar-description">{{ webinar.description|truncatewords:18 }}</p>
+              
+              <div class="event-footer">
+     
+  
+                <div class="webinar-button">
+                  <a class="webinar-detail" href="{% url 'webinar_detail' webinar.id %}">
+                    <span>View Details</span>
+                   
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-events">
+        <div class="no-events-icon">
+          <i class="fas fa-calendar-times"></i>
+        </div>
+        <h3>No Upcoming Events</h3>
+        <p>There are no scheduled events at the moment. Please check back later for updates.</p>
+      </div>
+    {% endif %}
     
     <!-- Background  --> 
-      <div class="blob one blob-purple"></div>
-      <div class="blob two blob-purple"></div>
+    <div class="blob one blob-purple"></div>
+    <div class="blob two blob-purple"></div>
             
-    </section>
+  </section>
 
     <!-- Participant Section  --> 
     <section id="guidelines" class="participant-guidelines">
@@ -140,8 +232,8 @@
 
           <h4>How to answer</h4>
           <li>Be honest: Share what you truly think — what was helpful, what could be better. 
-            Be specific: Instead of just rating “Average,” you can add short comments like
-            “It was a bit fast The way the Speaker is talking, maybe slow down next time.”</li>
+            Be specific: Instead of just rating "Average," you can add short comments like
+            "It was a bit fast The way the Speaker is talking, maybe slow down next time."</li>
           <li>Was the topic well explained?</li>
           <li>Did the instructor make it interesting?</li>
           <li>Was the system easy to join and navigate?</li>
@@ -207,7 +299,6 @@
           <li><a href="#aboutus-section">About Us</a></li>
         </ul>
 
-
       </div>
 
     </div>
@@ -231,13 +322,79 @@
 
 </footer>
 
-
 <script>
-  
+  // Alert auto-hide script
   setTimeout(function () {
     document.querySelectorAll('.alert').forEach(function(el) {
       el.style.display = 'none';
     });
   }, 10000); 
+
+  // Modal functions
+  function openAssistanceModal() {
+    document.getElementById('assistanceModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAssistanceModal() {
+    document.getElementById('assistanceModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    // Reset form and hide success message
+    document.getElementById('assistanceForm').reset();
+    document.getElementById('successMessage').style.display = 'none';
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('assistanceModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeAssistanceModal();
+    }
+  });
+
+  // Handle form submission
+  document.getElementById('assistanceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('.btn-submit');
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    
+    fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('successMessage').style.display = 'block';
+        this.reset();
+        setTimeout(() => {
+          closeAssistanceModal();
+        }, 2000);
+      } else {
+        alert('Error sending message. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error sending message. Please try again.');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+    });
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeAssistanceModal();
+    }
+  });
 </script>
 {% endblock %}

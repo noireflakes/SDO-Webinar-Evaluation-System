@@ -829,7 +829,7 @@ function saveUserChanges() {
             currentEditingUser = null;
             
         } else {
-            // Show error message
+           
             showErrorMessage(data.message || 'Error updating user');
         }
     })
@@ -863,7 +863,6 @@ function showErrorMessage(message) {
     }, 5000);
 }
 function showSuccessMessage(message) {
-    // Create a temporary success message
     const alertDiv = document.createElement('div');
     alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';

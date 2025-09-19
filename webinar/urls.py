@@ -19,6 +19,9 @@ urlpatterns=[
     path("eventsdata", views.events_data, name="events_data"),
     path("user_event_date", views.user_events_data, name="user_events_data"),
 
-    path('check_attendance/<int:id>/<str:test_type>/', views.check_attendance, name="check_attendance")
+    path('check_attendance/<int:id>/<str:test_type>/', views.check_attendance, name="check_attendance"),
+    path('<int:webinar_id>/close-evaluation/', views.close_webinar_evaluation, name='close_evaluation'),
+
+    path('<int:webinar_id>/toggle-evaluation/', views.toggle_evaluation_ajax, name='toggle_evaluation'),
     
 ]

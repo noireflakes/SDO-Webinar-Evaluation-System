@@ -8,142 +8,6 @@
 <link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
 <link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
 
-<style>
-/* Toggle Switch Styles */
-.view-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
-.toggle-label {
-    font-weight: 500;
-    color: #333;
-}
-
-/* Badge styles for completion status */
-.completion-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-align: center;
-    min-width: 70px;
-    display: inline-block;
-}
-
-.completion-completed {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.completion-not-completed {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-/* FIXED: Table column visibility - Initial state hides test columns */
-.test-column {
-    display: none;
-    transition: all 0.3s ease;
-}
-
-.timestamp-column {
-    transition: all 0.3s ease;
-}
-
-/* Show test columns when toggle is active */
-.show-all-tests .test-column {
-    display: table-cell;
-}
-
-/* Hide timestamp column when showing all tests */
-.show-all-tests .timestamp-column {
-    display: none;
-}
-
-.overall-progress {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-}
-
-.progress-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.progress-icon {
-    font-size: 12px;
-}
-
-.progress-icon.completed {
-    color: #28a745;
-}
-
-.progress-icon.not-completed {
-    color: #dc3545;
-}
-</style>
 
 {% endblock %}
 
@@ -154,6 +18,7 @@ input:checked + .slider:before {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <div class="app">
+    {% csrf_token %}
     <div class="sidebar">
         <aside>
             <div class="title-container">
@@ -168,19 +33,51 @@ input:checked + .slider:before {
 
     <div class="main-content">
         <h2 class="title head">Evaluation Management</h2>
+
+        <section class="evaluation-control-section">
+            <div class="control-header">
+                <h3 class="control-title">
+                    <i class="fas fa-toggle-on me-2"></i>Evaluation Control
+                </h3>
+                <div class="evaluation-status-toggle">
+                    <div class="toggle-container">
+                        <label class="toggle-label-text">
+                            Evaluation Status: 
+                            <span id="evaluation-status-text" class="status-text">
+                                {{ webinar.close_evaluation|yesno:"Closed,Open" }}
+                            </span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" 
+                                   id="evaluation-toggle" 
+                                   {% if not webinar.close_evaluation %}checked{% endif %}
+                                   onchange="toggleEvaluationStatus()">
+                            <span class="toggle-slider round">
+                           
+                            </span>
+                        </label>
+                    </div>
+                    <div class="toggle-description">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Toggle to open or close evaluation submissions for this webinar
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         
         <section class="evaluation-section">
             <h2 class="title">Evaluation Report</h2>
             <div class="evaluation-container">
-                <!-- Chart containers remain the same as in your original code -->
+                
                 <div class="chart-wrapper">
                     <div class="chart-controls">
                         <button class="chart-type-btn active" onclick="changeChartType('speaker', 'pie')">
                             <i class="fas fa-chart-pie"></i> Pie
                         </button>
-                        <button class="chart-type-btn" onclick="changeChartType('speaker', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
+                    
                         <button class="chart-type-btn" onclick="changeChartType('speaker', 'doughnut')">
                             <i class="fas fa-circle-notch"></i> Doughnut
                         </button>
@@ -201,9 +98,7 @@ input:checked + .slider:before {
                         <button class="chart-type-btn active" onclick="changeChartType('venue', 'pie')">
                             <i class="fas fa-chart-pie"></i> Pie
                         </button>
-                        <button class="chart-type-btn" onclick="changeChartType('venue', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
+                
                         <button class="chart-type-btn" onclick="changeChartType('venue', 'doughnut')">
                             <i class="fas fa-circle-notch"></i> Doughnut
                         </button>
@@ -224,9 +119,7 @@ input:checked + .slider:before {
                         <button class="chart-type-btn active" onclick="changeChartType('food', 'pie')">
                             <i class="fas fa-chart-pie"></i> Pie
                         </button>
-                        <button class="chart-type-btn" onclick="changeChartType('food', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
+              
                         <button class="chart-type-btn" onclick="changeChartType('food', 'doughnut')">
                             <i class="fas fa-circle-notch"></i> Doughnut
                         </button>
@@ -247,9 +140,7 @@ input:checked + .slider:before {
                         <button class="chart-type-btn active" onclick="changeChartType('manage', 'pie')">
                             <i class="fas fa-chart-pie"></i> Pie
                         </button>
-                        <button class="chart-type-btn" onclick="changeChartType('manage', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
+                 
                         <button class="chart-type-btn" onclick="changeChartType('manage', 'doughnut')">
                             <i class="fas fa-circle-notch"></i> Doughnut
                         </button>
@@ -270,9 +161,7 @@ input:checked + .slider:before {
                         <button class="chart-type-btn active" onclick="changeChartType('overall', 'pie')">
                             <i class="fas fa-chart-pie"></i> Pie
                         </button>
-                        <button class="chart-type-btn" onclick="changeChartType('overall', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
+             
                         <button class="chart-type-btn" onclick="changeChartType('overall', 'doughnut')">
                             <i class="fas fa-circle-notch"></i> Doughnut
                         </button>
@@ -451,6 +340,105 @@ let currentAttendeesPage = 1;
 let attendeesRowsPerPage = 10;
 let showAllTests = false;
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Toast notification system
+function showToast(message, type = 'success') {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+
+function updateStatusDisplay(isOpen) {
+    const statusText = document.getElementById('evaluation-status-text');
+    const statusClass = isOpen ? 'open' : 'closed';
+    const statusLabel = isOpen ? 'Open' : 'Closed';
+    
+    statusText.textContent = statusLabel;
+    statusText.className = `status-text ${statusClass}`;
+}
+
+async function toggleEvaluationStatus() {
+    const toggle = document.getElementById('evaluation-toggle');
+    const toggleSwitch = document.querySelector('.toggle-switch');
+    const webinarId = {{ webinar.id }};
+    
+    if (!toggleSwitch) {
+        console.error('Toggle switch element not found');
+        return;
+    }
+    
+    toggleSwitch.classList.add('loading');
+    
+    try {
+        const csrftoken = getCookie('csrftoken');
+        
+        const response = await fetch(`/webinar/${webinarId}/toggle-evaluation/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                action: 'toggle'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const isOpen = !data.closed;
+            updateStatusDisplay(isOpen);
+            showToast(data.message, 'success');
+            toggle.checked = isOpen;
+        } else {
+            toggle.checked = !toggle.checked;
+            showToast(data.error || 'Failed to update evaluation status', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error toggling evaluation status:', error);
+        toggle.checked = !toggle.checked;
+        showToast('Network error. Please try again.', 'error');
+    } finally {
+        toggleSwitch.classList.remove('loading');
+    }
+}
+
 // Your existing chart functions remain the same...
 async function DownloadExcel() {
     const id = parseInt("{{ webinar.id }}");
@@ -538,7 +526,8 @@ async function DownloadExcel() {
 
 async function downloadTestData() {
     console.log("Downloading test data...");
-    const response = await fetch("{% url 'test_data' webinar.id %}");
+    const event_id = {{ webinar.id|escapejs }};
+    const response = await fetch(`/exam_portal/result_data/${event_id}`);
     const data = await response.json();
 
     console.log("Fetched test data:", data);
@@ -548,7 +537,6 @@ async function downloadTestData() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "test_data");
     XLSX.writeFile(workbook, "Test_result.xlsx");
 }
-
 
 function toggleAttendanceView() {
     const toggle = document.getElementById('show-all-toggle');
@@ -565,7 +553,7 @@ function toggleAttendanceView() {
     displayAttendeesTable();
 }
 
-// FIXED: Updated attendees table functions
+
 function displayAttendeesTable() {
     const tableBody = document.getElementById('attendees-table-body');
     const tableInfo = document.getElementById('attendees-table-info');
@@ -738,13 +726,13 @@ function setupCommentsCarousel(commentsData) {
         return;
     }
     
-    // Clear existing content
+
     indicatorsContainer.innerHTML = '';
     slidesContainer.innerHTML = '';
     
-    // Create indicators and slides
+
     commentsData.forEach((comment, index) => {
-        // Create indicator
+    
         const indicator = document.createElement('button');
         indicator.type = 'button';
         indicator.setAttribute('data-bs-target', '#commentsCarousel');
@@ -754,11 +742,11 @@ function setupCommentsCarousel(commentsData) {
         indicator.setAttribute('aria-label', `Slide ${index + 1}`);
         indicatorsContainer.appendChild(indicator);
         
-        // Create slide
+
         const slide = document.createElement('div');
         slide.className = `carousel-item ${index === 0 ? 'active' : ''}`;
         
-        // Get user initials for avatar
+
         const userInitials = comment.user_email ? 
             comment.user_email.split('@')[0].slice(0, 2).toUpperCase() : 
             'AN';
@@ -820,7 +808,7 @@ function createChart(chartId, type, data, labels, colors, title) {
         chartInstances[chartId].destroy();
     }
 
-    // Clean the data first to remove undefined/null values
+  
     const cleanedData = cleanChartData(data);
 
     if (!hasData(cleanedData)) {
@@ -832,27 +820,16 @@ function createChart(chartId, type, data, labels, colors, title) {
     
     const ctx = document.getElementById(chartId).getContext('2d');
     
-    // Filter out labels and data where values are 0 (cleaned undefined values)
-    const filteredData = [];
-    const filteredLabels = [];
-    const filteredColors = [];
-    
-    cleanedData.forEach((value, index) => {
-        if (value > 0) {
-            filteredData.push(value);
-            filteredLabels.push(labels[index]);
-            filteredColors.push(colors[index]);
-        }
-    });
+ 
     
     const config = {
         type: type,
         data: {
-            labels: filteredLabels,
+            labels: labels, 
             datasets: [{
-                data: filteredData,
-                backgroundColor: filteredColors,
-                borderColor: type === 'bar' ? filteredColors : '#fff',
+                data: cleanedData, 
+                backgroundColor: colors, 
+                borderColor: type === 'bar' ? colors : '#fff',
                 borderWidth: 1
             }]
         },
@@ -864,7 +841,12 @@ function createChart(chartId, type, data, labels, colors, title) {
                     position: type === 'bar' ? 'top' : 'right',
                     labels: {
                         boxWidth: 12,
-                        padding: 20
+                        padding: 20,
+             
+                        filter: function(legendItem, chartData) {
+              
+                            return true;
+                        }
                     }
                 },
                 title: {
@@ -877,12 +859,26 @@ function createChart(chartId, type, data, labels, colors, title) {
                         top: 10,
                         bottom: 20
                     }
+                },
+                // Add tooltip customization to show meaningful info even for 0 values
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                            return `${label}: ${value} responses (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     };
 
     if (type === 'bar') {
+        
+
         config.options.scales = {
             y: {
                 beginAtZero: true,
@@ -895,7 +891,6 @@ function createChart(chartId, type, data, labels, colors, title) {
 
     chartInstances[chartId] = new Chart(ctx, config);
 }
-
 function createTestChart(chartId, type, data, labels) {
     if (testChartInstances[chartId]) {
         testChartInstances[chartId].destroy();
@@ -916,7 +911,7 @@ function createTestChart(chartId, type, data, labels) {
         data: {
             labels: labels,
             datasets: [{
-                label: "Number of students",
+                label: "Total Respondents",
                 data: Object.values(data),
                 backgroundColor: backgroundColor,
                 borderColor: type === 'bar' ? backgroundColor : '#fff',
@@ -977,8 +972,268 @@ function randomColor() {
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
+const UPDATE_INTERVALS = {
+    CHARTS: 30000,        // 30 seconds for chart data
+    ATTENDEES: 15000,     // 15 seconds for attendees
+    COMMENTS: 60000,      // 1 minute for comments
+    TESTS: 45000          // 45 seconds for test data
+};
+
+let updateTimers = {};
+let isUpdating = false;
+
+// Real-time update functions
+async function updateChartsData() {
+    if (isUpdating) return;
+    isUpdating = true;
+    
+    try {
+        const id = parseInt("{{ webinar.id }}");
+        const response = await fetch(`/exam_portal/rounded_data/${id}?t=${Date.now()}`);
+        const data = await response.json();
+        
+        const newChartData = {
+            speaker: data.speaker,
+            venue: data.venue,
+            food: data.meals,
+            manage: data.manage,
+            overall: data.overall
+        };
+        
+        // Only update if data has changed
+        if (JSON.stringify(newChartData) !== JSON.stringify(chartData)) {
+            console.log('Charts data updated');
+            chartData = newChartData;
+            
+            const labels = ['5 (Highly Acceptable)', '4 (Moderately Acceptable)', '3 (Acceptable)', '2 (Fairly Acceptable)', '1 (Poorly Acceptable)'];
+            const colors = ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'];
+            
+            const chartIds = ['speaker', 'venue', 'food', 'manage', 'overall'];
+            
+            chartIds.forEach(id => {
+                const title = id.charAt(0).toUpperCase() + id.slice(1) + ' Evaluation';
+                createChart(id, 'pie', chartData[id], labels, colors, title);
+            });
+            
+            showToast('Evaluation charts updated', 'success');
+        }
+    } catch (error) {
+        console.error('Error updating charts:', error);
+    } finally {
+        isUpdating = false;
+    }
+}
+
+async function updateTestData() {
+    if (isUpdating) return;
+    
+    try {
+        const graphIds = ['pre-test', 'post-test'];
+        const pre_test = "{% url 'test_score' webinar.id 'pre_test' %}";
+        const post_test = "{% url 'test_score' webinar.id 'post_test' %}";
+        
+        let dataChanged = false;
+        
+        for (const [index, id] of graphIds.entries()) {
+            const url = (index < 1) ? pre_test : post_test;
+            const response = await fetch(`${url}?t=${Date.now()}`);
+            const json = await response.json();
+            
+            if (JSON.stringify(json.scores) !== JSON.stringify(testData[id])) {
+                console.log(`${id} data updated`);
+                testData[id] = json.scores;
+                const labels = Object.keys(json.scores);
+                createTestChart(id, 'doughnut', json.scores, labels);
+                dataChanged = true;
+            }
+        }
+        
+        if (dataChanged) {
+            showToast('Test data updated', 'success');
+        }
+    } catch (error) {
+        console.error('Error updating test data:', error);
+    }
+}
+
+async function updateAttendeesData() {
+    if (isUpdating) return;
+    
+    try {
+        const id = parseInt("{{ webinar.id }}");
+        const response = await fetch(`/exam_portal/attendees_data/${id}?t=${Date.now()}`);
+        
+        if (response.ok) {
+            const newData = await response.json();
+            const newAttendeesData = newData.attendees || [];
+            
+            if (JSON.stringify(newAttendeesData) !== JSON.stringify(attendeesData)) {
+                console.log('Attendees data updated');
+                attendeesData = newAttendeesData;
+                
+                // Preserve current search and pagination state
+                const currentSearch = document.getElementById('attendees-search').value;
+                if (currentSearch) {
+                    filteredAttendeesData = attendeesData.filter(item =>
+                        item.email.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                        (item.deped_id && item.deped_id.toLowerCase().includes(currentSearch.toLowerCase()))
+                    );
+                } else {
+                    filteredAttendeesData = [...attendeesData];
+                }
+                
+                displayAttendeesTable();
+                setupAttendeesPagination();
+                showToast('Attendees data updated', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating attendees:', error);
+    }
+}
+
+async function updateCommentsData() {
+    try {
+        const id = parseInt("{{ webinar.id }}");
+        const response = await fetch(`/exam_portal/result_data/${id}?t=${Date.now()}`);
+        const data = await response.json();
+        
+        const newCommentsData = [];
+        const maxCommentsLength = Math.max(
+            data.comment_emails?.length || 0,
+            data.comment_deped_ids?.length || 0,
+            data.comment_texts?.length || 0,
+            data.comment_timestamps?.length || 0
+        );
+        
+        for (let i = 0; i < maxCommentsLength; i++) {
+            newCommentsData.push({
+                user_email: data.comment_emails?.[i] || '',
+                deped_id: data.comment_deped_ids?.[i] || '',
+                text: data.comment_texts?.[i] || '',
+                timestamp: data.comment_timestamps?.[i] || ''
+            });
+        }
+        
+        // Check if comments have changed
+        const currentComments = document.querySelectorAll('#comment-slides .carousel-item').length;
+        if (newCommentsData.length !== currentComments) {
+            console.log('Comments data updated');
+            setupCommentsCarousel(newCommentsData);
+            showToast('Comments updated', 'success');
+        }
+    } catch (error) {
+        console.error('Error updating comments:', error);
+    }
+}
+
+// Start real-time updates
+function startRealTimeUpdates() {
+    console.log('Starting real-time updates...');
+    
+    // Clear any existing timers
+    Object.values(updateTimers).forEach(timer => clearInterval(timer));
+    
+    // Set up update intervals
+    updateTimers.charts = setInterval(updateChartsData, UPDATE_INTERVALS.CHARTS);
+    updateTimers.attendees = setInterval(updateAttendeesData, UPDATE_INTERVALS.ATTENDEES);
+    updateTimers.comments = setInterval(updateCommentsData, UPDATE_INTERVALS.COMMENTS);
+    updateTimers.tests = setInterval(updateTestData, UPDATE_INTERVALS.TESTS);
+    
+    // Add visual indicator for real-time updates
+    addRealTimeIndicator();
+}
+
+// Stop real-time updates
+function stopRealTimeUpdates() {
+    console.log('Stopping real-time updates...');
+    Object.values(updateTimers).forEach(timer => clearInterval(timer));
+    updateTimers = {};
+    removeRealTimeIndicator();
+}
+
+//
+function removeRealTimeIndicator() {
+    const indicator = document.getElementById('real-time-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+async function refreshAllData() {
+    if (isUpdating) {
+        showToast('Update already in progress...', 'error');
+        return;
+    }
+    
+    showToast('Refreshing all data...', 'success');
+    
+    await Promise.all([
+        updateChartsData(),
+        updateTestData(),
+        updateAttendeesData(),
+        updateCommentsData()
+    ]);
+    
+    showToast('All data refreshed successfully!', 'success');
+}
+
+
+function addRefreshButton() {
+    const refreshBtn = document.createElement('button');
+    refreshBtn.innerHTML = `
+        <i class="fas fa-sync-alt"></i> Refresh Data
+    `;
+    refreshBtn.className = 'btn btn-outline-primary';
+    refreshBtn.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    `;
+    refreshBtn.onclick = refreshAllData;
+    document.body.appendChild(refreshBtn);
+}
+
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        console.log('Page hidden - pausing updates');
+        stopRealTimeUpdates();
+    } else {
+        console.log('Page visible - resuming updates');
+        startRealTimeUpdates();
+     
+        setTimeout(refreshAllData, 1000);
+    }
+}
+
+
+function initializeRealTimeUpdates() {
+
+    startRealTimeUpdates();
+    
+
+    addRefreshButton();
+    
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+  
+    window.addEventListener('beforeunload', stopRealTimeUpdates);
+    
+    console.log('Real-time update system initialized');
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize charts
+    setTimeout(() => {
+        initializeRealTimeUpdates();
+    }, 5000);
     async function fetchData() {
         const id = parseInt("{{ webinar.id }}");
         const evaluation = await fetch(`/exam_portal/rounded_data/${id}`);
@@ -1022,201 +1277,205 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-const loadingStyle = `
-<style id="loading-styles">
-.attendees-section {
-    position: relative;
-}
+    const loadingStyle = `
+    <style id="loading-styles">
+    .attendees-section {
+        position: relative;
+    }
 
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    min-height: 300px;
-}
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        min-height: 300px;
+    }
 
-.loading-spinner {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-.attendees-table.loading {
-    opacity: 0.3;
-    pointer-events: none;
-}
-</style>
-`;
+    .attendees-table.loading {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    </style>
+    `;
 
-// Add loading styles to the page
-document.head.insertAdjacentHTML('beforeend', loadingStyle);
+    // Add loading styles to the page
+    document.head.insertAdjacentHTML('beforeend', loadingStyle);
 
-// Updated fetchAttendeesAndComments function with better loading states
-async function fetchAttendeesAndComments() {
-    const id = parseInt("{{ webinar.id }}");
-    
-    // Show loading state
-    showLoadingState();
-    
-    try {
-        // Fetch attendees data with test completion status
-        console.log("Fetching attendees data from:", `/exam_portal/attendees_data/${id}`);
-        const attendeesResponse = await fetch(`/exam_portal/attendees_data/${id}`);
+    async function fetchAttendeesAndComments() {
+        const id = parseInt("{{ webinar.id }}");
         
-        if (!attendeesResponse.ok) {
-            console.error("Failed to fetch attendees data:", attendeesResponse.status, attendeesResponse.statusText);
-            // Fall back to original method if new endpoint fails
+        // Show loading state
+        showLoadingState();
+        
+        try {
+            const attendeesResponse = await fetch(`/exam_portal/attendees_data/${id}`);
+            
+            if (!attendeesResponse.ok) {
+                console.error("Failed to fetch attendees data:", attendeesResponse.status, attendeesResponse.statusText);
+              
+                const response = await fetch(`/exam_portal/result_data/${id}`);
+                const data = await response.json();
+                
+                attendeesData = [];
+                const maxLength = Math.max(
+                    data.attendance_emails?.length || 0,
+                    data.attendance_deped_ids?.length || 0,
+                    data.attendance_scores?.length || 0
+                );
+                
+                for (let i = 0; i < maxLength; i++) {
+                    attendeesData.push({
+                        email: data.attendance_emails?.[i] || '',
+                        deped_id: data.attendance_deped_ids?.[i] || '',
+                        attendance: data.attendance_scores?.[i] || 0,
+                        pre_test_completion: false,
+                        post_test_completion: false,
+                        evaluation_timestamp: null
+                    });
+                }
+            } else {
+                const attendeesData_raw = await attendeesResponse.json();
+                console.log("Received attendees data:", attendeesData_raw);
+                attendeesData = attendeesData_raw.attendees || [];
+            }
+            
+            console.log("Final attendeesData:", attendeesData);
+            filteredAttendeesData = [...attendeesData];
+            
+            // Hide loading state and display table
+            hideLoadingState();
+            displayAttendeesTable();
+            setupAttendeesPagination();
+            
+        } catch (error) {
+            console.error("Error fetching attendees data:", error);
+            hideLoadingState();
+            showErrorState();
+        }
+        
+        // Fetch comments data
+        try {
             const response = await fetch(`/exam_portal/result_data/${id}`);
             const data = await response.json();
             
-            attendeesData = [];
-            const maxLength = Math.max(
-                data.attendance_emails?.length || 0,
-                data.attendance_deped_ids?.length || 0,
-                data.attendance_scores?.length || 0
+            const commentsData = [];
+            const maxCommentsLength = Math.max(
+                data.comment_emails?.length || 0,
+                data.comment_deped_ids?.length || 0,
+                data.comment_texts?.length || 0,
+                data.comment_timestamps?.length || 0
             );
             
-            for (let i = 0; i < maxLength; i++) {
-                attendeesData.push({
-                    email: data.attendance_emails?.[i] || '',
-                    deped_id: data.attendance_deped_ids?.[i] || '',
-                    attendance: data.attendance_scores?.[i] || 0,
-                    pre_test_completion: false,
-                    post_test_completion: false,
-                    evaluation_timestamp: null
+            for (let i = 0; i < maxCommentsLength; i++) {
+                commentsData.push({
+                    user_email: data.comment_emails?.[i] || '',
+                    deped_id: data.comment_deped_ids?.[i] || '',
+                    text: data.comment_texts?.[i] || '',
+                    timestamp: data.comment_timestamps?.[i] || ''
                 });
             }
-        } else {
-            const attendeesData_raw = await attendeesResponse.json();
-            console.log("Received attendees data:", attendeesData_raw);
-            attendeesData = attendeesData_raw.attendees || [];
+            
+            setupCommentsCarousel(commentsData);
+        } catch (error) {
+            console.error("Error fetching comments data:", error);
+        }
+    }
+
+    // Function to show loading state
+    function showLoadingState() {
+        const attendeesSection = document.querySelector('.attendees-section');
+        const attendeesTable = document.querySelector('.attendees-table');
+        
+        if (attendeesSection && !attendeesSection.querySelector('.loading-overlay')) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div>
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 15px; color: #666;">Loading attendees data...</p>
+                </div>
+            `;
+            attendeesSection.appendChild(loadingOverlay);
         }
         
-        console.log("Final attendeesData:", attendeesData);
-        filteredAttendeesData = [...attendeesData];
-        
-        // Hide loading state and display table
-        hideLoadingState();
-        displayAttendeesTable();
-        setupAttendeesPagination();
-        
-    } catch (error) {
-        console.error("Error fetching attendees data:", error);
-        hideLoadingState();
-        showErrorState();
+        if (attendeesTable) {
+            attendeesTable.classList.add('loading');
+        }
     }
-    
-    // Fetch comments data
-    try {
-        const response = await fetch(`/exam_portal/result_data/${id}`);
-        const data = await response.json();
+
+    // Function to hide loading state
+    function hideLoadingState() {
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        const attendeesTable = document.querySelector('.attendees-table');
         
-        const commentsData = [];
-        const maxCommentsLength = Math.max(
-            data.comment_emails?.length || 0,
-            data.comment_deped_ids?.length || 0,
-            data.comment_texts?.length || 0,
-            data.comment_timestamps?.length || 0
-        );
-        
-        for (let i = 0; i < maxCommentsLength; i++) {
-            commentsData.push({
-                user_email: data.comment_emails?.[i] || '',
-                deped_id: data.comment_deped_ids?.[i] || '',
-                text: data.comment_texts?.[i] || '',
-                timestamp: data.comment_timestamps?.[i] || ''
-            });
+        if (loadingOverlay) {
+            loadingOverlay.remove();
         }
         
-        setupCommentsCarousel(commentsData);
-    } catch (error) {
-        console.error("Error fetching comments data:", error);
+        if (attendeesTable) {
+            attendeesTable.classList.remove('loading');
+        }
+        
+        // Remove loading styles after use
+        const loadingStyles = document.getElementById('loading-styles');
+        if (loadingStyles) {
+            setTimeout(() => loadingStyles.remove(), 500);
+        }
     }
-}
 
-// Function to show loading state
-function showLoadingState() {
-    const attendeesSection = document.querySelector('.attendees-section');
-    const attendeesTable = document.querySelector('.attendees-table');
-    
-    if (attendeesSection && !attendeesSection.querySelector('.loading-overlay')) {
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = `
-            <div>
-                <div class="loading-spinner"></div>
-                <p style="margin-top: 15px; color: #666;">Loading attendees data...</p>
-            </div>
-        `;
-        attendeesSection.appendChild(loadingOverlay);
+    // Function to show error state
+    function showErrorState() {
+        const tableBody = document.getElementById('attendees-table-body');
+        const tableInfo = document.getElementById('attendees-table-info');
+        
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Failed to load attendees data. Please refresh the page and try again.
+                    </td>
+                </tr>
+            `;
+        }
+        
+        if (tableInfo) {
+            tableInfo.innerHTML = "Failed to load data";
+        }
     }
     
-    if (attendeesTable) {
-        attendeesTable.classList.add('loading');
-    }
-}
-
-// Function to hide loading state
-function hideLoadingState() {
-    const loadingOverlay = document.querySelector('.loading-overlay');
-    const attendeesTable = document.querySelector('.attendees-table');
-    
-    if (loadingOverlay) {
-        loadingOverlay.remove();
-    }
-    
-    if (attendeesTable) {
-        attendeesTable.classList.remove('loading');
-    }
-    
-    // Remove loading styles after use
-    const loadingStyles = document.getElementById('loading-styles');
-    if (loadingStyles) {
-        setTimeout(() => loadingStyles.remove(), 500);
-    }
-}
-
-// Function to show error state
-function showErrorState() {
-    const tableBody = document.getElementById('attendees-table-body');
-    const tableInfo = document.getElementById('attendees-table-info');
-    
-    if (tableBody) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center text-muted py-4">
-                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                    Failed to load attendees data. Please refresh the page and try again.
-                </td>
-            </tr>
-        `;
-    }
-    
-    if (tableInfo) {
-        tableInfo.innerHTML = "Failed to load data";
-    }
-}
     
     fetchData();
     TestChart();
     fetchAttendeesAndComments();
+ 
+    const toggle = document.getElementById('evaluation-toggle');
+    if (toggle) {
+        updateStatusDisplay(toggle.checked);
+    }
 });
+
 
 
 </script>

@@ -528,14 +528,65 @@ def record_test(request, id, type):
     
     return redirect("test_result", webinar.id, type, user.id)
 
+@login_required
+def close_webinar_evaluation(request, webinar_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('user_dashboard')
+    
+    webinar = get_object_or_404(Webinar, id=webinar_id)
+    
+    if request.method == 'POST':
+        # Close the evaluation
+        webinar.close_evaluation = True
+        webinar.save()
+        
+        messages.success(request, f"All evaluations for '{webinar.title}' have been closed successfully.")
+        return redirect('admin_dashboard')
+    
+    return render(request, 'admin/close_evaluation_confirm.html', {
+        'webinar': webinar
+    })
+
+from django.utils import timezone
+from datetime import timedelta
+
+@login_required
+def toggle_evaluation_ajax(request, webinar_id):
+
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+    
+    webinar = get_object_or_404(Webinar, id=webinar_id)
+    
+    # Toggle the status
+    webinar.close_evaluation = not webinar.close_evaluation
+    webinar.save()
+    
+    status = "closed" if webinar.close_evaluation else "opened"
+    
+    return JsonResponse({
+        'success': True,
+        'status': status,
+        'closed': webinar.close_evaluation,
+        'message': f"Evaluation has been {status}."
+    })
+
+
+from django.utils import timezone
+from datetime import timedelta
 
 def check_attendance(request, id, test_type='evaluation'):
     webinar = get_object_or_404(Webinar, id=id)
-    
-    
+
     if webinar.close_evaluation:
-        messages.error(request, "The evaluation is closed")
-        return redirect("webinar_detail", webinar.id)
+        test_name = test_type.replace('_', ' ').title()
+        messages.error(request, f"The {test_name} is closed for this webinar.")
+        return render(request, "webinar/validate.html", {
+            "webinar": webinar,
+            "test_type": test_type,
+            "closing": True
+        })
     
     valid_test_types = ['evaluation', 'pre_test', 'post_test']
     if test_type not in valid_test_types:
@@ -583,7 +634,6 @@ def check_attendance(request, id, test_type='evaluation'):
 
     return render(request, "webinar/validate.html", {
         "webinar": webinar,
-        "test_type": test_type
+        "test_type": test_type,
+        "closing": False
     })
-
-
