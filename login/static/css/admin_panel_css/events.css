@@ -3,6 +3,7 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    font-family: 'poppins', sans-serif;
     
 }
 
@@ -28,18 +29,17 @@ body{
 
 h1{
     text-align: left;
-    font-weight: 400;
-    font-size: 40px;
+    font-weight: 500;
+    font-size: clamp(25px, 3vw, 60px);
     border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
     border-top: solid 4px;
-    font-family: 'poppins','san-serif';
+ 
 }
 
 .title-container{
     display: flex;
     margin-top: 20px;
     justify-content: left;
-
     border-radius: 3%;
     color:#2d3748 ;
 }
@@ -123,9 +123,6 @@ h1{
     display: flex;
     margin-left: 20px;
     align-items: center;
-    
-
-    
     flex-direction: column;
     font-size: 14px;
 }

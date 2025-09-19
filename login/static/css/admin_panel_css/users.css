@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    font-family: 'Poppins', 'San-serif';
+}
+
 
 body, html {
     height: 100%;
@@ -13,7 +19,6 @@ body, html {
     flex: 1;
     padding-left: 1em;
     padding-right: 1em;
-
     width: 100%;
     padding-top: 3rem;
     box-sizing: border-box;
@@ -22,7 +27,6 @@ body, html {
 
 table{
     padding: 1rem;
-    
 
 }
 
@@ -73,12 +77,18 @@ table{
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+
 }
 
 .page-title {
-    font-size: clamp(16px, 4vw, 24px);
-    font-weight: 600;
+    font-size: clamp(25px, 3vw, 60px);
+    font-weight: 500;
     color: #2d3748;
+    border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
+    border-top: solid 4px;
+    font-family: 'roboto', 'san-serif';
+ 
+    
 }
 
 
@@ -95,6 +105,7 @@ table{
  
     width:100%
 }
+
 .registration-form {
     flex: 1;
     background: white;
@@ -111,11 +122,15 @@ table{
     margin-bottom: 16px;
     color: #2d3748;
     border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+
+
 }
 
 .form-group {
     margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .form-group label {
@@ -123,6 +138,7 @@ table{
     margin-bottom: 6px;
     font-weight: 500;
     color: #4a5568;
+
 }
 
 .form-control {

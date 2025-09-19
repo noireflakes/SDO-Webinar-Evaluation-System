@@ -4,10 +4,8 @@ body{
 
 .blob {
     position: absolute;
-
     width: 90rem;
     height: 90rem;
-    
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     animation: blobMorph 8s infinite ease-in-out;
 }

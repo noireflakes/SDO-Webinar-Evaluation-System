@@ -7,7 +7,16 @@ html,body{
     height: 100%;
 }
 
-
+.header-container h2{
+    font-size: clamp(25px, 3vw, 60px);
+    font-weight: 500;
+    color: #2d3748;
+    border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
+    border-top: solid 4px;
+    font-family: 'roboto', 'san-serif';
+    width: fit-content;
+ 
+}
  
 
 body{

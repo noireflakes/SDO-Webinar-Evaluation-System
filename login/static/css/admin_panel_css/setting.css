@@ -1,7 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    font-family: 'poppins','san-serif';
+}
+
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
-   background: linear-gradient(to bottom right, #e7e9fae8, #d6dbff);
+   
+    background: linear-gradient(to bottom right, #e7e9fae8, #d6dbff);
     color: #1e293b;
     line-height: 1.6;
     min-height: 100vh;
@@ -22,12 +28,18 @@ body {
 }
 
 .settings-container h2 {
-    color: black;
-    font-size: 2rem;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 2rem;
-    text-align: left;
+    font-size: clamp(25px, 3vw, 60px);
+    font-weight: 500;
+    color: #2d3748;
+    width: fit-content;
    
+    border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
+    border-top: solid 4px;
+    font-family: 'roboto', 'san-serif';
+    
+ 
 }
 
 .card {
