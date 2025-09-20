@@ -89,6 +89,7 @@ body {
   padding: 0;
   margin-left: 50px;
   justify-content: flex-start;
+  margin-top: 2rem;
 }
 .title h2{
   font-size: 50px;
