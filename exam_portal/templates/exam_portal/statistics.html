@@ -277,7 +277,7 @@
                             <tr>
                                 <th style="width: 5%;">ID</th>
                                 <th style="width: 20%;">Email</th>
-                                <th style="width: 15%;">DepEd ID</th>
+                              
                                 <th style="width: 15%;">Evaluation</th>
                                 <th class="test-column" style="width: 12%;">Pre-test</th>
                                 <th class="test-column" style="width: 12%;">Post-test</th>
@@ -886,7 +886,7 @@ function displayAttendeesTable() {
         let tr = `<tr>
                     <td>${start + index + 1}</td>
                     <td title="${attendee.email}">${attendee.email}</td>
-                    <td>${attendee.deped_id || 'N/A'}</td>
+                  
                     <td><span class="completion-badge ${evaluationClass}">${evaluationStatus}</span></td>
                     <td class="test-column">${preTestBadge}</td>
                     <td class="test-column">${postTestBadge}</td>
