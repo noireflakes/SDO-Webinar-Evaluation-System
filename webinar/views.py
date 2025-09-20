@@ -309,26 +309,51 @@ def questionaire(request, id):
              
                 current_date = timezone.now().date()
                 if webinar.start_date <= current_date:
+                    # Generate the user dashboard URL
+                    dashboard_url = request.build_absolute_uri(reverse('user_dashboard'))
+                    
                     subject = f"Congratulations! You've completed {webinar.title}"
                     html_message = f"""
                     <html>
-                      <body style="font-family: Arial, sans-serif; line-height: 1.5;">
-                        <p>Hello <strong>{user.first_name or user.username}</strong>,</p>
-                        
-                        <p>🎉 <strong>Congratulations!</strong> You have successfully completed the evaluation for "<strong>{webinar.title}</strong>".</p>
-                        
-                        <p>
-                          📅 <strong>Event Date:</strong> {webinar.start_date}<br>
-                          📍 <strong>Location:</strong> {webinar.venue}<br>
-                          ✅ <strong>Status:</strong> Completed
-                        </p>
-                        
-                        <p>Thank you for your participation and valuable feedback. Your input helps us improve future events.</p>
-                        
-                        <p>We hope you found the event informative and valuable!</p>
-                        
-                        <p>Best regards,<br>
-                        The SDO Baliwag</p>
+                      <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                          <p>Hello <strong>{user.first_name or user.username}</strong>,</p>
+                          
+                          <p>🎉 <strong>Congratulations!</strong> You have successfully completed the evaluation for "<strong>{webinar.title}</strong>".</p>
+                          
+                          <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <p style="margin: 5px 0;">
+                              📅 <strong>Event Date:</strong> {webinar.start_date}<br>
+                              📍 <strong>Location:</strong> {webinar.venue}<br>
+                              ✅ <strong>Status:</strong> Completed
+                            </p>
+                          </div>
+                          
+                          <p>Thank you for your participation and valuable feedback. Your input helps us improve future events.</p>
+                          
+                          <div style="text-align: center; margin: 30px 0;">
+                            <a href="{dashboard_url}" 
+                               style="display: inline-block; 
+                                      background-color: #007bff; 
+                                      color: white; 
+                                      padding: 12px 24px; 
+                                      text-decoration: none; 
+                                      border-radius: 5px; 
+                                      font-weight: bold;
+                                      font-size: 16px;">
+                              View Your Dashboard
+                            </a>
+                          </div>
+                          
+                          <p style="font-size: 14px; color: #666; text-align: center;">
+                            Click the button above to access your dashboard and view your certificates, test results, and more.
+                          </p>
+                          
+                          <p>We hope you found the event informative and valuable!</p>
+                          
+                          <p>Best regards,<br>
+                          The SDO Baliwag</p>
+                        </div>
                       </body>
                     </html>
                     """
