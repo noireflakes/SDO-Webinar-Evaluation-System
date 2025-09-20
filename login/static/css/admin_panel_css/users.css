@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 *{
-    font-family: 'Poppins', 'San-serif';
+    font-family: 'Poppins', sans-serif;
 }
 
 
@@ -86,9 +86,7 @@ table{
     color: #2d3748;
     border-image: linear-gradient(135deg, #4f46e5, #8b5cf6)1;
     border-top: solid 4px;
-    font-family: 'roboto', 'san-serif';
- 
-    
+    font-family: 'Poppins', sans-serif;    
 }
 
 
