@@ -135,7 +135,7 @@ input[type="submit"]:hover {
 }
 
 .lockout-alert {
-    background-color: #fff3cd;
+    background-color: white;
     border: 1px solid #ffeaa7;
     padding: 20px;
     border-radius: 8px;
@@ -158,7 +158,7 @@ input[type="submit"]:hover {
 }
 
 .alert-error {
-    background-color: #ffebee;
+    background-color: #ffffff;
     border: 1px solid #f44336;
     color: #c62828;
     padding: 15px;
@@ -215,6 +215,7 @@ div:empty {
 .error {
     color: var(--error_red);
     background-color: #fce8e6;
+    background-color: #ffffff;
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 20px;

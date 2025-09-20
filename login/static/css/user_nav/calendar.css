@@ -1,56 +1,95 @@
-/* Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
+  
 }
 
 body {
-  background: linear-gradient(to bottom right, #e7e9fa, #d6dbff);
+  background-color:#e0e3fa ;
   color: #333;
 }
-
+.view{
+  margin: 0;
+  padding: 0;
+}
+.view a{
+  color: grey;
+  margin: 0;
+  padding: 0;
+  font-size: .8rem;
+  text-decoration: none;
+ 
+}
+.view a:hover{
+  text-decoration: underline;
+}
 .main-content{
   display: flex;
   max-width: 100vw;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
- background: linear-gradient(to bottom right, #e7e9fa, #d6dbff);
 }
 
 
-/* Events Section (Optional Sidebar) */
 .events-section {
   background-color: white;
-  height: 90vh;
+  height: 90%;
   padding: 20px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
 
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+
+
 }
+
+.events-container{
+  
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  scrollbar-width: none; 
+
+}
+
+.main-content{
+  width: 100%;
+ 
+}
+
 #calendar{
   display: flex;
-  width: 800px;
-  background-color: rgb(255, 255, 255);
+  background-color: blue;
+
+  width: 75% !important;
+  background-color: white;
   padding: 20px;
   border-radius:5%;
   margin: 15px;
+
 }
 
 .calendar-section{
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+ 
+  
+  width: 100%;
+  
 }
 .title{
   margin: 0;
   padding: 0;
   margin-left: 50px;
   justify-content: flex-start;
+  margin-top: 2rem;
 }
 .title h2{
   font-size: 50px;
@@ -158,16 +197,17 @@ body {
 
 }
 
+
 .events-section {
   position: absolute;
   right: 0;
   top: 100px; 
-  width: 210px; 
+  width: 200px; 
   background-color: #ffffff;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   z-index: 2;
 
 }
@@ -181,7 +221,7 @@ body {
   
 }
 
-.event-container {
+.events-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -195,6 +235,7 @@ body {
   border-left: 4px solid #4c43ce;
   box-shadow: 0 2px 6px rgba(79, 70, 229, 0.05);
   transition: all 0.2s ease;
+  margin-top: 3px;
 
 }
 
@@ -227,17 +268,37 @@ body {
   text-align: center;
 }
 
-
-@media screen and (max-width:700px) {
-
+@media screen and (min-width: 1920px){
   .calendar-section{
-    display: none
+    width: 90%;
+    height: 100%;
+    
+    
+   
   }
 
+  #calendar{
+    width: 90%;
+    height: 70% !important;
+    margin-left: 30px;
+  }
+
+
+}
+
+
+@media screen and (max-width: 700px){
+
+  .calendar-section{
+    display: none;
+  }
+  
+}
+
+@media screen and (min-width:1600px) {
+
   .events-section{
-    width: 60%;
-    left: 35%;
-    height: auto;
+    width: 20%;
   }
   
 }

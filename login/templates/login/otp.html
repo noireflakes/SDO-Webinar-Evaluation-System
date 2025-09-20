@@ -15,16 +15,17 @@
 
 
 {% if locked_out %}
-    <div class="lockout-container">
+    <div class="lockout-container" >
         <div class="alert alert-warning lockout-alert">
             <h2>🔒 Account Temporarily Locked</h2>
             <p>{{ error }}</p>
             <div id="lockout-timer" class="lockout-timer"></div>
             <p class="lockout-info">For security reasons, you've been temporarily locked out after too many failed attempts.</p>
-        </div>
-        <div class="lockout-actions">
+                   <div class="lockout-actions">
             <a href="{% url 'login' %}" class="back-to-login">← Back to Login</a>
         </div>
+        </div>
+ 
     </div>
 {% else %}
     <form action="" method="post" id="form">
@@ -34,7 +35,7 @@
         <h2>Enter OTP</h2>
         
         {% if error %}
-            <div class="alert alert-error">
+            <div class="alert alert-error"  style="background-color: white;">
                 {{ error }}
                 {% if "attempts remaining" in error %}
                     <div class="attempts-warning">
