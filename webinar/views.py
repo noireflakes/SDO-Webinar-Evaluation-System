@@ -306,8 +306,7 @@ def questionaire(request, id):
                         )                  
                 attendee.attendance = 1                 
                 attendee.save()
-                
-                # Send completion email only if event is ongoing or past
+             
                 current_date = timezone.now().date()
                 if webinar.start_date <= current_date:
                     subject = f"Congratulations! You've completed {webinar.title}"
@@ -339,7 +338,7 @@ def questionaire(request, id):
                         subject=subject,
                         body=html_message
                     )                  
-                
+                messages.success(request, "Summited Successfully")
                 return redirect("index")              
             else:                 
                 error_message = "You already answered"                 
