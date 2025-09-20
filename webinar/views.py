@@ -24,6 +24,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 
+from django.utils import timezone
+
 #create events
 def make_webinar(request):
     if request.method=='POST':
@@ -249,7 +251,6 @@ def validation(request, id):
     })
 
 #questionaire
-from django.utils import timezone
 
 def questionaire(request, id):     
     webinar = get_object_or_404(Webinar, id=id)      
@@ -303,7 +304,6 @@ def questionaire(request, id):
                             q5=response[4],                             
                             sex=sex                         
                         )                  
-                
                 attendee.attendance = 1                 
                 attendee.save()
                 

@@ -43,34 +43,40 @@ h1{
     color:#2d3748 ;
 }
 
-.btn-container{
-
-    
+.btn-container {
     display: flex;
-    justify-content: right;
+    justify-content: flex-start; /* center horizontally */
+    margin: 20px 0;
 }
-.create-btn{
-    background: linear-gradient(135deg, #4f46e5, #8b5cf6) ;
-    padding:5px;
-    width: 15%;
-    height: 30px;
+
+.create-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* space between text and icon */
+
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+    padding: 10px 20px;
     font-size: 16px;
+    font-weight: 500;
+
+    color: #fff;
     text-decoration: none;
-    color:white;
-    text-align: center;
-    border-radius: 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
 }
 
-.bi-plus{
-    font-weight: 900;
+.create-btn:hover {
+    background: linear-gradient(135deg, #4338ca, #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+
+.create-btn i {
     font-size: 18px;
-
 }
 
-.create-btn:hover{
-    background: linear-gradient(135deg, #332d99, #422c77) ;
-
-}
 .webinar{
     width: 100%;
     display: flex;
