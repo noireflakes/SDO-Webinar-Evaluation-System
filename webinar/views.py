@@ -251,7 +251,7 @@ def validation(request, id):
     })
 
 #questionaire
-
+from django.urls import reverse
 def questionaire(request, id):     
     webinar = get_object_or_404(Webinar, id=id)      
     speaker = []     
@@ -363,8 +363,8 @@ def questionaire(request, id):
                         subject=subject,
                         body=html_message
                     )                  
-                messages.success(request, "Summited Successfully")
-                return redirect("index")              
+                messages.success(request, "Evaluation submitted successfully! Thank you for your participation.")
+                return redirect("user_dashboard")              
             else:                 
                 error_message = "You already answered"                 
                 messages.error(request, "You already answered")                 
@@ -398,7 +398,6 @@ def questionaire(request, id):
     return render(request, 'webinar/evaluation/workshop.html', {         
         'webinar': webinar     
     })
-
 def create_test(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     
