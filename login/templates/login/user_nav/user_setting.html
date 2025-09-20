@@ -142,9 +142,7 @@
             {% csrf_token %}
             <h4><i class="fas fa-lock me-2"></i>Change Password</h4>
             
-            {% if error_password %}
-                <div class="alert alert-danger">{{ error_password }}</div>
-            {% endif %}
+        
             
             <!-- Password mismatch error message -->
             <div id="password-mismatch-error" class="password-error">
