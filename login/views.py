@@ -385,7 +385,7 @@ def generate_otp(request, user_id=None):
             
            
             return render(request, 'login/otp.html', {
-                'error': f'Invalid OTP. {3 - current_otp.retry} attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
+                'error': f'Invalid OTP. attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
                 'user_id': user_id
             })
 
@@ -1493,6 +1493,7 @@ def get_event_statistics(request, event_id):
         logger.error(f"Error fetching event statistics for {event_id}: {str(e)}")
         return JsonResponse({'error': 'Failed to fetch event statistics'}, status=500)
     
+    
 @login_required
 @staff_member_required
 @require_http_methods(["POST"])
@@ -1611,6 +1612,7 @@ def update_user_form(request):
     Handle user updates via traditional form submission
     """
     user_id = request.POST.get('user_id')
+    
     
     if not user_id:
         messages.error(request, 'User ID is required')
