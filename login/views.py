@@ -881,7 +881,7 @@ def create_admin(request):
             user.is_staff = True
             user.save()
             UserProfile.objects.create(user=user,deped_id=deped_id, birthday=birthday, middle_initial=middle)
-            messages.success(request, "Admin account created successfully.")
+            messages.success(request, "Staff account created successfully.")
 
     return redirect('admin_users')
 
