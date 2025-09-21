@@ -364,7 +364,7 @@ def questionaire(request, id):
                         body=html_message
                     )                  
                 messages.success(request, "Evaluation submitted successfully! Thank you for your participation.")
-                return redirect("user_dashboard")              
+                return redirect("index")              
             else:                 
                 error_message = "You already answered"                 
                 messages.error(request, "You already answered")                 
@@ -529,6 +529,7 @@ def delete_question(request, id):
     
     return redirect(redirect_create_test, id=test.webinar.id)
 
+
 def record_test(request, id, type):
     webinar = Webinar.objects.get(id=id)
     questions = webinar.question.filter(test_type=type)
@@ -574,6 +575,7 @@ def record_test(request, id, type):
             return redirect("display_test", id, type)
     
     return redirect("test_result", webinar.id, type, user.id)
+
 
 @login_required
 def close_webinar_evaluation(request, webinar_id):
