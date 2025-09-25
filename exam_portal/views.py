@@ -80,21 +80,37 @@ def attendees_data(request, id):
     
     attendees_list = []
     for attendee in attendees:
-       
         questionnaire_response = ResponseQuestionaire.objects.filter(
             webinar=webinar,
             user=attendee.user
         ).first()
+   
+        user_name = ""
+        if attendee.user:
+ 
+            if attendee.user.first_name or attendee.user.last_name:
+                user_name = f"{attendee.user.first_name} {attendee.user.last_name}".strip()
+            else:
+                user_name = attendee.user.username
         
         attendees_list.append({
             'email': attendee.email,
             'deped_id': attendee.deped_id or '',
+            'name': user_name,
             'attendance': attendee.attendance,
             'pre_test_completion': attendee.pre_test_completion,
             'post_test_completion': attendee.post_test_completion,
             'user_id': attendee.user.id if attendee.user else None,
             'evaluation_timestamp': questionnaire_response.timestamp if questionnaire_response else None,
         })
+    
+
+    attendees_list.sort(
+        key=lambda x: (
+            x['evaluation_timestamp'] is None, 
+            -(x['evaluation_timestamp'].timestamp() if x['evaluation_timestamp'] else 0)  
+        )
+    )
     
     return JsonResponse({
         'attendees': attendees_list
@@ -202,6 +218,7 @@ def result_data(request, id):
             user_evaluations[user_email]['manage'].append(average)
     
     # Now create one entry per user
+    all_scores = []  # For overall average calculation
     for user_email, data in user_evaluations.items():
         email.append(user_email)
         deped_id.append(data['user'].user_profile.deped_id)
@@ -218,6 +235,11 @@ def result_data(request, id):
         venue.append(venue_avg)
         meal.append(meal_avg)
         manage.append(manage_avg)
+        
+        # Collect all scores for overall average
+        category_scores = [s for s in [speaker_avg, venue_avg, meal_avg, manage_avg] if s > 0]
+        if category_scores:
+            all_scores.extend(category_scores)
 
     # Process attendance     
     for attendee in webinar.attendees.all():         
@@ -241,6 +263,73 @@ def result_data(request, id):
 
     overall = speaker + venue + meal + manage      
 
+    # Calculate summary statistics
+    total_registered = webinar.attendees.count()
+    total_attended = sum(1 for score in attendance_scores if score >= 1)
+    total_evaluations = len(user_evaluations)
+    total_comments = len(comment_texts)
+    
+    # Calculate attendance rate
+    attendance_rate = (total_attended / total_registered * 100) if total_registered > 0 else 0
+    
+    # Calculate evaluation completion rate
+    evaluation_rate = (total_evaluations / total_attended * 100) if total_attended > 0 else 0
+    
+    # Calculate overall evaluation score
+    overall_score = sum(all_scores) / len(all_scores) if all_scores else 0
+    
+    # Get satisfaction rating based on overall score
+    def get_satisfaction_rating(score):
+        if score >= 4.5:
+            return "Excellent"
+        elif score >= 4.0:
+            return "Very Good"
+        elif score >= 3.5:
+            return "Good"
+        elif score >= 3.0:
+            return "Satisfactory"
+        elif score >= 2.5:
+            return "Needs Improvement"
+        else:
+            return "Poor"
+    
+    satisfaction_rating = get_satisfaction_rating(overall_score)
+    
+    # Calculate category averages
+    category_averages = {
+        'speaker': sum(speaker) / len(speaker) if speaker and any(s > 0 for s in speaker) else 0,
+        'venue': sum(venue) / len(venue) if venue and any(s > 0 for s in venue) else 0,
+        'meal': sum(meal) / len(meal) if meal and any(s > 0 for s in meal) else 0,
+        'manage': sum(manage) / len(manage) if manage and any(s > 0 for s in manage) else 0,
+    }
+    
+    # Get test data for summary
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            # Pre-test data
+            cursor.execute("""
+                SELECT COUNT(*) as total_pre_test,
+                       AVG(score) as avg_pre_test
+                FROM exam_portal_result 
+                WHERE webinar_id = %s AND test_type = 'pre_test'
+            """, [id])
+            pre_test_data = cursor.fetchone()
+            
+            # Post-test data
+            cursor.execute("""
+                SELECT COUNT(*) as total_post_test,
+                       AVG(score) as avg_post_test
+                FROM exam_portal_result 
+                WHERE webinar_id = %s AND test_type = 'post_test'
+            """, [id])
+            post_test_data = cursor.fetchone()
+            
+    except Exception as e:
+        print(f"Error fetching test data: {e}")
+        pre_test_data = (0, 0)
+        post_test_data = (0, 0)
+
     # Combined response data     
     response_data = {         
         # Evaluation data         
@@ -263,7 +352,31 @@ def result_data(request, id):
         "comment_emails": comment_emails,         
         "comment_deped_ids": comment_deped_ids,         
         "comment_texts": comment_texts,         
-        "comment_timestamps": comment_timestamps,     
+        "comment_timestamps": comment_timestamps,
+        
+        # Summary statistics
+        "summary": {
+            "total_registered": total_registered,
+            "total_attended": total_attended,
+            "total_evaluations": total_evaluations,
+            "total_comments": total_comments,
+            "attendance_rate": round(attendance_rate, 1),
+            "evaluation_rate": round(evaluation_rate, 1),
+            "overall_score": round(overall_score, 2),
+            "satisfaction_rating": satisfaction_rating,
+            "category_averages": {
+                "speaker": round(category_averages['speaker'], 2),
+                "venue": round(category_averages['venue'], 2),
+                "meal": round(category_averages['meal'], 2),
+                "manage": round(category_averages['manage'], 2),
+            },
+            "test_data": {
+                "pre_test_count": pre_test_data[0] if pre_test_data else 0,
+                "pre_test_average": round(pre_test_data[1], 1) if pre_test_data and pre_test_data[1] else 0,
+                "post_test_count": post_test_data[0] if post_test_data else 0,
+                "post_test_average": round(post_test_data[1], 1) if post_test_data and post_test_data[1] else 0,
+            }
+        }
     }      
     print("evaluation")
 

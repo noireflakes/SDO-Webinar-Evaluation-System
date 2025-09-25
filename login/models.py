@@ -7,9 +7,11 @@ import uuid
 class UserProfile(models.Model):
     
     user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
-    img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='UserProfile', null=True, blank=True , default='media/UserProfile/defaultprofile_pv9ccz.jpg',)
+    img=models.ImageField(storage=MediaCloudinaryStorage(),upload_to='UserProfile', null=True, blank=True ,  default='UserProfile/cloud_emwloy.png',
+)
     deped_id=models.CharField(max_length=100, null=True, blank=True)
     number=models.CharField(max_length=100, null=True, blank=True)
+    position=models.CharField(max_length=200, default="Subject Teacher", null=True)
     school=models.CharField(max_length=100, null=True, blank=True)
     middle_initial=models.CharField(max_length=200, null=True, blank=True)
     birthday=models.DateField(default=timezone.now)

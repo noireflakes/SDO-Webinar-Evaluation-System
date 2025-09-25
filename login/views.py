@@ -255,7 +255,6 @@ def generate_otp(request, user_id=None):
     
     user = get_object_or_404(User, id=user_id)
     
-    
     current_otp = Otp.objects.filter(user=user).first()
     
     if current_otp and current_otp.is_locked_out():
@@ -269,10 +268,8 @@ def generate_otp(request, user_id=None):
             'user_id': user_id
         })
     
-   
     if current_otp and current_otp.lockout_until and not current_otp.is_locked_out():
         current_otp.clear_lockout()
-   
     
     if request.method == 'POST':
         user_otp = (request.POST.get('otp') or '').strip()
@@ -284,7 +281,7 @@ def generate_otp(request, user_id=None):
                 'expired': True
             })
         
-        # Check if OTP is expired
+     
         time_diff = timezone.now() - current_otp.created_at
         if time_diff.total_seconds() > 300:  
             current_otp.is_valid = False
@@ -296,46 +293,35 @@ def generate_otp(request, user_id=None):
                 'expired': True
             })
         
-        
         totp = pyotp.TOTP(current_otp.secret_key, interval=300)
-        
-        
-
         
         is_valid = False
         
-        
         if totp.verify(user_otp, valid_window=1):  
             is_valid = True
-         
         
-    
         if not is_valid:
             current_time = timezone.now().timestamp()
             current_otp_code = totp.at(current_time)
             if user_otp == current_otp_code:
                 is_valid = True
-               
-        
 
         if not is_valid and hasattr(current_otp, 'otp') and current_otp.otp:
             if user_otp == str(current_otp.otp):
                 is_valid = True
-               
         
         if is_valid:
-         
+      
+            is_first_login = user.last_login is None
+            
             login(request, user)
             request.session.modified = True
             request.session.pop('username', None)
-            
-            # Clear OTP generation flag
+           
             session_key = f"otp_generated_{user_id}"
             request.session.pop(session_key, None)
             
-            print('The OTP is correct')
-            
-            # Handle trusted device
+
             device_hash = request.session.get('hash')
             if device_hash:
                 TrustedDevice.objects.get_or_create(
@@ -345,9 +331,28 @@ def generate_otp(request, user_id=None):
                 request.session.pop('hash', None)
 
             current_otp.delete()
-            return redirect('index')
+          
+            if is_first_login:
+              
+                PasswordReset.objects.filter(user=user, used=False).delete()
+                
+                login(request, user)
+                reset_token = uuid.uuid4()
+                PasswordReset.objects.create(
+                    user=user,
+                    token=reset_token,
+                    created_at=timezone.now(),
+                    used=False
+                )
+                
+                
+                request.session['first_login_password_reset'] = True
+                
+                
+                return redirect('reset_password', token=reset_token)
+            else:
+                return redirect('index')
         else:
-            # Wrong OTP - increment counters
             current_otp.retry += 1
             current_otp.total_failed_attempts += 1
             current_otp.last_attempt = timezone.now()
@@ -357,8 +362,7 @@ def generate_otp(request, user_id=None):
             
             if request.user.is_authenticated:
                 return redirect('index')
-            
-            # Check if we've reached 10 total failed attempts
+    
             if current_otp.total_failed_attempts >= 10:
                 current_otp.lockout_until = timezone.now() + timedelta(minutes=10)
                 current_otp.is_valid = False
@@ -370,9 +374,8 @@ def generate_otp(request, user_id=None):
                     'user': user,
                     'user_id': user_id
                 })
-            
-            # Check if current OTP has 3 attempts (generate new OTP)
-            if current_otp.retry >= 3:
+
+            if current_otp.retry >= 10:
                 current_otp.is_valid = False
                 current_otp.save()
                 session_key = f"otp_generated_{user_id}"
@@ -383,12 +386,10 @@ def generate_otp(request, user_id=None):
                     'expired': True
                 })
             
-           
             return render(request, 'login/otp.html', {
                 'error': f'Invalid OTP. attempts remaining for current OTP. (Total attempts: {current_otp.total_failed_attempts}/10)',
                 'user_id': user_id
             })
-
 
     existing_otp = Otp.objects.filter(user=user).first()
     should_generate_otp = False
@@ -402,7 +403,7 @@ def generate_otp(request, user_id=None):
             existing_otp.save()
             
             return render(request, 'login/otp.html', {
-                'error': 'OTP has expired. Please request a new one.',
+                'error': 'Please Click Send Otp Again?',
                 'user_id': user_id,
                 'expired': True
             })
@@ -420,25 +421,18 @@ def generate_otp(request, user_id=None):
             otp_secret_key = pyotp.random_base32()
             totp = pyotp.TOTP(otp_secret_key, interval=300)
             
-
             current_time = timezone.now()
             otp_code = totp.at(current_time.timestamp())
             
-            print(f"Generated OTP: {otp_code} at time: {current_time}")
-            print(f"Secret key: {otp_secret_key}")
-            
             if existing_otp:
-                
                 existing_otp.otp = otp_code
                 existing_otp.secret_key = otp_secret_key
                 existing_otp.created_at = current_time
                 existing_otp.retry = 0  
                 existing_otp.is_valid = True
                 existing_otp.last_attempt = None 
-
                 existing_otp.save()
             else:
- 
                 Otp.objects.create(
                     user=user,
                     otp=otp_code,
@@ -454,14 +448,14 @@ def generate_otp(request, user_id=None):
                 to_email=user.email,
                 subject="OTP code From SDO",
                 body=f"""<body style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
-                <p>Dear { user.username },</p>
+                <p>Dear {user.username},</p>
 
                 <p>
                     To confirm your login, please use the One-Time Password (otp) provided below:
                 </p>
 
                 <p style="font-size: 20px; font-weight: bold; letter-spacing: 2px;">
-                    { otp_code }
+                    {otp_code}
                 </p>
 
                 <p>
@@ -480,7 +474,6 @@ def generate_otp(request, user_id=None):
     return render(request, 'login/otp.html', {
         'user_id': user_id
     })
-
 
 def resend_otp(request, user_id):
 
@@ -609,8 +602,15 @@ def event_data(request):
 
 @user_required
 def user_setting(request):
-    return render(request, "login/user_nav/user_setting.html")
-
+ 
+    first_login_message = request.session.pop('first_login_message', None)
+    
+    context = {
+        'first_login_message': first_login_message,
+    
+    }
+    messages.success(request, first_login_message)
+    return render(request, 'login/user_nav/user_setting.html')
 
 @user_required 
 def certificate(request):     
@@ -683,8 +683,15 @@ def admin_events(request):
 
 @admin_required
 def admin_setting(request):
-    return render(request, "login/admin_panel/setting.html")
+   
+    first_login_message = request.session.pop('first_login_message', None)
+    
 
+    context = {
+        'first_login_message': first_login_message,
+    }
+    messages.success(request, first_login_message)
+    return render(request, 'login/admin_panel/setting.html', context)
 
 @admin_required
 def admin_users(request):
@@ -706,13 +713,20 @@ def register_user(request):
         birth_date_str=request.POST.get("user_birth_date")
         email=request.POST.get("user_email")
         password=request.POST.get("user_password")
-
+        school=request.POST.get("user_school")  
+        position=request.POST.get("user_position")  
+        custom_position=request.POST.get("user_custom_position")  
 
         if request.POST.get("user_middle"):
             middle=request.POST.get("user_middle")
         else:
             middle="N/A"
 
+        # Handle position selection
+        if position == "Other" and custom_position:
+            position = custom_position
+        elif not position:
+            position = "Subject Teacher"  # Default value
 
         try:
             birth_date = date.fromisoformat(birth_date_str)  
@@ -729,7 +743,6 @@ def register_user(request):
         else:
             deped_id="N/A"
 
-     
         username=first_name
 
         if User.objects.filter(username=username).exists():
@@ -741,8 +754,14 @@ def register_user(request):
             return redirect('admin_users')
         else:
             user= User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
-            profile=UserProfile.objects.create(user=user, deped_id=deped_id, birthday=birth_date, middle_initial=middle)
-
+            profile=UserProfile.objects.create(
+                user=user, 
+                deped_id=deped_id, 
+                birthday=birth_date, 
+                middle_initial=middle,
+                school=school,  # Add school field
+                position=position  # Add position field
+            )
 
         result = send_email(
         to_email=f"{user.email}",
@@ -760,7 +779,6 @@ def register_user(request):
             </td>
           </tr>
 
-
             <td style="padding:24px 28px;">
               <p style="margin:0 0 12px 0;font-size:15px;">Hi <strong>{user.first_name}</strong>,</p>
 
@@ -775,6 +793,8 @@ def register_user(request):
                     <p style="margin:0 0 8px 0;font-size:14px;"><strong>Username:</strong> {user.username}</p>
                     <p style="margin:0 0 8px 0;font-size:14px;"><strong>First Name:</strong> {user.first_name}</p>
                     <p style="margin:0 0 8px 0;font-size:14px;"><strong>Last Name:</strong> {user.last_name}</p>
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>School:</strong> {profile.school or 'N/A'}</p>
+                    <p style="margin:0 0 8px 0;font-size:14px;"><strong>Position:</strong> {profile.position}</p>
                     <p style="margin:0;font-size:14px;"><strong>DepEd ID:</strong> {profile.deped_id}</p>
                   </td>
                 </tr>
@@ -826,10 +846,7 @@ def register_user(request):
     </tr>
   </table>
 </body>
-
-
         """
-
         )
         messages.success(request,"Successfully registered")
         return redirect('admin_users')
@@ -849,22 +866,31 @@ def generete_authorization_key(request):
         body= f'Staff {request.user} has requested to create an admin account. If you approve this request, please share the following authorization code: {code}'
     )
     return redirect('admin_users')
-            
 
 @admin_required
 def create_admin(request):
     if request.method == 'POST':
- 
         first_name=request.POST.get("staff_firstname")
         last_name=request.POST.get("staff_lastname")
         deped_id=request.POST.get("staff_deped_id")
         email = request.POST.get("staff_email")
         password = request.POST.get("staff_password")
         birthday= request.POST.get("staff_birth_date")
+        school=request.POST.get("staff_school")  # New field
+        position=request.POST.get("staff_position")  # New field
+        custom_position=request.POST.get("staff_custom_position")  # New field for custom position
+        
         if request.POST.get("staff_middle"):
-            middle=request.POST.get("user_middle")
+            middle=request.POST.get("staff_middle")
         else:
             middle="N/A"
+
+        # Handle position selection
+        if position == "Other" and custom_position:
+            position = custom_position
+        elif not position:
+            position = "Staff"  # Default value for staff
+            
         username = first_name
 
         if User.objects.filter(username=username).exists():
@@ -880,11 +906,17 @@ def create_admin(request):
                 password=password)
             user.is_staff = True
             user.save()
-            UserProfile.objects.create(user=user,deped_id=deped_id, birthday=birthday, middle_initial=middle)
+            UserProfile.objects.create(
+                user=user,
+                deped_id=deped_id, 
+                birthday=birthday, 
+                middle_initial=middle,
+                school=school, 
+                position=position  
+            )
             messages.success(request, "Staff account created successfully.")
 
     return redirect('admin_users')
-
 
 @admin_required
 def delete_user(request, id):
@@ -1103,71 +1135,71 @@ def forgot_password(request):
                 subject="Password Reset - SDO",
                 body=f"""
 
-<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial, sans-serif;color:#222;">
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-      <td align="center" style="padding:24px;">
-        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08)">
-          
-          <!-- Header -->
-          <tr>
-            <td style="padding:20px 28px;background:#0b69ff;color:#ffffff;">
-              <h1 style="margin:0;font-size:20px;font-weight:700;">Password Reset Request</h1>
+        <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial, sans-serif;color:#222;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+            <td align="center" style="padding:24px;">
+                <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08)">
+                
+                <!-- Header -->
+                <tr>
+                    <td style="padding:20px 28px;background:#0b69ff;color:#ffffff;">
+                    <h1 style="margin:0;font-size:20px;font-weight:700;">Password Reset Request</h1>
+                    </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                    <td style="padding:24px 28px;">
+                    <p style="margin:0 0 12px 0;font-size:15px;">Dear <strong>{user.first_name or user.username}</strong>,</p>
+
+                    <p style="margin:0 0 16px 0;font-size:15px;line-height:1.5;">
+                        We received a request to reset the password for your account. To proceed, please click the button below:
+                    </p>
+
+                    <div style="margin:24px 0;text-align:center;">
+                        <a href="{reset_link}" 
+                        style="display:inline-block;padding:12px 20px;text-decoration:none;
+                                border-radius:6px;background:#0b69ff;color:#fff;font-weight:600;">
+                        Reset Password
+                        </a>
+                    </div>
+
+                    <p style="margin:16px 0;font-size:14px;line-height:1.5;">
+                        If the button doesn’t work, you can also copy and paste this link into your browser:
+                    </p>
+
+                    <p style="margin:0 0 16px 0;font-size:13px;word-break:break-all;color:#0b69ff;">
+                        {reset_link}
+                    </p>
+
+                    <p style="margin:0 0 12px 0;font-size:14px;color:#555;">
+                        <em>Please note that this link will expire in 1 hour for security purposes.</em>
+                    </p>
+
+                    <p style="margin:18px 0 0 0;font-size:14px;">
+                        If you did not request a password reset, please ignore this email. Your account will remain secure.
+                    </p>
+
+                    <p style="margin:22px 0 0 0;font-size:14px;">
+                        Thank you,<br/>
+                        The SDO Team
+                    </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding:16px 28px;background:#f7f9fb;color:#8a95a6;font-size:12px;text-align:center;">
+                    This is an automated message, please do not reply.
+                    </td>
+                </tr>
+                </table>
             </td>
-          </tr>
-
-          <!-- Body -->
-          <tr>
-            <td style="padding:24px 28px;">
-              <p style="margin:0 0 12px 0;font-size:15px;">Dear <strong>{user.first_name or user.username}</strong>,</p>
-
-              <p style="margin:0 0 16px 0;font-size:15px;line-height:1.5;">
-                We received a request to reset the password for your account. To proceed, please click the button below:
-              </p>
-
-              <div style="margin:24px 0;text-align:center;">
-                <a href="{reset_link}" 
-                   style="display:inline-block;padding:12px 20px;text-decoration:none;
-                          border-radius:6px;background:#0b69ff;color:#fff;font-weight:600;">
-                   Reset Password
-                </a>
-              </div>
-
-              <p style="margin:16px 0;font-size:14px;line-height:1.5;">
-                If the button doesn’t work, you can also copy and paste this link into your browser:
-              </p>
-
-              <p style="margin:0 0 16px 0;font-size:13px;word-break:break-all;color:#0b69ff;">
-                {reset_link}
-              </p>
-
-              <p style="margin:0 0 12px 0;font-size:14px;color:#555;">
-                <em>Please note that this link will expire in 1 hour for security purposes.</em>
-              </p>
-
-              <p style="margin:18px 0 0 0;font-size:14px;">
-                If you did not request a password reset, please ignore this email. Your account will remain secure.
-              </p>
-
-              <p style="margin:22px 0 0 0;font-size:14px;">
-                Thank you,<br/>
-                The SDO Team
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding:16px 28px;background:#f7f9fb;color:#8a95a6;font-size:12px;text-align:center;">
-              This is an automated message, please do not reply.
-            </td>
-          </tr>
+            </tr>
         </table>
-      </td>
-    </tr>
-  </table>
-</body>
-                """
+        </body>
+                        """
             )
             
             messages.success(request, 'Password reset link sent to your email!')
@@ -1179,7 +1211,6 @@ def forgot_password(request):
     
     return render(request, 'login/forgot_password.html')
 
-
 def reset_password(request, token):
     try:
         reset_obj = PasswordReset.objects.get(token=token, used=False)
@@ -1188,18 +1219,26 @@ def reset_password(request, token):
             messages.error(request, 'Reset link has expired. Please request a new one.')
             return redirect('forgot_password')
         
+     
+        is_first_login = request.session.get('first_login_password_reset', False)
+        
         if request.method == 'POST':
             new_password = request.POST.get('password')
             confirm_password = request.POST.get('confirm_password')
             
             if not new_password or len(new_password) < 6:
                 messages.error(request, 'Password must be at least 6 characters long.')
-                return render(request, 'login/reset_password.html', {'token': token})
+                return render(request, 'login/reset_password.html', {
+                    'token': token,
+                    'is_first_login': is_first_login
+                })
             
             if new_password != confirm_password:
                 messages.error(request, 'Passwords do not match.')
-                return render(request, 'login/reset_password.html', {'token': token})
-            
+                return render(request, 'login/reset_password.html', {
+                    'token': token,
+                    'is_first_login': is_first_login
+                })
             
             user = reset_obj.user
             user.set_password(new_password)
@@ -1209,15 +1248,29 @@ def reset_password(request, token):
             reset_obj.used = True
             reset_obj.save()
             
-            messages.success(request, 'Password reset successfully! You can now login.')
-            return redirect('login')
+          
+            request.session.pop('first_login_password_reset', None)
+            request.session.pop('first_login_message', None)
+            
+            if is_first_login:
+                messages.success(request, 'Password created successfully! You can now access your account.')
+              
+              
+                return redirect('index')
+     
+            else:
+                messages.success(request, 'Password reset successfully! You can now login.')
+                return redirect('login')
         
-        return render(request, 'login/reset_password.html', {'token': token})
+        return render(request, 'login/reset_password.html', {
+            'token': token,
+            'is_first_login': is_first_login,
+            'first_login_message': request.session.get('first_login_message')
+        })
         
     except PasswordReset.DoesNotExist:
         messages.error(request, 'Invalid or expired reset link.')
         return redirect('forgot_password')
-
 
 def cal_event_data(request, id):
     webinar = get_object_or_404(Webinar, id=id)

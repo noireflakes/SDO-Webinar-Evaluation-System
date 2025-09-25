@@ -140,6 +140,12 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
+
+#user_custom_position,
+#staff_custom_position {
+    display: none;
+    margin-top: 10px;
+}
 </style>
 {% endblock %}
 
@@ -255,11 +261,39 @@
         <input type="text" id="deped_id" name="deped_id" class="form-control" 
                placeholder="Enter User Deped Id"  autocomplete="off" >
     </div>
-    
-    <div class="form-group">
+        <div class="form-group">
         <label for="user_birth_date">Birth Date:</label>
         <input type="date" id="user_birth_date" name="user_birth_date" class="form-control" 
                required autocomplete="bday" >
+    </div>
+    
+    <!-- School/Institute Field -->
+    <div class="form-group">
+        <label for="user_school">School/Institute:</label>
+        <input type="text" id="user_school" name="user_school" class="form-control" 
+               placeholder="Enter School or Institute" autocomplete="off" required>
+    </div>
+    
+    <!-- Position Field -->
+    <div class="form-group">
+        <label for="user_position">Position:</label>
+        <select id="user_position" name="user_position" class="form-control" required>
+            <option value="">Select Position</option>
+            <option value="Subject Teacher">Subject Teacher</option>
+            <option value="Class Advisor">Class Advisor</option>
+            <option value="Department Head">Department Head</option>
+            <option value="Coordinator">Coordinator</option>
+            <option value="Principal">Principal</option>
+            <option value="Vice Principal">Vice Principal</option>
+            <option value="Administrative Staff">Administrative Staff</option>
+            <option value="Guidance Counselor">Guidance Counselor</option>
+            <option value="Librarian">Librarian</option>
+            <option value="Other">Other</option>
+        </select>
+        
+        <!-- Custom position input (hidden by default) -->
+        <input type="text" id="user_custom_position" name="user_custom_position" 
+               class="form-control" placeholder="Please specify your position">
     </div>
     
     <div class="form-group">
@@ -321,6 +355,36 @@
         <label for="staff_birth_date">Birth Date:</label>
         <input type="date" id="staff_birth_date" name="staff_birth_date" class="form-control" 
                required autocomplete="bday">
+    </div>
+    
+    <!-- School/Institute Field for Staff -->
+    <div class="form-group">
+        <label for="staff_school">School/Institute:</label>
+        <input type="text" id="staff_school" name="staff_school" class="form-control" 
+               placeholder="Enter School or Institute" autocomplete="off" required>
+    </div>
+    
+    <!-- Position Field for Staff -->
+    <div class="form-group">
+        <label for="staff_position">Position:</label>
+        <select id="staff_position" name="staff_position" class="form-control" required>
+            <option value="">Select Position</option>
+            <option value="Staff">Staff</option>
+            <option value="Administrative Staff">Administrative Staff</option>
+            <option value="IT Staff">IT Staff</option>
+            <option value="HR Staff">HR Staff</option>
+            <option value="Finance Staff">Finance Staff</option>
+            <option value="Records Staff">Records Staff</option>
+            <option value="Support Staff">Support Staff</option>
+            <option value="Coordinator">Coordinator</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Manager">Manager</option>
+            <option value="Other">Other</option>
+        </select>
+        
+        <!-- Custom position input (hidden by default) -->
+        <input type="text" id="staff_custom_position" name="staff_custom_position" 
+               class="form-control" placeholder="Please specify your position">
     </div>
     
     <div class="form-group">
@@ -439,6 +503,10 @@
                             <span class="user-detail-label">Last Name:</span>
                             <span class="user-detail-value" id="modalLastName"></span>
                         </div>
+                        <div class="user-detail-row">
+                            <span class="user-detail-label">School:</span>
+                            <span class="user-detail-value" id="modalSchool"></span>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="user-detail-row">
@@ -448,6 +516,10 @@
                         <div class="user-detail-row">
                             <span class="user-detail-label">Birth Date:</span>
                             <span class="user-detail-value" id="modalBirthDate"></span>
+                        </div>
+                        <div class="user-detail-row">
+                            <span class="user-detail-label">Position:</span>
+                            <span class="user-detail-value" id="modalPosition"></span>
                         </div>
                         <div class="user-detail-row">
                             <span class="user-detail-label">Role:</span>
@@ -510,6 +582,11 @@
                                 <label for="editLastName">Last Name</label>
                                 <input type="text" class="form-control" id="editLastName" name="last_name" required>
                             </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editSchool">School/Institute</label>
+                                <input type="text" class="form-control" id="editSchool" name="school">
+                            </div>
                         </div>
                         
                         <div class="col-md-6">
@@ -521,6 +598,11 @@
                             <div class="edit-form-group">
                                 <label for="editBirthDate">Birth Date</label>
                                 <input type="date" class="form-control" id="editBirthDate" name="birth_date">
+                            </div>
+                            
+                            <div class="edit-form-group">
+                                <label for="editPosition">Position</label>
+                                <input type="text" class="form-control" id="editPosition" name="position">
                             </div>
                             
                             <div class="edit-form-group" id="roleEditGroup">
@@ -649,6 +731,8 @@ const userData = [
         last_name: "{{ user.last_name|escapejs }}",
         deped_id: "{{ user.user_profile.deped_id|default:''|escapejs }}",
         birth_date: "{{ user.user_profile.birthday|default:''|escapejs }}",
+        school: "{{ user.user_profile.school|default:''|escapejs }}",
+        position: "{{ user.user_profile.position|default:''|escapejs }}",
         is_superuser: {% if user.is_superuser %}true{% else %}false{% endif %},
         is_staff: {% if user.is_staff %}true{% else %}false{% endif %},
         delete_url: "{% url 'delete_user' user.id %}"
@@ -707,6 +791,8 @@ function viewUserDetails(userId) {
     document.getElementById('modalLastName').textContent = user.last_name || 'N/A';
     document.getElementById('modalDepedId').textContent = user.deped_id || 'N/A';
     document.getElementById('modalBirthDate').textContent = user.birth_date || 'N/A';
+    document.getElementById('modalSchool').textContent = user.school || 'N/A';
+    document.getElementById('modalPosition').textContent = user.position || 'N/A';
     
     // Set role badge
     document.getElementById('modalRole').innerHTML = getPositionBadge(user);
@@ -729,6 +815,8 @@ function openEditModal() {
     document.getElementById('editLastName').value = user.last_name || '';
     document.getElementById('editDepedId').value = user.deped_id || '';
     document.getElementById('editBirthDate').value = user.birth_date || '';
+    document.getElementById('editSchool').value = user.school || '';
+    document.getElementById('editPosition').value = user.position || '';
     
     // Set role
     let role = 'user';
@@ -761,9 +849,7 @@ function openEditModal() {
 function showSaveConfirmation() {
     if (!currentEditingUser) return;
     
-   
     document.getElementById('saveUserName').textContent = currentEditingUser.username;
-    
     
     bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
     
@@ -777,7 +863,6 @@ function saveUserChanges() {
     const form = document.getElementById('editUserForm');
     const formData = new FormData(form);
     
-
     const jsonData = {};
     formData.forEach((value, key) => {
         jsonData[key] = value;
@@ -799,7 +884,6 @@ function saveUserChanges() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-     
             const userId = parseInt(jsonData.user_id);
             const userIndex = userData.findIndex(u => u.id === userId);
             
@@ -810,13 +894,14 @@ function saveUserChanges() {
                 userData[userIndex].last_name = jsonData.last_name;
                 userData[userIndex].deped_id = jsonData.deped_id || '';
                 userData[userIndex].birth_date = jsonData.birth_date || '';
+                userData[userIndex].school = jsonData.school || '';
+                userData[userIndex].position = jsonData.position || '';
                 
                 const role = jsonData.role;
                 userData[userIndex].is_superuser = role === 'admin';
                 userData[userIndex].is_staff = role === 'staff' || role === 'admin';
             }
             
-        
             filterUsers();
             
             // Show success message
@@ -827,7 +912,6 @@ function saveUserChanges() {
             currentEditingUser = null;
             
         } else {
-           
             showErrorMessage(data.message || 'Error updating user');
         }
     })
@@ -860,6 +944,7 @@ function showErrorMessage(message) {
         }
     }, 5000);
 }
+
 function showSuccessMessage(message) {
     const alertDiv = document.createElement('div');
     alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
@@ -1020,25 +1105,19 @@ function generatePassword(length = 12) {
     return password;
 }
 
-function generateAndSetPassword(user) {
-    if (user==="user"){
-        console.log("this what being called user")
-        const passwordInput = document.querySelector("#user_password");
-    }else{
-         console.log("this what being called staff")
-        const passwordInput = document.querySelector("#staff_password");
-    }
+// Position dropdown handlers
+function handlePositionChange(selectId, customInputId) {
+    const select = document.getElementById(selectId);
+    const customInput = document.getElementById(customInputId);
     
-    passwordInput.value = generatePassword(12); 
-}
-
-function clearPassword(user) {
-    if (user==="user"){
-        const passwordInput = document.getElementById("user_password");
-    }else{
-        const passwordInput = document.getElementById("staff_password");
+    if (select.value === 'Other') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
     }
-    passwordInput.value = "";
 }
 
 function setupPasswordToggle(toggleButtonId, passwordInputId, iconId) {
@@ -1123,6 +1202,22 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmSaveBtn.addEventListener('click', saveUserChanges);
     }
 
+    // Position dropdown handlers
+    const userPositionSelect = document.getElementById('user_position');
+    const staffPositionSelect = document.getElementById('staff_position');
+    
+    if (userPositionSelect) {
+        userPositionSelect.addEventListener('change', function() {
+            handlePositionChange('user_position', 'user_custom_position');
+        });
+    }
+    
+    if (staffPositionSelect) {
+        staffPositionSelect.addEventListener('change', function() {
+            handlePositionChange('staff_position', 'staff_custom_position');
+        });
+    }
+
     // Password toggles
     setupPasswordToggle("togglePassword", "user_password", "togglePasswordIcon");
     setupPasswordToggle("toggleStaffPassword", "staff_password", "toggleStaffPasswordIcon");
@@ -1145,13 +1240,13 @@ document.addEventListener('DOMContentLoaded', function() {
         field.setAttribute('data-lpignore', 'true');
     });
     
-    // Clear fields after a short delay
+   
     setTimeout(() => {
         emailFields.forEach(field => field.value = '');
         passwordFields.forEach(field => field.value = '');
     }, 100);
 
-    // Auto-hide messages
+   
     setTimeout(() => {
         const msgContainer = document.querySelector('.message-container');
         if (msgContainer) {

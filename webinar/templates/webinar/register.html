@@ -4,11 +4,119 @@
 {% block css %}
  <link rel="stylesheet" href="{% static 'webinar/css/register_attendees.css' %}">
  <link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
-
  <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
-
-
-  {% endblock %}
+ 
+ <style>
+    /* Autocomplete dropdown styling */
+    .autocomplete-container {
+        position: relative;
+        width: 100%;
+    }
+    
+    .suggestions-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+    }
+    
+    .suggestions-dropdown.show {
+        display: block;
+    }
+    
+    .suggestion-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .suggestion-item:hover,
+    .suggestion-item.highlighted {
+        background-color: #f8f9fa;
+    }
+    
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+    
+    .suggestion-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    
+    .suggestion-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .suggestion-name {
+        font-weight: 500;
+        color: #333;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+    
+    .suggestion-email {
+        color: #666;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .no-suggestions {
+        padding: 15px;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        font-size: 14px;
+    }
+    
+    .loading-suggestions {
+        padding: 15px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    /* Modify the email input to accommodate dropdown */
+    .form-group input[type="email"] {
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .form-group input[type="email"]:focus {
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .form-group input[type="email"].no-dropdown {
+        border-radius: 8px;
+    }
+ </style>
+{% endblock %}
 
 {% block body %}
     <div class="top-bar">
@@ -16,8 +124,8 @@
             <a class="bc-a" href="{% url 'admin_events' %}">Admin Events</a>  › <a class="bc-a" href="{% url 'webinar_detail' webinar.id %}">Events Details</a> ›  <a id="direct" class="bc-a">  Register Attendees</a>
         </div>
         <h2>{{ webinar.title }}</h2>
-       
     </div>
+    
     {% if messages %}
   <div class="popup-messages" id="popupMessages">
     {% for message in messages %}
@@ -44,11 +152,19 @@
         {% csrf_token %}
         <h2 class="form-title">Register Attendees</h2>
 
-
-
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" required>
+            <div class="autocomplete-container">
+                <input type="email" 
+                       name="email" 
+                       id="email" 
+                       autocomplete="off"
+                       placeholder="Type to search users..."
+                       required>
+                <div class="suggestions-dropdown" id="suggestionsDropdown">
+                    <!-- Suggestions will be populated here -->
+                </div>
+            </div>
         </div>
 
         <input class="submit-button" type="submit" value="Register">
@@ -77,14 +193,151 @@
             </div>
         </div>
         {% endif %}
-
-
-
-
     </div>
-    
-
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('email');
+    const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+    let currentFocus = -1;
+    let searchTimeout;
+    
+    // Handle input changes
+    emailInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+            hideSuggestions();
+            return;
+        }
+        
+        // Add loading indicator
+        showLoading();
+        
+        // Debounce the search to avoid too many requests
+        searchTimeout = setTimeout(() => {
+            fetchSuggestions(query);
+        }, 300);
+    });
+    
+    // Handle keyboard navigation
+    emailInput.addEventListener('keydown', function(e) {
+        const suggestions = suggestionsDropdown.querySelectorAll('.suggestion-item');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus++;
+            if (currentFocus >= suggestions.length) currentFocus = 0;
+            highlightSuggestion(suggestions);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = suggestions.length - 1;
+            highlightSuggestion(suggestions);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentFocus > -1 && suggestions[currentFocus]) {
+                selectSuggestion(suggestions[currentFocus]);
+            }
+        } else if (e.key === 'Escape') {
+            hideSuggestions();
+        }
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!emailInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+    
+    function fetchSuggestions(query) {
+        fetch(`/webinar/get-user-suggestions/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySuggestions(data.suggestions);
+                console.log("bitch")
+            })
+            .catch(error => {
+                console.error('Error fetching suggestions:', error);
+                hideSuggestions();
+                  console.log("bitchs")
+            });
+    }
+    
+    function displaySuggestions(suggestions) {
+        suggestionsDropdown.innerHTML = '';
+        currentFocus = -1;
+        
+        if (suggestions.length === 0) {
+            suggestionsDropdown.innerHTML = '<div class="no-suggestions">No users found</div>';
+            showSuggestions();
+            return;
+        }
+        
+        suggestions.forEach(user => {
+            const suggestionItem = createSuggestionItem(user);
+            suggestionsDropdown.appendChild(suggestionItem);
+        });
+        
+        showSuggestions();
+    }
+    
+    function createSuggestionItem(user) {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.setAttribute('data-email', user.email);
+        
+        const avatar = user.profile_img 
+            ? `<img src="${user.profile_img}" alt="${user.full_name}" class="suggestion-avatar">`
+            : `<div class="suggestion-avatar"><i class="fas fa-user"></i></div>`;
+        
+        item.innerHTML = `
+            ${avatar}
+            <div class="suggestion-info">
+                <div class="suggestion-name">${user.full_name}</div>
+                <div class="suggestion-email">${user.email}</div>
+            </div>
+        `;
+        
+        item.addEventListener('click', () => selectSuggestion(item));
+        
+        return item;
+    }
+    
+    function selectSuggestion(item) {
+        const email = item.getAttribute('data-email');
+        emailInput.value = email;
+        hideSuggestions();
+        currentFocus = -1;
+    }
+    
+    function highlightSuggestion(suggestions) {
+        suggestions.forEach((item, index) => {
+            item.classList.toggle('highlighted', index === currentFocus);
+        });
+    }
+    
+    function showSuggestions() {
+        suggestionsDropdown.classList.add('show');
+        emailInput.classList.remove('no-dropdown');
+    }
+    
+    function hideSuggestions() {
+        suggestionsDropdown.classList.remove('show');
+        emailInput.classList.add('no-dropdown');
+        currentFocus = -1;
+    }
+    
+    function showLoading() {
+        suggestionsDropdown.innerHTML = '<div class="loading-suggestions">Searching...</div>';
+        showSuggestions();
+    }
+});
+</script>
 
 {% endblock %}

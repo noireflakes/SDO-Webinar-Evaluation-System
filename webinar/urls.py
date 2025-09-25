@@ -23,5 +23,6 @@ urlpatterns=[
     path('<int:webinar_id>/close-evaluation/', views.close_webinar_evaluation, name='close_evaluation'),
 
     path('<int:webinar_id>/toggle-evaluation/', views.toggle_evaluation_ajax, name='toggle_evaluation'),
+    path('get-user-suggestions/', views.get_user_suggestions, name='get_user_suggestions'),
     
 ]

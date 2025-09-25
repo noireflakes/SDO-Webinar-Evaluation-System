@@ -3,7 +3,19 @@
 {% load static %}
 {% block css %} <link rel="stylesheet" href="{% static 'webinar/css/evaluation.css' %}">
 <link rel="stylesheet" href="{% static 'webinar/css/breadcrumbs.css' %}">
+<style>
+    body{
+    background-color: #e8e1fa;
+}
+a{
+    color:black;
+    text-decoration: none;
+}
 
+a:hover{
+    text-decoration:underline;
+}
+</style>
 {% endblock %}
 {% block body %}
 {% if user.is_staff or user.is_superuser %}
@@ -20,8 +32,14 @@
 
 <div class="evaluation-form">
     <div class="form-header">
+
         <h1>Evaluation Form</h1>
-        <h2>Teachers' Professional Development & Training</h2>
+        <div style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                        <h3 style="color:#202020; font-style:italic; margin-top:2rem; margin-bottom:2rem; font-size:clamp(16px, 4vw, 28px); line-height:1.4;  text-align: center; width: 80%;">
+        {{ webinar.title }}
+        </h3>
+
+        </div>
         <p class="author">SGOD Chief, Irene L. Elizalde</p>
         <p class="date">April 1, 2025</p>
         <div class="divider">
@@ -64,6 +82,7 @@
             {% if error_message %}
                 <h4 style="color:red">{{ error_message }}</h4>
             {% endif %}
+
         <table class="info-table">
             <tr >
                 <td><p class="sex-label">Sex: 
@@ -73,24 +92,43 @@
                 <td style="display: none;">
                     <input type="text"  value="{{ user.email }}" name="email" id="email">
                 </td>
-
             </tr>
         </table>   
+
+       
+        {% if speakers %}
+        <div class="speakers-section">
+            <h3>Our Speakers</h3>
+            <div class="speakers-grid">
+                {% for speaker in speakers %}
+                <div class="speaker-card">
+                    {% if speaker.img %}
+                        <img src="{{ speaker.img.url }}" alt="{{ speaker.name }}" class="speaker-image">
+                    {% else %}
+                        <div class="speaker-image speaker-placeholder">
+                            {{ speaker.name|first }}
+                        </div>
+                    {% endif %}
+                    <div class="speaker-info">
+                        <h4>{{ speaker.name }}</h4>
+                        {% if speaker.email %}
+                            <p>{{ speaker.email }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
             
         <table class="rating-table">
-
-  
-
-     
             <tr>
-                <td><h2>Speaker</h2></td>
+                <td><h2>Speaker Evaluation</h2></td>
                 <td>5</td>
                 <td>4</td>
                 <td>3</td>
                 <td>2</td>
                 <td>1</td>
-            
-                
             </tr>
             <tr>
                 <td>1. Knowledge of subject matter</td>

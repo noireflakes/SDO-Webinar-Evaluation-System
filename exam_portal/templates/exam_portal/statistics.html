@@ -240,7 +240,6 @@
             </button>
         </section>
 
-        <!-- FIXED: Attendees Section -->
         <section class="attendees-section">
             <h2 class="title">
                 <i class="fas fa-users me-2"></i>Attendees Management
@@ -273,19 +272,19 @@
             <div class="attendees-table">
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th style="width: 5%;">ID</th>
-                                <th style="width: 20%;">Email</th>
-                              
-                                <th style="width: 15%;">Evaluation</th>
-                                <th class="test-column" style="width: 12%;">Pre-test</th>
-                                <th class="test-column" style="width: 12%;">Post-test</th>
-                                <th class="timestamp-column" style="width: 21%;">Evaluation Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendees-table-body">
-                            <!-- Dynamic content will be populated here -->
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">ID</th>
+                                        <th style="width: 15%;">Name</th>
+                                        <th style="width: 18%;">Email</th>
+                                        <th style="width: 12%;">Evaluation</th>
+                                        <th class="test-column" style="width: 10%;">Pre-test</th>
+                                        <th class="test-column" style="width: 10%;">Post-test</th>
+                                        <th class="timestamp-column" style="width: 20%;">Evaluation Time</th>
+                                    </tr>
+                                </thead>
+                            <tbody id="attendees-table-body">
+               
                         </tbody>
                     </table>
                 </div>
@@ -299,7 +298,7 @@
             </div>
         </section>
 
-        <!-- Comments Carousel Section -->
+     
         <section class="comments-section">
             <h2 class="title">
                 <i class="fas fa-comments me-2"></i>Participant Comments
@@ -355,7 +354,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Toast notification system
 function showToast(message, type = 'success') {
     let container = document.querySelector('.toast-container');
     if (!container) {
@@ -439,7 +437,6 @@ async function toggleEvaluationStatus() {
     }
 }
 
-// Your existing chart functions remain the same...
 async function DownloadExcel() {
     const id = parseInt("{{ webinar.id }}");
     const response = await fetch(`/exam_portal/result_data/${id}`);
@@ -447,8 +444,57 @@ async function DownloadExcel() {
 
     let csvContent = "";
 
+    // ===== OVERALL SUMMARY SECTION =====
+    csvContent += "=== Events OVERALL SUMMARY ===\n";
+    csvContent += "Event Title,{{ webinar.title|escapejs }}\n";
+    csvContent += "Report Generated,\"" + new Date().toLocaleString() + "\"\n";
+    csvContent += "\n";
+    
+    if (data.summary) {
+        csvContent += "PARTICIPATION STATISTICS\n";
+        csvContent += "Total Registered Participants," + (data.summary.total_registered || 0) + "\n";
+        csvContent += "Total Attended," + (data.summary.total_attended || 0) + "\n";
+        csvContent += "Attendance Rate," + (data.summary.attendance_rate || 0) + "%\n";
+        csvContent += "Evaluation Submissions," + (data.summary.total_evaluations || 0) + "\n";
+        csvContent += "Evaluation Completion Rate," + (data.summary.evaluation_rate || 0) + "%\n";
+        csvContent += "Total Comments," + (data.summary.total_comments || 0) + "\n";
+        csvContent += "\n";
+        
+        csvContent += "EVALUATION SCORES (AVERAGE)\n";
+        if (data.summary.category_averages) {
+            // Format numbers to prevent Excel date conversion - use text format with equals sign
+            const speakerAvg = (data.summary.category_averages.speaker || 0).toFixed(2);
+            const venueAvg = (data.summary.category_averages.venue || 0).toFixed(2);
+            const mealAvg = (data.summary.category_averages.meal || 0).toFixed(2);
+            const manageAvg = (data.summary.category_averages.manage || 0).toFixed(2);
+            
+            csvContent += "Speaker Evaluation,=\"" + speakerAvg + "/5\"\n";
+            csvContent += "Venue Evaluation,=\"" + venueAvg + "/5\"\n";
+            csvContent += "Meal Evaluation,=\"" + mealAvg + "/5\"\n";
+            csvContent += "Management Evaluation,=\"" + manageAvg + "/5\"\n";
+        }
+        const overallScore = (data.summary.overall_score || 0).toFixed(2);
+        csvContent += "Overall Score,=\"" + overallScore + "/5\"\n";
+        csvContent += "Satisfaction Rating,\"" + (data.summary.satisfaction_rating || "N/A") + "\"\n";
+        csvContent += "\n";
+        
+        if (data.summary.test_data) {
+            csvContent += "TEST RESULTS SUMMARY\n";
+            csvContent += "Pre-test Participants," + (data.summary.test_data.pre_test_count || 0) + "\n";
+            csvContent += "Pre-test Average Score," + (data.summary.test_data.pre_test_average || 0) + "%\n";
+            csvContent += "Post-test Participants," + (data.summary.test_data.post_test_count || 0) + "\n";
+            csvContent += "Post-test Average Score," + (data.summary.test_data.post_test_average || 0) + "%\n";
+            
+            if (data.summary.test_data.pre_test_average > 0 && data.summary.test_data.post_test_average > 0) {
+                const improvement = data.summary.test_data.post_test_average - data.summary.test_data.pre_test_average;
+                csvContent += "Score Improvement," + improvement.toFixed(1) + "%\n";
+            }
+        }
+        csvContent += "\n";
+    }
+
     // ===== EVALUATION DATA SHEET =====
-    csvContent += "=== EVALUATION DATA ===\n";
+    csvContent += "=== DETAILED EVALUATION DATA ===\n";
     csvContent += "Email,Deped ID,Sex,Timestamp,Speaker,Venue,Meal,Manage\n";
 
     const maxEvalLength = Math.max(
@@ -462,51 +508,55 @@ async function DownloadExcel() {
         data.manage?.length || 0
     );
 
-   for (let i = 0; i < maxEvalLength; i++) {
-    const email = data.email?.[i] ?? "";
-    const schoolId = data.deped_id?.[i] ?? "";
-    const sex = data.sex?.[i] ?? "";
-    const timestamp = data.timestamp?.[i] ?? "";
-    const speaker = data.speaker?.[i] ?? "";
-    const venue = data.venue?.[i] ?? "";
-    const meal = data.meal?.[i] ?? "";
-    const manage = data.manage?.[i] ?? "";
+    for (let i = 0; i < maxEvalLength; i++) {
+        const email = data.email?.[i] ?? "";
+        const schoolId = data.deped_id?.[i] ?? "";
+        const sex = data.sex?.[i] ?? "";
+        const timestamp = data.timestamp?.[i] ?? "";
+        const speaker = data.speaker?.[i] ?? "";
+        const venue = data.venue?.[i] ?? "";
+        const meal = data.meal?.[i] ?? "";
+        const manage = data.manage?.[i] ?? "";
 
-    const escapedEmail = email.includes(",") ? `"${email}"` : email;
-    const escapedSchoolId = schoolId.includes(",") ? `"${schoolId}"` : schoolId;
-    const escapedSex = sex.includes(",") ? `"${sex}"` : sex;
+        const escapedEmail = email.includes(",") ? `"${email}"` : email;
+        const escapedSchoolId = schoolId.includes(",") ? `"${schoolId}"` : schoolId;
+        const escapedSex = sex.includes(",") ? `"${sex}"` : sex;
 
-    // Format timestamp
-    let formattedTimestamp = timestamp;
-    if (timestamp) {
-        const date = new Date(timestamp);
-        const options = { 
-            month: "long", 
-            day: "numeric", 
-            hour: "numeric", 
-            minute: "2-digit", 
-            hour12: true 
-        };
-        formattedTimestamp = date.toLocaleString("en-US", options);
+        // Format timestamp
+        let formattedTimestamp = timestamp;
+        if (timestamp) {
+            const date = new Date(timestamp);
+            const options = { 
+                month: "long", 
+                day: "numeric", 
+                hour: "numeric", 
+                minute: "2-digit", 
+                hour12: true 
+            };
+            formattedTimestamp = date.toLocaleString("en-US", options);
+        }
+
+        const escapedTimestamp = formattedTimestamp.includes(",") ? `"${formattedTimestamp}"` : formattedTimestamp;
+
+        // Format evaluation scores to prevent Excel date conversion - use space prefix
+        const formattedSpeaker = typeof speaker === 'number' ? (speaker === 0 ? '0' : ' ' + speaker.toFixed(2)) : speaker;
+        const formattedVenue = typeof venue === 'number' ? (venue === 0 ? '0' : ' ' + venue.toFixed(2)) : venue;
+        const formattedMeal = typeof meal === 'number' ? (meal === 0 ? '0' : ' ' + meal.toFixed(2)) : meal;
+        const formattedManage = typeof manage === 'number' ? (manage === 0 ? '0' : ' ' + manage.toFixed(2)) : manage;
+
+        csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${formattedSpeaker},${formattedVenue},${formattedMeal},${formattedManage}\n`;
     }
 
-    const escapedTimestamp = formattedTimestamp.includes(",") ? `"${formattedTimestamp}"` : formattedTimestamp;
-
-    csvContent += `${escapedEmail},${escapedSchoolId},${escapedSex},${escapedTimestamp},${speaker},${venue},${meal},${manage}\n`;
-}
-
-    // Add attendees data
     csvContent += "\n=== ATTENDEES DATA ===\n";
-    csvContent += "Email,DepEd ID,Attendance Score,Pre-test Completed,Post-test Completed\n";
+    csvContent += "Email,DepEd ID,Attendance,Pre-test Completed,Post-test Completed\n";
     
     for (let attendee of attendeesData) {
         const escapedEmail = attendee.email.includes(',') ? `"${attendee.email}"` : attendee.email;
         csvContent += `${escapedEmail},${attendee.deped_id || ''},${attendee.attendance},${attendee.pre_test_completion ? 'Yes' : 'No'},${attendee.post_test_completion ? 'Yes' : 'No'}\n`;
     }
 
-    // Add comments data
     csvContent += "\n=== COMMENTS DATA ===\n";
-    csvContent += "Email,DepEd ID,Comment\n";
+    csvContent += "Email,DepEd ID,Comment,Timestamp\n";
     
     const maxCommentsLength = Math.max(
         data.comment_emails?.length || 0,
@@ -524,7 +574,26 @@ async function DownloadExcel() {
         const escapedEmail = email.includes(',') ? `"${email}"` : email;
         const escapedText = text.includes(',') ? `"${text.replace(/"/g, '""')}"` : text;
         
-        csvContent += `${escapedEmail},${depedId},${escapedText},${timestamp}\n`;
+        let formattedCommentTimestamp = timestamp;
+        if (timestamp) {
+            try {
+                const date = new Date(timestamp);
+                if (!isNaN(date.getTime())) {
+                    formattedCommentTimestamp = date.toLocaleString("en-US", {
+                        month: "long",
+                        day: "numeric", 
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true
+                    });
+                }
+            } catch (error) {
+                console.warn('Error formatting comment timestamp:', error);
+            }
+        }
+        const escapedCommentTimestamp = formattedCommentTimestamp.includes(',') ? `"${formattedCommentTimestamp}"` : formattedCommentTimestamp;
+        
+        csvContent += `${escapedEmail},${depedId},${escapedText},${escapedCommentTimestamp}\n`;
     }
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -532,23 +601,21 @@ async function DownloadExcel() {
 
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `webinar_complete_data_${id}.csv`);
+
+    const now = new Date();
+    const timestamp = now.toISOString().split('T')[0];
+    link.setAttribute("download", `webinar_complete_report_${id}_${timestamp}.csv`);
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showToast('Evaluation Report has been Dowloaded Successful', 'success');
-}
-
-
-async function downloadTestData() {
- 
     
+    showToast('Complete Webinar Report Downloaded Successfully', 'success');
+}
+async function downloadTestData() {
     try {
         const webinarId = {{ webinar.id|escapejs }};
-        
-
-
         const response = await fetch(`/exam_portal/test_data/${webinarId}`);
         
         if (!response.ok) {
@@ -557,181 +624,214 @@ async function downloadTestData() {
         
         const data = await response.json();
         
-        
         if (!data.test_result || data.test_result.length === 0) {
             showToast('No test data available to download', 'error');
             return;
         }
-        
 
         const allTestData = data.test_result;
         const preTestData = allTestData.filter(item => item.test_type === 'pre_test');
         const postTestData = allTestData.filter(item => item.test_type === 'post_test');
 
-        
-   
+        // Calculate statistics
         const preTestAverage = preTestData.length > 0 ? 
-            (preTestData.reduce((sum, item) => sum + item.score, 0) / preTestData.length).toFixed(2) : 0;
+            (preTestData.reduce((sum, item) => sum + item.score, 0) / preTestData.length) : 0;
         const postTestAverage = postTestData.length > 0 ? 
-            (postTestData.reduce((sum, item) => sum + item.score, 0) / postTestData.length).toFixed(2) : 0;
-            
-  
+            (postTestData.reduce((sum, item) => sum + item.score, 0) / postTestData.length) : 0;
         
-  
-        const workbook = XLSX.utils.book_new();
+        const preTestMax = preTestData.length > 0 ? Math.max(...preTestData.map(item => item.score)) : 0;
+        const preTestMin = preTestData.length > 0 ? Math.min(...preTestData.map(item => item.score)) : 0;
+        const postTestMax = postTestData.length > 0 ? Math.max(...postTestData.map(item => item.score)) : 0;
+        const postTestMin = postTestData.length > 0 ? Math.min(...postTestData.map(item => item.score)) : 0;
         
+        const preTestPassCount = preTestData.filter(item => item.score >= 70).length;
+        const postTestPassCount = postTestData.filter(item => item.score >= 70).length;
+        
+        const preTestPassRate = preTestData.length > 0 ? (preTestPassCount / preTestData.length * 100) : 0;
+        const postTestPassRate = postTestData.length > 0 ? (postTestPassCount / postTestData.length * 100) : 0;
 
-        const preTestSheetData = [];
-        
+        let csvContent = "";
 
-        preTestSheetData.push({
-            'Email': 'PRE-TEST RESULTS',
-            'DepEd ID': '',
-            'Score': ''
-        });
-        
-        preTestSheetData.push({
-            'Email': '',
-            'DepEd ID': '',
-            'Score': ''
-        });
+        // ===== OVERALL SUMMARY SECTION =====
+        csvContent += "=== TEST RESULTS OVERALL SUMMARY ===\n";
+        csvContent += "Webinar Title,{{ webinar.title|escapejs }}\n";
+        csvContent += "Report Generated,\"" + new Date().toLocaleString() + "\"\n";
+        csvContent += "\n";
+
+        csvContent += "TEST PARTICIPATION STATISTICS\n";
+        csvContent += "Total Pre-test Participants," + preTestData.length + "\n";
+        csvContent += "Total Post-test Participants," + postTestData.length + "\n";
+        csvContent += "Total Test Submissions," + allTestData.length + "\n";
+        csvContent += "\n";
+
+        csvContent += "PRE-TEST PERFORMANCE SUMMARY\n";
+        if (preTestData.length > 0) {
+            csvContent += "Average Score,=\"" + preTestAverage.toFixed(2) + "%\"\n";
+            csvContent += "Highest Score," + preTestMax + "%\n";
+            csvContent += "Lowest Score," + preTestMin + "%\n";
+            csvContent += "Pass Rate (≥70%),=\"" + preTestPassRate.toFixed(1) + "% (" + preTestPassCount + "/" + preTestData.length + ")\"\n";
+        } else {
+            csvContent += "Average Score,No data available\n";
+            csvContent += "Highest Score,No data available\n";
+            csvContent += "Lowest Score,No data available\n";
+            csvContent += "Pass Rate (≥70%),No data available\n";
+        }
+        csvContent += "\n";
+
+        csvContent += "POST-TEST PERFORMANCE SUMMARY\n";
+        if (postTestData.length > 0) {
+            csvContent += "Average Score,=\"" + postTestAverage.toFixed(2) + "%\"\n";
+            csvContent += "Highest Score," + postTestMax + "%\n";
+            csvContent += "Lowest Score," + postTestMin + "%\n";
+            csvContent += "Pass Rate (≥70%),=\"" + postTestPassRate.toFixed(1) + "% (" + postTestPassCount + "/" + postTestData.length + ")\"\n";
+        } else {
+            csvContent += "Average Score,No data available\n";
+            csvContent += "Highest Score,No data available\n";
+            csvContent += "Lowest Score,No data available\n";
+            csvContent += "Pass Rate (≥70%),No data available\n";
+        }
+        csvContent += "\n";
+
+        // Performance comparison if both tests have data
+        if (preTestData.length > 0 && postTestData.length > 0) {
+            const improvement = postTestAverage - preTestAverage;
+            csvContent += "PERFORMANCE COMPARISON\n";
+            csvContent += "Score Improvement,=\"" + improvement.toFixed(2) + "%\"\n";
+            csvContent += "Improvement Status,\"" + (improvement > 0 ? "Positive" : improvement < 0 ? "Declined" : "No Change") + "\"\n";
+            csvContent += "\n";
+        }
+
+        // ===== PRE-TEST DETAILED DATA =====
+        csvContent += "=== PRE-TEST DETAILED RESULTS ===\n";
+        csvContent += "Email,DepEd ID,Score,Date Taken\n";
         
         if (preTestData.length > 0) {
-            // Add data rows
             preTestData.forEach(item => {
-                preTestSheetData.push({
-                    'Email': item.user,
-                    'DepEd ID': item.deped_id || 'N/A',
-                    'Score': item.score
-                });
-            });
-            
-            
-            preTestSheetData.push({
-                'Email': '',
-                'DepEd ID': '',
-                'Score': ''
-            });
-            
-          
-            preTestSheetData.push({
-                'Email': '',
-                'DepEd ID': 'AVERAGE:',
-                'Score': parseFloat(preTestAverage)
+                const email = item.user.includes(',') ? `"${item.user}"` : item.user;
+                const depedId = item.deped_id || 'N/A';
+                const score = item.score;
+                
+                // Format date
+                let formattedDate = 'N/A';
+                if (item.date_taken) {
+                    try {
+                        const date = new Date(item.date_taken);
+                        if (!isNaN(date.getTime())) {
+                            formattedDate = date.toLocaleString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Error formatting date:', error);
+                    }
+                }
+                const escapedDate = formattedDate.includes(',') ? `"${formattedDate}"` : formattedDate;
+                
+                csvContent += `${email},${depedId},${score}%,${escapedDate}\n`;
             });
         } else {
-        
-            preTestSheetData.push({
-                'Email': 'No pre-test data available',
-                'DepEd ID': '',
-                'Score': ''
-            });
+            csvContent += "No pre-test data available,,,\n";
         }
-        
-        const preTestWS = XLSX.utils.json_to_sheet(preTestSheetData);
-        
-       
-        preTestWS['!cols'] = [
-            { wch: 35 },
-            { wch: 15 },
-            { wch: 10 }  
-        ];
-        
-        XLSX.utils.book_append_sheet(workbook, preTestWS, "Pre-Test Results");
-        
-        // Create Post-Test sheet
-        const postTestSheetData = [];
-        
-        // Add title row
-        postTestSheetData.push({
-            'Email': 'POST-TEST RESULTS',
-            'DepEd ID': '',
-            'Score': ''
-        });
-        
-        // Add empty row for spacing
-        postTestSheetData.push({
-            'Email': '',
-            'DepEd ID': '',
-            'Score': ''
-        });
+
+        csvContent += "\n=== POST-TEST DETAILED RESULTS ===\n";
+        csvContent += "Email,DepEd ID,Score,Date Taken\n";
         
         if (postTestData.length > 0) {
-        
             postTestData.forEach(item => {
-                postTestSheetData.push({
-                    'Email': item.user,
-                    'DepEd ID': item.deped_id || 'N/A',
-                    'Score': item.score
-                });
-            });
-            
-            postTestSheetData.push({
-                'Email': '',
-                'DepEd ID': '',
-                'Score': ''
-            });
-            
-       
-            postTestSheetData.push({
-                'Email': '',
-                'DepEd ID': 'AVERAGE:',
-                'Score': parseFloat(postTestAverage)
+                const email = item.user.includes(',') ? `"${item.user}"` : item.user;
+                const depedId = item.deped_id || 'N/A';
+                const score = item.score;
+                
+                // Format date
+                let formattedDate = 'N/A';
+                if (item.date_taken) {
+                    try {
+                        const date = new Date(item.date_taken);
+                        if (!isNaN(date.getTime())) {
+                            formattedDate = date.toLocaleString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Error formatting date:', error);
+                    }
+                }
+                const escapedDate = formattedDate.includes(',') ? `"${formattedDate}"` : formattedDate;
+                
+                csvContent += `${email},${depedId},${score}%,${escapedDate}\n`;
             });
         } else {
+            csvContent += "No post-test data available,,,\n";
+        }
+
+        // ===== COMPARISON ANALYSIS (for users who took both tests) =====
+        csvContent += "\n=== INDIVIDUAL PERFORMANCE COMPARISON ===\n";
+        csvContent += "Email,DepEd ID,Pre-test Score,Post-test Score,Improvement,Status\n";
         
-            postTestSheetData.push({
-                'Email': 'No post-test data available',
-                'DepEd ID': '',
-                'Score': ''
+        // Create maps for easier lookup
+        const preTestMap = new Map(preTestData.map(item => [item.user, item]));
+        const postTestMap = new Map(postTestData.map(item => [item.user, item]));
+        
+        // Find users who took both tests
+        const commonUsers = [...preTestMap.keys()].filter(user => postTestMap.has(user));
+        
+        if (commonUsers.length > 0) {
+            commonUsers.forEach(userEmail => {
+                const preTest = preTestMap.get(userEmail);
+                const postTest = postTestMap.get(userEmail);
+                
+                const preScore = preTest.score;
+                const postScore = postTest.score;
+                const improvement = postScore - preScore;
+                const improvementText = improvement > 0 ? `+${improvement}` : `${improvement}`;
+                
+                let status = 'No Change';
+                if (improvement > 0) status = 'Improved';
+                else if (improvement < 0) status = 'Declined';
+                
+                const email = userEmail.includes(',') ? `"${userEmail}"` : userEmail;
+                const depedId = preTest.deped_id || 'N/A';
+                
+                csvContent += `${email},${depedId},${preScore}%,${postScore}%,${improvementText}%,${status}\n`;
             });
+        } else {
+            csvContent += "No users found who took both pre-test and post-test,,,,,\n";
         }
-        
-        const postTestWS = XLSX.utils.json_to_sheet(postTestSheetData);
-        
-       
-        postTestWS['!cols'] = [
-            { wch: 35 }, 
-            { wch: 15 }, 
-            { wch: 10 }  
-        ];
-        
-        XLSX.utils.book_append_sheet(workbook, postTestWS, "Post-Test Results");
-        
-   
-        if (workbook.SheetNames.length === 0) {
-            const emptyData = [{
-                'Email': 'No test data available',
-                'DepEd ID': '',
-                'Score': ''
-            }];
-            const emptyWS = XLSX.utils.json_to_sheet(emptyData);
-            XLSX.utils.book_append_sheet(workbook, emptyWS, "No Data");
-        }
-        
-  
+
+        // Create and download the CSV file
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+
         const now = new Date();
-        const timestamp = now.toISOString().split('T')[0]; 
-        const filename = `Test_Results_Webinar_${webinarId}_${timestamp}.xlsx`;
+        const timestamp = now.toISOString().split('T')[0];
+        link.setAttribute("download", `test_results_complete_report_${webinarId}_${timestamp}.csv`);
         
-      
-        XLSX.writeFile(workbook, filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
         
-        showToast('Test results downloaded successfully!', 'success');
-        console.log("Test data download completed");
+        showToast('Test Results Report Downloaded Successfully', 'success');
         
     } catch (error) {
         console.error('Error downloading test data:', error);
         showToast('Failed to download test results. Please try again.', 'error');
-    } finally {
-        // Reset button state
-        const downloadBtn = document.querySelector('.test-section .btn-download');
-        if (downloadBtn) {
-            downloadBtn.innerHTML = originalText;
-            downloadBtn.disabled = false;
-        }
     }
 }
+
 
 // Helper function to create test summary
 function createTestSummary(testData) {
@@ -826,7 +926,6 @@ function toggleAttendanceView() {
     displayAttendeesTable();
 }
 
-
 function displayAttendeesTable() {
     const tableBody = document.getElementById('attendees-table-body');
     const tableInfo = document.getElementById('attendees-table-info');
@@ -834,7 +933,7 @@ function displayAttendeesTable() {
     tableBody.innerHTML = "";
     
     if (filteredAttendeesData.length === 0) {
-        const colspan = showAllTests ? "7" : "5";
+        const colspan = showAllTests ? "7" : "6"; // Updated colspan
         tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">No attendees data available</td></tr>`;
         tableInfo.innerHTML = "Showing 0 entries";
         return;
@@ -885,8 +984,8 @@ function displayAttendeesTable() {
         
         let tr = `<tr>
                     <td>${start + index + 1}</td>
+                    <td title="${attendee.name || 'N/A'}">${attendee.name || 'N/A'}</td>
                     <td title="${attendee.email}">${attendee.email}</td>
-                  
                     <td><span class="completion-badge ${evaluationClass}">${evaluationStatus}</span></td>
                     <td class="test-column">${preTestBadge}</td>
                     <td class="test-column">${postTestBadge}</td>
@@ -899,6 +998,26 @@ function displayAttendeesTable() {
     tableInfo.innerHTML = `Showing ${start + 1} to ${actualEnd} of ${filteredAttendeesData.length} entries`;
 }
 
+// 4. Update the showErrorState function
+function showErrorState() {
+    const tableBody = document.getElementById('attendees-table-body');
+    const tableInfo = document.getElementById('attendees-table-info');
+    
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4"> <!-- Updated colspan -->
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Failed to load attendees data. Please refresh the page and try again.
+                </td>
+            </tr>
+        `;
+    }
+    
+    if (tableInfo) {
+        tableInfo.innerHTML = "Failed to load data";
+    }
+}
 function setupAttendeesPagination() {
     const pagination = document.getElementById('attendees-pagination');
     pagination.innerHTML = "";
@@ -964,7 +1083,8 @@ function searchAttendees() {
     } else {
         filteredAttendeesData = attendeesData.filter(item =>
             item.email.toLowerCase().includes(searchTerm) ||
-            (item.deped_id && item.deped_id.toLowerCase().includes(searchTerm))
+            (item.deped_id && item.deped_id.toLowerCase().includes(searchTerm)) ||
+            (item.name && item.name.toLowerCase().includes(searchTerm))
         );
     }
     

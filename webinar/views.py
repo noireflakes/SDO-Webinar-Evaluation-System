@@ -156,23 +156,25 @@ def user_events_data(request):
     return JsonResponse(events, safe=False)
 
 
+from django.http import JsonResponse
+from django.db.models import Q
+
 def register(request, id):
     webinar = get_object_or_404(Webinar, id=id)
 
     attendees = WebinarAttendees.objects.filter(webinar=webinar).order_by("-id")
 
     if request.method == 'POST':
-
         email = request.POST.get('email')
+        start_time = webinar.time.strftime("%I:%M %p")
+        start_date = webinar.start_date.strftime("%B %d, %Y")
 
         try:
-            user=User.objects.get(email=email)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             print("user not found")
             messages.error(request, "This Email is invalid")
             return redirect("register", webinar.id)
-        
-
 
         already_registered = WebinarAttendees.objects.filter(webinar=webinar, user=user).exists()
 
@@ -194,34 +196,112 @@ def register(request, id):
             "Best regards,\n"
             "The Webinar Team"
         """
-        html_message = f"""
+        html_message =f"""
 <html>
-  <body style="font-family: Arial, sans-serif; line-height: 1.5;">
-    <p>Hello,</p>
+  <body style="margin:0; padding:0; background-color:#f5f5f5; font-family: 'Segoe UI', Arial, sans-serif; color:#333;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 40px 20px;">
+          <!-- Main Container -->
+          <table width="600" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            
+            <!-- Header with Bright Purple -->
+            <tr>
+              <td style="background:#865dee; padding:0;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center" style="padding:30px 20px; color:#ffffff;">
+                      <h1 style="margin:0; font-size:26px; font-weight:600; letter-spacing:0.5px;">
+                        Registration Confirmed 🎉
+                      </h1>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
 
-    <p>You are now registered for "<strong>{webinar.title}</strong>".</p>
+            <!-- Body Content -->
+            <tr>
+              <td style="padding:40px 30px;">
+                <div style="text-align:left;">
+                  <p style="margin:0 0 20px 0; font-size:18px; color:#333; font-weight:400;">
+                    Hi there,
+                  </p>
+                  
+                  <p style="margin:0 0 25px 0; font-size:16px; line-height:1.6; color:#555;">
+                    You are now registered for
+                    <strong style="color:#4c43ce; font-weight:600;">{webinar.title}</strong>.
+                  </p>
 
-    <p>
-      📅 <strong>Date:</strong> {webinar.start_date}<br>
-      📍 <strong>Location:</strong> {webinar.venue}
-    </p>
+                  <!-- Event Details Section -->
+                  <div style="background-color:#f8f9fa; border-left:4px solid #4c43ce; padding:25px; margin:25px 0; border-radius:0 6px 6px 0;">
+                    <h2 style="margin:0 0 18px 0; font-size:18px; font-weight:600; color:#4c43ce;">
+                      📌 Event Details
+                    </h2>
+                    
+                    <div style="margin-bottom:15px;">
+                      <div style="color:#666; font-size:14px; font-weight:600; text-transform:uppercase;">Title</div>
+                      <strong style="color:#4c43ce; font-weight:600; font-size:20px">{webinar.title}</strong>.
+                    </div>
 
-    <p>We look forward to seeing you there!</p>
 
-    <p>Best regards,<br>
-     The SDO Baliwag</p>
+                    <div style="margin-bottom:15px;">
+                      <div style="color:#666; font-size:14px; font-weight:600; text-transform:uppercase;">Date</div>
+                      <div style="color:#333; font-size:16px; margin-top:4px;">{start_date}</div>
+                    </div>
+
+                    <div style="margin-bottom:15px;">
+                      <div style="color:#666; font-size:14px; font-weight:600; text-transform:uppercase;">Start Time</div>
+                      <div style="color:#333; font-size:16px; margin-top:4px;">{start_time}</div>
+                    </div>
+
+                    <div>
+                      <div style="color:#666; font-size:14px; font-weight:600; text-transform:uppercase;">Location</div>
+                      <div style="color:#333; font-size:16px; margin-top:4px;">{webinar.venue}</div>
+                    </div>
+                  </div>
+
+                  <p style="margin:30px 0 40px 0; font-size:16px; line-height:1.6; color:#555;">
+                    We look forward to seeing you there!
+                  </p>
+
+                  <!-- Signature -->
+                  <div style="border-top:1px solid #eee; padding-top:25px; margin-top:30px;">
+                    <p style="margin:0; font-size:16px; color:#555;">
+                      Best regards,
+                    </p>
+                    <p style="margin:5px 0 0 0; font-size:16px; color:#4c43ce; font-weight:600;">
+                      The SDO Baliwag
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background-color:#f8f9fa; text-align:center; padding:20px; border-top:1px solid #eee;">
+                <p style="margin:0; color:#888; font-size:12px; line-height:1.4;">
+                  This is an automated message. Please do not reply to this email.
+                </p>
+                <p style="margin:5px 0 0 0; color:#888; font-size:12px;">
+                  © 2025 SDO Baliwag. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
 """
 
-
-
-
         send_email(
-        to_email=email,
-        subject=subject,
-        body= html_message
-    )
+            to_email=email,
+            subject=subject,
+            body=html_message
+        )
 
         messages.success(request, "Registration successful!")
         return redirect('register', id=webinar.id)
@@ -231,6 +311,39 @@ def register(request, id):
         'attendees': attendees
     })
 
+
+def get_user_suggestions(request):
+
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:  
+        return JsonResponse({'suggestions': []})
+    
+    
+   
+    users = User.objects.filter(
+        Q(email__icontains=query) |
+        Q(username__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query)
+    ).distinct()[:10]  
+    
+    suggestions = []
+    for user in users:
+     
+        profile_img = None
+        if hasattr(user, 'user_profile') and user.user_profile.img:
+            profile_img = user.user_profile.img.url
+        
+        suggestions.append({
+            'id': user.id,
+            'email': user.email,
+            'username': user.username,
+            'full_name': f"{user.first_name} {user.last_name}".strip() or user.username,
+            'profile_img': profile_img
+        })
+    
+    return JsonResponse({'suggestions': suggestions})
 
 #validation
 def validation(request, id):
@@ -250,10 +363,10 @@ def validation(request, id):
         "id":id
     })
 
-#questionaire
 from django.urls import reverse
 def questionaire(request, id):     
     webinar = get_object_or_404(Webinar, id=id)      
+    speakers = webinar.speaker.all()
     speaker = []     
     venue = []     
     meals = []     
@@ -373,31 +486,40 @@ def questionaire(request, id):
             error_message = "Invalid id please recheck your Deped id"                          
             if webinar.event_type == 'recognition':                 
                 return render(request, 'webinar/evaluation/recognition.html', {                     
-                    'webinar': webinar,                     
+                    'webinar': webinar,
+                    'speakers': speakers ,
+
                     'error_message': error_message                 
                 })             
             elif webinar.event_type == 'seminar':                 
                 return render(request, 'webinar/evaluation/seminar.html', {                     
-                    'webinar': webinar,                     
+                    'webinar': webinar,        
+                    'speakers': speakers  ,             
                     'error_message': error_message                 
                 })                          
             return render(request, 'webinar/evaluation/workshop.html', {                 
-                'webinar': webinar,                 
+                'webinar': webinar,    
+                'speakers': speakers  ,             
                 'error_message': error_message             
             })      
 
     if webinar.event_type == 'recognition':         
         return render(request, 'webinar/evaluation/recognition.html', {             
-            'webinar': webinar         
+            'webinar': webinar,   
+            'speakers': speakers      
         })     
     elif webinar.event_type == 'seminar':         
         return render(request, 'webinar/evaluation/seminar.html', {             
-            'webinar': webinar         
+            'webinar': webinar,    
+            'speakers': speakers     
         })          
     
     return render(request, 'webinar/evaluation/workshop.html', {         
-        'webinar': webinar     
+        'webinar': webinar,    
+        'speakers': speakers 
     })
+
+
 def create_test(request, id):
     webinar = get_object_or_404(Webinar, id=id)
     
