@@ -478,19 +478,7 @@ async function DownloadExcel() {
         csvContent += "Satisfaction Rating,\"" + (data.summary.satisfaction_rating || "N/A") + "\"\n";
         csvContent += "\n";
         
-        if (data.summary.test_data) {
-            csvContent += "TEST RESULTS SUMMARY\n";
-            csvContent += "Pre-test Participants," + (data.summary.test_data.pre_test_count || 0) + "\n";
-            csvContent += "Pre-test Average Score," + (data.summary.test_data.pre_test_average || 0) + "%\n";
-            csvContent += "Post-test Participants," + (data.summary.test_data.post_test_count || 0) + "\n";
-            csvContent += "Post-test Average Score," + (data.summary.test_data.post_test_average || 0) + "%\n";
-            
-            if (data.summary.test_data.pre_test_average > 0 && data.summary.test_data.post_test_average > 0) {
-                const improvement = data.summary.test_data.post_test_average - data.summary.test_data.pre_test_average;
-                csvContent += "Score Improvement," + improvement.toFixed(1) + "%\n";
-            }
-        }
-        csvContent += "\n";
+     
     }
 
     // ===== EVALUATION DATA SHEET =====

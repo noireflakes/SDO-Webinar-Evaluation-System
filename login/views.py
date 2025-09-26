@@ -51,7 +51,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from .email_service import send_email
 from datetime import timedelta
-
+from django.contrib.admin.models import LogEntry, ADDITION, DELETION
+from django.contrib.contenttypes.models import ContentType
 
 # Create your views here.
 
@@ -701,7 +702,6 @@ def admin_users(request):
         'all_users': users  
     })
 
-
 @admin_required
 def register_user(request):
     today = timezone.now().date()
@@ -761,6 +761,16 @@ def register_user(request):
                 middle_initial=middle,
                 school=school,  # Add school field
                 position=position  # Add position field
+            )
+
+            # Add LogEntry for user creation
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(User).pk,
+                object_id=user.id,
+                object_repr=f"{user.first_name} {user.last_name} ({user.username})",
+                action_flag=ADDITION,
+                change_message=f"Regular user account created - Email: {email}, School: {school}, Position: {position}"
             )
 
         result = send_email(
@@ -851,7 +861,6 @@ def register_user(request):
         messages.success(request,"Successfully registered")
         return redirect('admin_users')
     return redirect('admin_users')
-
 @admin_required
 def generete_authorization_key(request):
    
@@ -906,7 +915,8 @@ def create_admin(request):
                 password=password)
             user.is_staff = True
             user.save()
-            UserProfile.objects.create(
+            
+            profile = UserProfile.objects.create(
                 user=user,
                 deped_id=deped_id, 
                 birthday=birthday, 
@@ -914,19 +924,58 @@ def create_admin(request):
                 school=school, 
                 position=position  
             )
-            messages.success(request, "Staff account created successfully.")
+            
+            # Add LogEntry for admin creation
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(User).pk,
+                object_id=user.id,
+                object_repr=f"{user.first_name} {user.last_name} ({user.username})",
+                action_flag=ADDITION,
+                change_message=f"Admin/Staff account created - Email: {email}, School: {school}, Position: {position}, DepEd ID: {deped_id}"
+            )
+            
+            messages.success(request, f"Staff account for '{first_name} {last_name}' created successfully.")
 
     return redirect('admin_users')
 
 @admin_required
 def delete_user(request, id):
-    user=User.objects.filter(id=id)
+    try:
+        user = User.objects.get(id=id)
+        
+        user_repr = f"{user.first_name} {user.last_name} ({user.username})"
+        user_email = user.email
+        
     
-    user.delete()
-    messages.success(request, "User has been deleted")
+        try:
+            profile = user.user_profile
+            school = profile.school if profile.school else 'N/A'
+            position = profile.position if profile.position else 'N/A'
+        except:
+            school = 'N/A'
+            position = 'N/A'
+        
+        # Delete the user
+        user.delete()
+        
+        # Add LogEntry for user deletion
+        LogEntry.objects.log_action(
+            user_id=request.user.id,
+            content_type_id=ContentType.objects.get_for_model(User).pk,
+            object_id=id,
+            object_repr=user_repr,
+            action_flag=DELETION,
+            change_message=f"User account deleted - Email: {user_email}, School: {school}, Position: {position}"
+        )
+        messages.success(request, f"User '{user_repr}' has been deleted successfully")
+        
+    except User.DoesNotExist:
+        messages.error(request, "User not found")
+    except Exception as e:
+        messages.error(request, f"Error deleting user: {str(e)}")
 
     return redirect("admin_users")
-
 
 @login_required
 def edit_user(request):
