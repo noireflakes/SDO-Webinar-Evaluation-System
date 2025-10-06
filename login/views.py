@@ -87,7 +87,7 @@ def create_device_hash(request):
     return hash
 
 
-#assistance
+# assistance
 @require_http_methods(["POST"])
 def send_assistance(request):
     try:
@@ -177,9 +177,8 @@ def send_assistance(request):
         return JsonResponse({"success": False, "error": "Failed to send message"})
 
 
-
 def index(request):
-    
+
     upcoming_webinars = Webinar.objects.filter(
         start_date__gte=timezone.now().date()
     ).order_by("start_date")[:6]
@@ -500,7 +499,6 @@ def resend_otp(request, user_id):
     if existing_otp and existing_otp.is_locked_out():
         return redirect("otp", user_id=user_id)
 
-
     otp_secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(otp_secret_key, interval=300)
 
@@ -561,10 +559,8 @@ def resend_otp(request, user_id):
     """,
     )
 
-
     session_key = f"otp_generated_{user_id}"
     request.session[session_key] = True
-
 
     return redirect("otp", user_id=user_id)
 
@@ -746,11 +742,10 @@ def register_user(request):
         else:
             middle = "N/A"
 
-    
         if position == "Other" and custom_position:
             position = custom_position
         elif not position:
-            position = "Subject Teacher"  
+            position = "Subject Teacher"
 
         try:
             birth_date = date.fromisoformat(birth_date_str)
@@ -789,11 +784,10 @@ def register_user(request):
                 deped_id=deped_id,
                 birthday=birth_date,
                 middle_initial=middle,
-                school=school,  
-                position=position, 
+                school=school,
+                position=position,
             )
 
-       
             LogEntry.objects.log_action(
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(User).pk,
@@ -865,9 +859,9 @@ def register_user(request):
 
               <p style="margin:18px 0 0 0;font-size:14px;color:#555;">
                 Best regards,<br/>
-                The Team
+                By The SDO
               </p>
-            </td>
+            </td>z
           </tr>
 
           <!-- Footer -->
@@ -917,22 +911,19 @@ def create_admin(request):
         email = request.POST.get("staff_email")
         password = request.POST.get("staff_password")
         birthday = request.POST.get("staff_birth_date")
-        school = request.POST.get("staff_school")  
-        position = request.POST.get("staff_position")  
-        custom_position = request.POST.get(
-            "staff_custom_position"
-        )  
+        school = request.POST.get("staff_school")
+        position = request.POST.get("staff_position")
+        custom_position = request.POST.get("staff_custom_position")
 
         if request.POST.get("staff_middle"):
             middle = request.POST.get("staff_middle")
         else:
             middle = "N/A"
 
-       
         if position == "Other" and custom_position:
             position = custom_position
         elif not position:
-            position = "Staff"  
+            position = "Staff"
 
         username = first_name
 
@@ -960,7 +951,6 @@ def create_admin(request):
                 position=position,
             )
 
-            
             LogEntry.objects.log_action(
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(User).pk,
@@ -994,10 +984,8 @@ def delete_user(request, id):
             school = "N/A"
             position = "N/A"
 
-       
         user.delete()
 
-        
         LogEntry.objects.log_action(
             user_id=request.user.id,
             content_type_id=ContentType.objects.get_for_model(User).pk,
@@ -1172,14 +1160,12 @@ def log_list(request):
             "change_message": log.change_message,
         }
 
-        
         if log.action_flag == DELETION:
             if log.content_type:
                 model_name = log.content_type.model.title()
                 log_data["deleted_model"] = model_name
                 log_data["deleted_id"] = log.object_id
 
-                
                 if (
                     not log.object_repr
                     or log.object_repr == "None"
@@ -1345,7 +1331,6 @@ def reset_password(request, token):
             user.set_password(new_password)
             user.save()
 
-          
             reset_obj.used = True
             reset_obj.save()
 
@@ -1484,13 +1469,12 @@ def compare_events(request):
         )
 
     try:
-        
+
         event1 = get_object_or_404(Webinar, id=event1_id)
         event2 = get_object_or_404(Webinar, id=event2_id)
         print(f"hello {event1}")
         print(f"hello {event2}")
 
-        
         event1_data = calculate_event_ratings(event1)
         event2_data = calculate_event_ratings(event2)
 
@@ -1542,12 +1526,11 @@ def calculate_event_ratings(webinar):
             "total_responses": 0,
         }
 
-    
     question_totals = {"q1": [], "q2": [], "q3": [], "q4": [], "q5": [], "q6": []}
     categories = {"speaker": [], "venue": [], "meals": [], "manage": []}
 
     for evaluation in evaluations:
-        
+
         questions = {
             "q1": evaluation.q1,
             "q2": evaluation.q2,
@@ -1557,12 +1540,10 @@ def calculate_event_ratings(webinar):
             "q6": evaluation.q6,
         }
 
-        
         for question, score in questions.items():
             if score is not None:
                 question_totals[question].append(score)
 
-        
         valid_scores = [score for score in questions.values() if score is not None]
         if valid_scores:
             eval_avg = sum(valid_scores) / len(valid_scores)
@@ -1570,21 +1551,18 @@ def calculate_event_ratings(webinar):
             if eval_type and eval_type in categories:
                 categories[eval_type].append(eval_avg)
 
-    
     question_averages = []
     for question in ["q1", "q2", "q3", "q4", "q5", "q6"]:
         scores = question_totals[question]
         avg = round(sum(scores) / len(scores), 2) if scores else 0
         question_averages.append(avg)
 
-    
     category_averages = {}
     for category, values in categories.items():
         category_averages[category] = (
             round(sum(values) / len(values), 2) if values else 0
         )
 
-    
     all_scores = []
     for scores in question_totals.values():
         all_scores.extend(scores)
@@ -1676,7 +1654,6 @@ def get_event_statistics(request, event_id):
                     question_stats[question_key]["distribution"][score] += 1
                     rating_distribution[score] += 1
 
-        
         for question_key in question_stats:
             stats = question_stats[question_key]
             if stats["responses"] > 0:
@@ -1715,9 +1692,7 @@ def update_user(request):
                 {"success": False, "message": "User ID is required"}, status=400
             )
 
- 
         user_to_edit = get_object_or_404(User, id=user_id)
-
 
         if not request.user.is_superuser:
             if user_to_edit.is_staff or user_to_edit.is_superuser:
@@ -1755,7 +1730,7 @@ def update_user(request):
             elif role == "staff":
                 user_to_edit.is_superuser = False
                 user_to_edit.is_staff = True
-            else:  
+            else:
                 user_to_edit.is_superuser = False
                 user_to_edit.is_staff = False
 

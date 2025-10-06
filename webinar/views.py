@@ -53,7 +53,6 @@ def make_webinar(request):
         banner = request.FILES.get("banner")
         venue = request.POST.get("venue")
 
-    
         if event_type == "other" and custom_event_type:
             event_type = custom_event_type.strip()
 
@@ -202,7 +201,7 @@ def register(request, id):
         ).exists()
 
         if already_registered:
-            messages.warning(request, "You are already registered for this webinar.")
+            messages.warning(request, "You are already registered for this event.")
             return redirect("register", id=webinar.id)
 
         attendee = WebinarAttendees(webinar=webinar, user=user, email=email)
@@ -773,7 +772,7 @@ def toggle_evaluation_ajax(request, webinar_id):
     )
 
 
-def check_attendance(request, id, test_type="evaluation"):
+def check_attendance(request, id, test_type="evaluation" ):
     webinar = get_object_or_404(Webinar, id=id)
 
     if webinar.close_evaluation:
@@ -819,10 +818,17 @@ def check_attendance(request, id, test_type="evaluation"):
                             type=test_type,
                             user_id=user.id,
                         )
-
+                    
+                    
+                    event_type = webinar.event_type  
+                    if event_type in ['seminar', 'recognition', 'workshop']:
+                        template_name = f"webinar/evaluation/{event_type}.html"
+                    else:
+                        template_name = "webinar/evaluation/seminar.html"
+                    
                     return render(
                         request,
-                        f"webinar/evaluation/{webinar.event_type}.html",
+                        template_name,
                         {
                             "webinar": webinar,
                             "user": user,

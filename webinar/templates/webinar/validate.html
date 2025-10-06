@@ -1,14 +1,13 @@
 {% extends 'login/layout.html' %}
 {% load static %}
-
 {% block css %}
-<title>Check Attendance</title>
-
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
-<link rel="stylesheet" href="{% static 'css/blob.css' %}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
- <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
-<style>
+    <title>Check Attendance</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/blob.css' %}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'webinar/css/pop_up_message.css' %}">
+    <style>
 .closed-message {
     background: #ffffff; 
     color: #444; 
@@ -43,75 +42,96 @@
     color: #555;
 }
 
-</style>
+/* Hide browser password reveal icons */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
 
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+}
+    </style>
 {% endblock %}
-
 {% block body %}
-
-<div class="blob one blob-yellow"></div>
-
-{% if messages %}
-  <div class="popup-messages" id="popupMessages">
-    {% for message in messages %}
-      {% if "expired" not in message|stringformat:"s" %}
-        <div class="popup-message {{ message.tags }}">
-          <i class="popup-message-icon fas 
-            {% if message.tags == 'error' %}fa-exclamation-triangle
-            {% elif message.tags == 'success' %}fa-check-circle
-            {% elif message.tags == 'warning' %}fa-exclamation-circle
-            {% elif message.tags == 'info' %}fa-info-circle
-            {% else %}fa-exclamation-triangle{% endif %}"></i>
-          <div class="popup-message-content">{{ message }}</div>
-          <button class="popup-message-close" onclick="closeMessage(this)">
-            <i class="fas fa-times"></i>
-          </button>
+    <div class="blob one blob-yellow"></div>
+    {% if messages %}
+        <div class="popup-messages" id="popupMessages">
+            {% for message in messages %}
+                {% if "expired" not in message|stringformat:"s" %}
+                    <div class="popup-message {{ message.tags }}">
+                        <i class="popup-message-icon fas {% if message.tags == 'error' %}fa-exclamation-triangle {% elif message.tags == 'success' %}fa-check-circle {% elif message.tags == 'warning' %}fa-exclamation-circle {% elif message.tags == 'info' %}fa-info-circle {% else %}fa-exclamation-triangle{% endif %}"></i>
+                        <div class="popup-message-content">{{ message }}</div>
+                        <button class="popup-message-close" onclick="closeMessage(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-{% endif %}
-
-{% if closing %}
-    <div class="closed-message">
-        <i class="bi bi-x-circle-fill"></i>
-        <h2>Submission is Now Closed</h2>
-        <p>This evaluation is no longer accepting submissions.</p>
-    </div>
-{% else %}
-    <div class="login">    
-        <img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 4rem; height: auto; margin-bottom: 5px;">
-
-        <div class="login-text">Open Evaluation</div>
-        
-        <form method="post" action="{% url 'check_attendance' webinar.id test_type %}">
-            {% csrf_token %}
-
-            <label class="name">Email: <br>
-                <input type="email" placeholder="email@example.com" name="email" id="email" required>
-            </label>
-            <br>
-            <label class="password">Password: <br> 
-                <div class="password-container">
-                    <input type="password" placeholder="Password" name="password" id="passwordField" required>
-                    <span class="password-toggle" onclick="togglePassword(this)">
-                        <i class="bi bi-eye"></i>
-                    </span>
+    {% endif %}
+    {% if closing %}
+        <div class="closed-message">
+            <i class="bi bi-x-circle-fill"></i>
+            <h2>Submission is Now Closed</h2>
+            <p>This evaluation is no longer accepting submissions.</p>
+        </div>
+    {% else %}
+        <div class="login">
+            <img class="logo"
+                 src="{% static 'asset/logo1.png' %}"
+                 alt="logo"
+                 style="width: 4rem;
+                        height: auto;
+                        margin-bottom: 5px">
+            <div class="login-text">Open Evaluation</div>
+            <form method="post"
+                  action="{% url 'check_attendance' webinar.id test_type %}">
+                {% csrf_token %}
+                <label class="name">
+                    Email:
+                    <br>
+                    <input type="email"
+                           placeholder="email@example.com"
+                           name="email"
+                           id="email"
+                           autocomplete="email"
+                           required>
+                </label>
+                <br>
+                <label class="password">
+                    Password:
+                    <br>
+                    <div class="password-container">
+                        <input type="password"
+                               placeholder="Password"
+                               name="password"
+                               id="passwordField"
+                               autocomplete="current-password"
+                               required>
+                        <span class="password-toggle" onclick="togglePassword(this)">
+                            <i class="bi bi-eye"></i>
+                        </span>
+                    </div>
+                </label>
+                <br>
+                <input class="submit-button" type="submit" value="Confirm Attendance">
+                <div style="color: red;">{{ credential_error }}</div>
+                <div>
+                    <a class="forgot-pass"
+                       href="{% url 'forgot_password' %}"
+                       style="color:rgb(38, 38, 129);
+                              font-weight: 500;
+                              text-decoration: none">Forgot Password ?</a>
                 </div>
-            </label>
-            <br>
-
-            <input class="submit-button" 
-                    type="submit" 
-                    value="Confirm Attendance">
-            <div style="color: red;">{{ credential_error }}</div>
-
-            <div><a class="forgot-pass" href="{% url 'forgot_password' %}" style="color:rgb(38, 38, 129); font-weight: 500; text-decoration: none;">Forgot Password ?</a></div>
-        </form>
-    </div>
-{% endif %}
-
-<script>
+            </form>
+        </div>
+    {% endif %}
+    <script>
     function togglePassword(element) {
         const passwordField = document.getElementById('passwordField');
         
@@ -121,7 +141,6 @@
             passwordField.type = 'password';
         }
         
-     
         element.querySelector("i").classList.toggle("bi-eye");
         element.querySelector("i").classList.toggle("bi-eye-slash");
     }
@@ -131,6 +150,5 @@
             el.style.display = 'none';
         });
     }, 15000);
-</script>
-
+    </script>
 {% endblock %}
