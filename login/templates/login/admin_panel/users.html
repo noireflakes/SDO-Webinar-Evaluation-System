@@ -267,14 +267,14 @@
                required autocomplete="bday" >
     </div>
     
-    <!-- School/Institute Field -->
+
     <div class="form-group">
         <label for="user_school">School/Institute:</label>
         <input type="text" id="user_school" name="user_school" class="form-control" 
                placeholder="Enter School or Institute" autocomplete="off" required>
     </div>
     
-    <!-- Position Field -->
+
     <div class="form-group">
         <label for="user_position">Position:</label>
         <select id="user_position" name="user_position" class="form-control" required>
@@ -291,7 +291,7 @@
             <option value="Other">Other</option>
         </select>
         
-        <!-- Custom position input (hidden by default) -->
+
         <input type="text" id="user_custom_position" name="user_custom_position" 
                class="form-control" placeholder="Please specify your position">
     </div>
@@ -357,14 +357,14 @@
                required autocomplete="bday">
     </div>
     
-    <!-- School/Institute Field for Staff -->
+   
     <div class="form-group">
         <label for="staff_school">School/Institute:</label>
         <input type="text" id="staff_school" name="staff_school" class="form-control" 
                placeholder="Enter School or Institute" autocomplete="off" required>
     </div>
     
-    <!-- Position Field for Staff -->
+
     <div class="form-group">
         <label for="staff_position">Position:</label>
         <select id="staff_position" name="staff_position" class="form-control" required>
@@ -382,7 +382,7 @@
             <option value="Other">Other</option>
         </select>
         
-        <!-- Custom position input (hidden by default) -->
+    
         <input type="text" id="staff_custom_position" name="staff_custom_position" 
                class="form-control" placeholder="Please specify your position">
     </div>
@@ -474,7 +474,7 @@
     </main>
 </div>
 
-<!-- View User Modal -->
+
 <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -546,7 +546,7 @@
     </div>
 </div>
 
-<!-- Edit User Modal -->
+
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -642,7 +642,7 @@
     </div>
 </div>
 
-<!-- Save Confirmation Modal -->
+
 <div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -675,7 +675,7 @@
     </div>
 </div>
 
-<!-- Delete Confirmation -->
+
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -740,7 +740,7 @@ const userData = [
     {% endfor %}
 ];
 
-// Pagination settings
+
 const rowsPerPage = 5;
 let currentPage = 1;
 let filteredUserData = [...userData]; 
@@ -748,7 +748,7 @@ let currentSearchTerm = '';
 let currentRoleFilter = '';
 let currentEditingUser = null;
 
-// Helper functions
+
 function getPositionBadge(user) {
     if (user.is_superuser) {
         return '<span class="badge bg-danger">Admin</span>';
@@ -762,12 +762,12 @@ function getPositionBadge(user) {
 function getActionButtons(user) {
     let buttons = '';
     
-    // View button for all users
+
     buttons += `<button type="button" class="btn btn-sm btn-view" onclick="viewUserDetails(${user.id})">
                     <i class="fas fa-eye"></i> View
                 </button>`;
     
-    // Delete button only for regular users
+
     if (!user.is_superuser && !user.is_staff) {
         buttons += `<button type="button" class="btn btn-sm btn-danger" 
                         onclick="confirmDelete('${user.username}', '${user.id}', '${user.delete_url}')">
@@ -784,7 +784,7 @@ function viewUserDetails(userId) {
     
     currentEditingUser = user;
     
-    // Populate modal with user data
+
     document.getElementById('modalUsername').textContent = user.username;
     document.getElementById('modalEmail').textContent = user.email;
     document.getElementById('modalFirstName').textContent = user.first_name || 'N/A';
@@ -794,10 +794,10 @@ function viewUserDetails(userId) {
     document.getElementById('modalSchool').textContent = user.school || 'N/A';
     document.getElementById('modalPosition').textContent = user.position || 'N/A';
     
-    // Set role badge
+
     document.getElementById('modalRole').innerHTML = getPositionBadge(user);
     
-    // Show the modal
+
     const viewModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
     viewModal.show();
 }
@@ -807,7 +807,7 @@ function openEditModal() {
     
     const user = currentEditingUser;
     
-    // Populate edit form
+
     document.getElementById('editUserId').value = user.id;
     document.getElementById('editUsername').value = user.username;
     document.getElementById('editEmail').value = user.email;
@@ -818,16 +818,16 @@ function openEditModal() {
     document.getElementById('editSchool').value = user.school || '';
     document.getElementById('editPosition').value = user.position || '';
     
-    // Set role
+
     let role = 'user';
     if (user.is_superuser) role = 'admin';
     else if (user.is_staff) role = 'staff';
     document.getElementById('editRole').value = role;
     
-    // Set status (assuming active for now)
+   
     document.getElementById('editStatus').value = 'active';
     
-    // Hide role edit for superusers editing themselves or if current user is not superuser
+    
     const currentUserIsSuperuser = {{ user.is_superuser|yesno:"true,false" }};
     const editingCurrentUser = user.id === {{ user.id }};
     
@@ -837,7 +837,6 @@ function openEditModal() {
         document.getElementById('roleEditGroup').style.display = 'block';
     }
     
-    // Close view modal and open edit modal
     bootstrap.Modal.getInstance(document.getElementById('viewUserModal')).hide();
     
     setTimeout(() => {
@@ -904,10 +903,10 @@ function saveUserChanges() {
             
             filterUsers();
             
-            // Show success message
+
             showSuccessMessage(data.message || 'User updated successfully!');
             
-            // Close modal
+
             bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
             currentEditingUser = null;
             
@@ -920,7 +919,7 @@ function saveUserChanges() {
         showErrorMessage('Network error occurred. Please try again.');
     })
     .finally(() => {
-        // Reset button state
+ 
         confirmBtn.innerHTML = originalText;
         confirmBtn.disabled = false;
     });
@@ -957,7 +956,6 @@ function showSuccessMessage(message) {
     
     document.body.appendChild(alertDiv);
     
-    // Auto-remove after 5 seconds
     setTimeout(() => {
         if (alertDiv.parentNode) {
             alertDiv.remove();
@@ -1012,7 +1010,7 @@ function setupPagination() {
 
     if (pageCount <= 1) return;
 
-    // Previous button
+
     let prevLi = document.createElement("li");
     prevLi.className = "page-item " + (currentPage === 1 ? "disabled" : "");
     prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">
@@ -1028,7 +1026,7 @@ function setupPagination() {
     }
     pagination.appendChild(prevLi);
 
-    // Page numbers
+
     for (let i = 1; i <= pageCount; i++) {
         let li = document.createElement("li");
         li.className = "page-item " + (i === currentPage ? "active" : "");
@@ -1044,7 +1042,6 @@ function setupPagination() {
         pagination.appendChild(li);
     }
 
-    // Next button
     let nextLi = document.createElement("li");
     nextLi.className = "page-item " + (currentPage === pageCount ? "disabled" : "");
     nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">
@@ -1073,12 +1070,10 @@ function confirmDelete(userName, userId, deleteUrl) {
 
 function filterUsers() {
     filteredUserData = userData.filter(user => {
-        // Text search
         const matchesSearch = currentSearchTerm === '' || 
             user.username.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(currentSearchTerm.toLowerCase());
         
-        // Role filter
         let matchesRole = true;
         if (currentRoleFilter !== '') {
             if (currentRoleFilter === 'admin' && !user.is_superuser) matchesRole = false;
@@ -1089,7 +1084,6 @@ function filterUsers() {
         return matchesSearch && matchesRole;
     });
     
-    // Reset to first page after filtering
     currentPage = 1;
     displayTable(currentPage);
     setupPagination();
@@ -1105,7 +1099,6 @@ function generatePassword(length = 12) {
     return password;
 }
 
-// Position dropdown handlers
 function handlePositionChange(selectId, customInputId) {
     const select = document.getElementById(selectId);
     const customInput = document.getElementById(customInputId);
@@ -1185,7 +1178,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Event listeners for edit functionality
     const editUserBtn = document.getElementById('editUserBtn');
     const saveUserChangesBtn = document.getElementById('saveUserChangesBtn');
     const confirmSaveBtn = document.getElementById('confirmSaveBtn');
@@ -1202,7 +1194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmSaveBtn.addEventListener('click', saveUserChanges);
     }
 
-    // Position dropdown handlers
     const userPositionSelect = document.getElementById('user_position');
     const staffPositionSelect = document.getElementById('staff_position');
     
@@ -1218,15 +1209,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Password toggles
     setupPasswordToggle("togglePassword", "user_password", "togglePasswordIcon");
     setupPasswordToggle("toggleStaffPassword", "staff_password", "toggleStaffPasswordIcon");
     
-    // Auto password generation
     setupAutoPasswordGeneration("user_firstname", "user_password");
     setupAutoPasswordGeneration("staff_firstname", "staff_password");
 
-    // Disable autocomplete for email and password fields
     const emailFields = document.querySelectorAll('input[type="email"]');
     const passwordFields = document.querySelectorAll('input[type="password"]');
     

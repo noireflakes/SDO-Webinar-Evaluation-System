@@ -1,62 +1,56 @@
 {% extends "login/layout.html" %}
 {% load static %}
-
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/user_nav/certificate.css' %}">
-<link rel="stylesheet" href="{% static 'css/bar.css' %}"> 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="{% static 'exam_portal/css/cretificatepreview.css' %}">>
+    <link rel="stylesheet" href="{% static 'css/user_nav/certificate.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bar.css' %}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="{% static 'exam_portal/css/cretificatepreview.css' %}">
+    >
 {% endblock %}
-
 {% block body %}
-<div class="certificate-preview-page">
-    <div class="preview-container">
-        <!-- Header with title and actions -->
-        <div class="preview-header">
-            <h1 class="preview-title">Certificate Preview</h1>
-            <div class="preview-actions">
-
-                <a href="{% url 'certificate' %}" class="preview-btn btn-back-preview">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-            </div>
-        </div>
-        
-        <!-- Certificate display area -->
-        <div class="certificate-display-area">
-            <div id="loadingState" class="loading-state">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
+    <div class="certificate-preview-page">
+        <div class="preview-container">
+            <div class="preview-header">
+                <h1 class="preview-title">Certificate Preview</h1>
+                <div class="preview-actions">
+                    <a href="{% url 'certificate' %}" class="preview-btn btn-back-preview">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
                 </div>
-                <p>Generating certificate preview...</p>
             </div>
-            <canvas id="certificatePreviewCanvas" style="display: none;"></canvas>
-        </div>
-        
-        <!-- Certificate metadata -->
-        <div class="certificate-meta">
-            <h3 class="meta-title">Certificate Details</h3>
-            <div class="meta-row">
-                <span class="meta-label">Participant Name:</span>
-                <span class="meta-value">{{ user.first_name }} {{ user.last_name }}</span>
+            <div class="certificate-display-area">
+                <div id="loadingState" class="loading-state">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <p>Generating certificate preview...</p>
+                </div>
+                <canvas id="certificatePreviewCanvas" style="display: none;"></canvas>
             </div>
-            <div class="meta-row">
-                <span class="meta-label">Webinar Title:</span>
-                <span id="webinarTitleMeta" class="meta-value">{{ certificate.title }}</span>
-            </div>
-            <div class="meta-row">
-                <span class="meta-label">Completion Date:</span>
-                <span id="completionDateMeta" class="meta-value">{{ certificate.date }}</span>
-            </div>
-            <div class="meta-row">
-                <span class="meta-label">Certificate ID:</span>
-                <span id="certificateIdMeta" class="meta-value">{{ webinar.id }}</span>
+            <div class="certificate-meta">
+                <h3 class="meta-title">Certificate Details</h3>
+                <div class="meta-row">
+                    <span class="meta-label">Participant Name:</span>
+                    <span class="meta-value">{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Webinar Title:</span>
+                    <span id="webinarTitleMeta" class="meta-value">{{ certificate.title }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Completion Date:</span>
+                    <span id="completionDateMeta" class="meta-value">{{ certificate.date }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Certificate ID:</span>
+                    <span id="certificateIdMeta" class="meta-value">{{ webinar.id }}</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('certificatePreviewCanvas');
     const ctx = canvas.getContext('2d');
@@ -196,5 +190,5 @@ document.addEventListener('DOMContentLoaded', function() {
         pdf.save("certificate.pdf");
     }
 });
-</script>
-{% endblock %}
+    </script>
+{% endblock body %}

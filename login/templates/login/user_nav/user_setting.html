@@ -144,7 +144,6 @@
             
         
             
-            <!-- Password mismatch error message -->
             <div id="password-mismatch-error" class="password-error">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span id="password-error-text"></span>
@@ -222,7 +221,7 @@ function previewFile(input) {
     const previewImg = document.getElementById('preview-img');
     
     if (file) {
-        // Validate file type
+
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         if (!validTypes.includes(file.type)) {
             alert('Please select a valid image file (PNG, JPG, JPEG)');
@@ -230,7 +229,6 @@ function previewFile(input) {
             return;
         }
         
-        // Validate file size (5MB)
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size must be less than 5MB');
@@ -243,7 +241,7 @@ function previewFile(input) {
             <span>${file.name}</span>
         `;
         
-        // Show preview
+
         const reader = new FileReader();
         reader.onload = function(e) {
             previewImg.src = e.target.result;
@@ -260,7 +258,7 @@ function previewFile(input) {
     }
 }
 
-// Password validation functions
+
 function showPasswordError(message) {
     const errorDiv = document.getElementById('password-mismatch-error');
     const errorText = document.getElementById('password-error-text');
@@ -296,11 +294,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmPasswordField = document.getElementById('confirm_password');
     
     if (passwordForm) {
-        // Real-time validation as user types
         newPasswordField.addEventListener('input', validatePasswords);
         confirmPasswordField.addEventListener('input', validatePasswords);
         
-        // Form submission validation
         passwordForm.addEventListener('submit', function(e) {
             if (!validatePasswords()) {
                 e.preventDefault();

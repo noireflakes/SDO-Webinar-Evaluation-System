@@ -1,90 +1,89 @@
 {% extends "login/layout.html" %}
 {% load static %}
-
 {% block css %}
-<link rel="stylesheet" href="{% static 'exam_portal/css/display_test.css' %}">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet"
+          href="{% static 'exam_portal/css/display_test.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
 {% endblock %}
-
-{% block title %}
-<title>Exam</title>
-{% endblock %}
-
+{% block title %}<title>Exam</title>{% endblock %}
 {% block body %}
-<div class="form-container">
-    <div class="form-header">
-        <div class="form-title-bar">
-            <div class="form-title">Test Questions</div>
-            <div class="form-description">Please answer all questions</div>
+    <div class="form-container">
+        <div class="form-header">
+            <div class="form-title-bar">
+                <div class="form-title">Test Questions</div>
+                <div class="form-description">Please answer all questions</div>
+            </div>
+        </div>
+        <form method="post"
+              action="{% url 'record_test' webinar.id type %}"
+              class="form">
+            {% csrf_token %}
+            <!-- Hidden email input - gets value from session or context -->
+            <input type="hidden" name="email" value="{{ user.email }}">
+            <div class="form-content">
+                {% for question in questions %}
+                    <div class="question-block">
+                        <div class="question-header">
+                            <span class="question-number">Question {{ forloop.counter }}</span>
+                        </div>
+                        <div class="question-text">{{ question.question }}</div>
+                        <div class="question-response">
+                            {% if question.question_type == 'FB' %}
+                                <div class="text-input-container">
+                                    <input type="text"
+                                           name="user_input_{{ question.id }}"
+                                           id="user_input_{{ question.id }}"
+                                           class="text-input"
+                                           placeholder="Your answer">
+                                    <div class="underline"></div>
+                                </div>
+                            {% elif question.question_type == 'MC' %}
+                                <div class="radio-options">
+                                    {% for choice in question.choices.all %}
+                                        <label class="radio-option">
+                                            <span class="radio-container">
+                                                <input type="radio"
+                                                       name="user_input_{{ question.id }}"
+                                                       value="{{ choice.id }}"
+                                                       class="radio-input">
+                                                <span class="radio-checkmark"></span>
+                                            </span>
+                                            <span class="radio-label">{{ choice.text_option }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="form-footer">
+                    <button type="submit" class="submit-button">
+                        <span class="button-text">Submit</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="user-info"
+         style="position: fixed;
+                top: 10px;
+                right: 10px;
+                background: #f0f0f0;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 12px">
+        <div>
+            <strong>User:</strong> {{ user.email }}
+        </div>
+        <div>
+            <strong>Test Type:</strong> {{ type|title }}
         </div>
     </div>
-
-    <form method="post" action="{% url 'record_test' webinar.id type %}" class="form">
-        {% csrf_token %}
-        
-        <!-- Hidden email input - gets value from session or context -->
-        <input type="hidden" name="email" value="{{ user.email }}">
-        
-        <div class="form-content">
-
-
-            {% for question in questions %}
-            <div class="question-block">
-                <div class="question-header">
-                    <span class="question-number">Question {{ forloop.counter }}</span>
-                </div>
-
-                <div class="question-text">{{ question.question }}</div>
-
-                <div class="question-response">
-                    {% if question.question_type == 'FB' %}
-                        <div class="text-input-container">
-                            <input type="text"
-                                   name="user_input_{{ question.id }}"
-                                   id="user_input_{{ question.id }}"
-                                   class="text-input"
-                                   placeholder="Your answer">
-                            <div class="underline"></div>
-                        </div>
-
-                    {% elif question.question_type == 'MC' %}
-                        <div class="radio-options">
-                            {% for choice in question.choices.all %}
-                            <label class="radio-option">
-                                <span class="radio-container">
-                                    <input type="radio"
-                                           name="user_input_{{ question.id }}"
-                                           value="{{ choice.id }}"
-                                           class="radio-input">
-                                    <span class="radio-checkmark"></span>
-                                </span>
-                                <span class="radio-label">{{ choice.text_option }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-
-            <div class="form-footer">
-                <button type="submit" class="submit-button">
-                    <span class="button-text">Submit</span>
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<div class="user-info" style="position: fixed; top: 10px; right: 10px; background: #f0f0f0; padding: 10px; border-radius: 5px; font-size: 12px;">
-    <div><strong>User:</strong> {{ user.email }}</div>
-    <div><strong>Test Type:</strong> {{ type|title }}</div>
-</div>
-
-<style>
+    <style>
 .user-info {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     color: #666;
 }
-</style>
+    </style>
 {% endblock %}

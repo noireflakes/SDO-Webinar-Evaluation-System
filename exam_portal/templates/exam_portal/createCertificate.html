@@ -1,149 +1,156 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate Editor</title>
-    <link rel="stylesheet" href="{% static 'exam_portal/css/createCertificate.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div id="instru-cont" >
-        <h3>How to Use Certificate Editor</h3>
-        <p><strong>There are two ways to use the Certificate Editor:</strong></p>
-
-        <p><strong>1. Automated Certificate Generation</strong></p>
-        <ul>
-            <li>Upload your certificate template</li>
-            <li>Click <strong>Upload</strong></li>
-            <li>You’re done!</li>
-        </ul>
-        <p>Certificates will be available for attendees to download after the event ends.</p>
-
-        <p><strong>2. Editing Feature</strong></p>
-        <ul>
-            <li>Type the text you want to add</li>
-            <li>See changes in real time</li>
-            <li>Click <strong>Apply Changes</strong> to update the certificate</li>
-        </ul>
-        <p>This will update the certificate for all users who download it after the event.</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Certificate Editor</title>
+        <link rel="stylesheet"
+              href="{% static 'exam_portal/css/createCertificate.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap"
+              rel="stylesheet">
+    </head>
+    <body>
+        <div id="instru-cont">
+            <h3>How to Use Certificate Editor</h3>
+            <p>
+                <strong>There are two ways to use the Certificate Editor:</strong>
+            </p>
+            <p>
+                <strong>1. Automated Certificate Generation</strong>
+            </p>
+            <ul>
+                <li>Upload your certificate template</li>
+                <li>
+                    Click <strong>Upload</strong>
+                </li>
+                <li>You’re done!</li>
+            </ul>
+            <p>Certificates will be available for attendees to download after the event ends.</p>
+            <p>
+                <strong>2. Editing Feature</strong>
+            </p>
+            <ul>
+                <li>Type the text you want to add</li>
+                <li>See changes in real time</li>
+                <li>
+                    Click <strong>Apply Changes</strong> to update the certificate
+                </li>
+            </ul>
+            <p>This will update the certificate for all users who download it after the event.</p>
+        </div>
     </div>
-        
-
-    </div>
-
     <div class="sidebar">
-       
         <div class="sidebar-header">
-             <p><a href="{% url 'admin_certificate' %}" class="back">Back to Certificate </a></p>
+            <p>
+                <a href="{% url 'admin_certificate' %}" class="back">Back to Certificate</a>
+            </p>
             <h1>Certificate Editor</h1>
         </div>
         <div class="sidebar-section howto-cont">
             <h4 id="use">How to use</h4>
-            
-
-            
-
-
         </div>
-        
         <div class="sidebar-section">
-            
             <h2>Upload Certificate Template</h2>
-            <p id="changes" style="color:rgb(18, 165, 18); font-weight: 500; display: none;" >
-
-            </p> 
- 
-            <form action="{% url 'upload_img' webinar.id %}" method="post" enctype="multipart/form-data" class="upload-form">
+            <p id="changes"
+               style="color:rgb(18, 165, 18);
+                      font-weight: 500;
+                      display: none"></p>
+            <form action="{% url 'upload_img' webinar.id %}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="upload-form">
                 {% csrf_token %}
                 <div class="file-upload">
                     <label for="img" class="file-upload-label">
                         <span class="file-upload-icon"></span>
                         <span class="file-upload-text" id="fileName">Choose a file</span>
                     </label>
-                    <input id="img" name="img" type="file" class="file-upload-input" accept=".png, .jpg, .jpeg" required >
+                    <input id="img"
+                           name="img"
+                           type="file"
+                           class="file-upload-input"
+                           accept=".png, .jpg, .jpeg"
+                           required>
                 </div>
-
                 <input type="submit" value="Upload" class="btn btn-upload">
             </form>
         </div>
-
         <div class="sidebar-section">
             <h2>Edit Content</h2>
-            <form {% if img %} action="{% url 'upload_contents' img.id %}" {% endif %} method="post" id="form-content" class="edit-form">
+            <form {% if img %} action="{% url 'upload_contents' img.id %}" {% endif %}
+                  method="post"
+                  id="form-content"
+                  class="edit-form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="certificate-title">Title:</label>
-                    <input type="text" id="certificate-title" name="certificate-title" value="{{ img.title }}" class="form-input">
+                    <input type="text"
+                           id="certificate-title"
+                           name="certificate-title"
+                           value="{{ img.title }}"
+                           class="form-input">
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-subtitle">Subtitle:</label>
-                    <input type="text" id="certificate-subtitle" name="certificate-subtitle" value="{{ img.subtitle }}" class="form-input">
+                    <input type="text"
+                           id="certificate-subtitle"
+                           name="certificate-subtitle"
+                           value="{{ img.subtitle }}"
+                           class="form-input">
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-name">Participants:</label>
-                    <input type="text" id="certificate-name"  name="certificate-name" value="{{ img.participant }}"  class="form-input">
+                    <input type="text"
+                           id="certificate-name"
+                           name="certificate-name"
+                           value="{{ img.participant }}"
+                           class="form-input">
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-host">Host:</label>
-                    <input type="text" id="certificate-host" name="certificate-host" value="{{ img.host }}" class="form-input">
+                    <input type="text"
+                           id="certificate-host"
+                           name="certificate-host"
+                           value="{{ img.host }}"
+                           class="form-input">
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-subject">Subject:</label>
                     <textarea name="certificate-subject" id="certificate-subject"  class="form-textarea">{% if  img.subject  %}{{ img.subject }}{% endif %}
                     </textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-address">Address:</label>
                     <textarea name="certificate-address" id="certificate-address" class="form-textarea">{% if  img.address  %}{{ img.address }}{% endif %}
                     </textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="certificate-date">Date:</label>
                     <textarea name="certificate-date" id="certificate-date"  class="form-textarea">{% if  img.date  %}{{img.date}}{% endif %}
                     </textarea>
                 </div>
-                
-                <input type="submit" value="Apply Changes" id="apply-btn" class="btn btn-primary">
+                <input type="submit"
+                       value="Apply Changes"
+                       id="apply-btn"
+                       class="btn btn-primary">
             </form>
         </div>
     </div>
-
     <div id="canvas-container"  class="canvas-container main-content">
         <div class="canvas-wrapper">
             <canvas id="canvas" name="canvas"></canvas>
         </div>
-
-        <div><button onclick="downloadPDF()" class="btn btn-download">Download Template </button></div>
-
-        
+        <div>
+            <button onclick="downloadPDF()" class="btn btn-download">Download Template</button>
+        </div>
     </div>
-
     <div id="data-box"
-     data-img="{% if img %}true{% else %}false{% endif %}"
-     data-msg="{% if messages %}true{% else %}false{% endif %}">
-    </div>
-    
+         data-img="{% if img %}true{% else %}false{% endif %}"
+         data-msg="{% if messages %}true{% else %}false{% endif %}"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-
+    <script></script>
     <script>
- 
-
-
-    </script>
-
-
-
-    <script>
-        
         const canvas=document.getElementById('canvas');
         const ctx=canvas.getContext('2d');
         const apply=document.getElementById("apply-btn");
@@ -283,7 +290,7 @@ function drawAllParagraphs(maxWidth, y) {
 
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
-    const fontSize = 15;
+    const fontSize = 18;
     const lineHeight = 25;
     const fontFamily = "'Bookman Old Style'";
     const x = canvas.width / 2 / 2;

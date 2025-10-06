@@ -1,333 +1,327 @@
 {% extends "login/layout.html" %}
-
 {% load static %}
 {% block css %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
-<link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
-
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'exam_portal/css/statistics.css' %}">
+    <link rel="stylesheet" href="{% static 'webinar/css/footer.css' %}">
 {% endblock %}
-
 {% block body %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<div class="app">
-    {% csrf_token %}
-    <div class="sidebar">
-        <aside>
-            <div class="title-container">
-                <p class="webinar-detail">
-                    <a href="{% url 'webinar_detail' webinar.id %}">Webinar detail</a> > Evaluation Tool
-                </p>
-                <h2>{{ webinar.title }}</h2>
-                <p class="stat">Statistic and Result</p>
-            </div>
-        </aside>
-    </div>
-
-    <div class="main-content">
-        <h2 class="title head">Evaluation Management</h2>
-
-        <section class="evaluation-control-section">
-            <div class="control-header">
-                <h3 class="control-title">
-                    <i class="fas fa-toggle-on me-2"></i>Evaluation Control
-                </h3>
-                <div class="evaluation-status-toggle">
-                    <div class="toggle-container">
-                        <label class="toggle-label-text">
-                            Evaluation Status: 
-                            <span id="evaluation-status-text" class="status-text">
-                                {{ webinar.close_evaluation|yesno:"Closed,Open" }}
-                            </span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" 
-                                   id="evaluation-toggle" 
-                                   {% if not webinar.close_evaluation %}checked{% endif %}
-                                   onchange="toggleEvaluationStatus()">
-                            <span class="toggle-slider round">
-                           
-                            </span>
-                        </label>
-                    </div>
-                    <div class="toggle-description">
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Toggle to open or close evaluation submissions for this webinar
-                        </small>
-                    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="app">
+        {% csrf_token %}
+        <div class="sidebar">
+            <aside>
+                <div class="title-container">
+                    <p class="webinar-detail">
+                        <a href="{% url 'webinar_detail' webinar.id %}">Webinar detail</a> > Evaluation Tool
+                    </p>
+                    <h2>{{ webinar.title }}</h2>
+                    <p class="stat">Statistic and Result</p>
                 </div>
-            </div>
-        </section>
-
-        
-        <section class="evaluation-section">
-            <h2 class="title">Evaluation Report</h2>
-            <div class="evaluation-container">
-                
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeChartType('speaker', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-                    
-                        <button class="chart-type-btn" onclick="changeChartType('speaker', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="speaker" class="chart"></canvas>
-                        <div id="speaker-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-chart-pie" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No evaluation data available for Speaker</div>
-                            </div>
+            </aside>
+        </div>
+        <div class="main-content">
+            <h2 class="title head">Evaluation Management</h2>
+            <section class="evaluation-control-section">
+                <div class="control-header">
+                    <h3 class="control-title">
+                        <i class="fas fa-toggle-on me-2"></i>Evaluation Control
+                    </h3>
+                    <div class="evaluation-status-toggle">
+                        <div class="toggle-container">
+                            <label class="toggle-label-text">
+                                Evaluation Status:
+                                <span id="evaluation-status-text" class="status-text">{{ webinar.close_evaluation|yesno:"Closed,Open" }}</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox"
+                                       id="evaluation-toggle"
+                                       {% if not webinar.close_evaluation %}checked{% endif %}
+                                       onchange="toggleEvaluationStatus()">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-description">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Toggle to open or close evaluation submissions for this webinar
+                            </small>
                         </div>
                     </div>
                 </div>
-                
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeChartType('venue', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-                
-                        <button class="chart-type-btn" onclick="changeChartType('venue', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="venue" class="chart"></canvas>
-                        <div id="venue-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-map-marker-alt" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No evaluation data available for Venue</div>
-                            </div>
+            </section>
+            <section class="evaluation-section">
+                <h2 class="title">Evaluation Report</h2>
+                <div class="evaluation-container">
+                    <div class="chart-wrapper">
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeChartType('speaker', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeChartType('speaker', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeChartType('food', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-              
-                        <button class="chart-type-btn" onclick="changeChartType('food', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="food" class="chart"></canvas>
-                        <div id="food-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No evaluation data available for Food</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeChartType('manage', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-                 
-                        <button class="chart-type-btn" onclick="changeChartType('manage', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="manage" class="chart"></canvas>
-                        <div id="manage-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-cogs" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No evaluation data available for Management</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeChartType('overall', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-             
-                        <button class="chart-type-btn" onclick="changeChartType('overall', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="overall" class="chart"></canvas>
-                        <div id="overall-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-star" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No evaluation data available for Overall</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="btn-download" onclick="DownloadExcel()"> 
-                <i class="fas fa-download"></i>Generate Evaluation Report
-            </button>
-        </section>
-
-        <section class="test-section">
-            <h2 class="title">Test Results</h2>
-            <div class="test-container">
-                <div class="container">
-                    <h4>Pre Test</h4>
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeTestChartType('pre-test', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                        <button class="chart-type-btn" onclick="changeTestChartType('pre-test', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
-                        <button class="chart-type-btn" onclick="changeTestChartType('pre-test', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-                    </div>
-                    <div class="bar-wrapper">
-                        <canvas id="pre-test" class="doughnut"></canvas>
-                        <div id="pre-test-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <i class="fas fa-clipboard-check" style="font-size: 24px; margin-bottom: 10px;"></i>
-                                <div>No pre-test data</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="container">
-                    <h4>Post Test</h4>
-                    <div class="chart-controls">
-                        <button class="chart-type-btn active" onclick="changeTestChartType('post-test', 'doughnut')">
-                            <i class="fas fa-circle-notch"></i> Doughnut
-                        </button>
-                        <button class="chart-type-btn" onclick="changeTestChartType('post-test', 'bar')">
-                            <i class="fas fa-chart-bar"></i> Bar
-                        </button>
-                        <button class="chart-type-btn" onclick="changeTestChartType('post-test', 'pie')">
-                            <i class="fas fa-chart-pie"></i> Pie
-                        </button>
-                    </div>
-                    <div class="bar-wrapper">
-                        <canvas id="post-test" class="doughnut"></canvas>
-                        <div id="post-test-no-data" class="no-data-message" style="display: none;">
-                            <div class="no-data-message-cont">
-                                <div class="no-data-icon">
-                                    <i class="fas fa-clipboard-check"></i>
+                        <div class="chart-container">
+                            <canvas id="speaker" class="chart"></canvas>
+                            <div id="speaker-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-chart-pie" style="font-size: 24px; margin-bottom: 10px"></i>
+                                    <div>No evaluation data available for Speaker</div>
                                 </div>
-                                <div class="no-data-title">No Post-Test Data</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeChartType('venue', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                            <button class="chart-type-btn" onclick="changeChartType('venue', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="venue" class="chart"></canvas>
+                            <div id="venue-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-map-marker-alt"
+                                       style="font-size: 24px;
+                                              margin-bottom: 10px"></i>
+                                    <div>No evaluation data available for Venue</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeChartType('food', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                            <button class="chart-type-btn" onclick="changeChartType('food', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="food" class="chart"></canvas>
+                            <div id="food-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                    <div>No evaluation data available for Food</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeChartType('manage', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeChartType('manage', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="manage" class="chart"></canvas>
+                            <div id="manage-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-cogs" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                    <div>No evaluation data available for Management</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeChartType('overall', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeChartType('overall', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="overall" class="chart"></canvas>
+                            <div id="overall-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-star" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                    <div>No evaluation data available for Overall</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <button class="btn-download" onclick="downloadTestData()"> 
-                <i class="fas fa-download"></i> Generate Test Report
-            </button>
-        </section>
-
-        <section class="attendees-section">
-            <h2 class="title">
-                <i class="fas fa-users me-2"></i>Attendees Management
-            </h2>
-            
-            <div class="table-controls">
-                <div class="search-box">
-                    <i class="fas fa-search text-muted"></i>
-                    <input type="text" id="attendees-search" placeholder="Search attendees..." onkeyup="searchAttendees()">
+                <button class="btn-download" onclick="DownloadExcel()">
+                    <i class="fas fa-download"></i>Generate Evaluation Report
+                </button>
+            </section>
+            <section class="test-section">
+                <h2 class="title">Test Results</h2>
+                <div class="test-container">
+                    <div class="container">
+                        <h4>Pre Test</h4>
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeTestChartType('pre-test', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeTestChartType('pre-test', 'bar')">
+                                <i class="fas fa-chart-bar"></i> Bar
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeTestChartType('pre-test', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                        </div>
+                        <div class="bar-wrapper">
+                            <canvas id="pre-test" class="doughnut"></canvas>
+                            <div id="pre-test-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <i class="fas fa-clipboard-check"
+                                       style="font-size: 24px;
+                                              margin-bottom: 10px"></i>
+                                    <div>No pre-test data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <h4>Post Test</h4>
+                        <div class="chart-controls">
+                            <button class="chart-type-btn active"
+                                    onclick="changeTestChartType('post-test', 'doughnut')">
+                                <i class="fas fa-circle-notch"></i> Doughnut
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeTestChartType('post-test', 'bar')">
+                                <i class="fas fa-chart-bar"></i> Bar
+                            </button>
+                            <button class="chart-type-btn"
+                                    onclick="changeTestChartType('post-test', 'pie')">
+                                <i class="fas fa-chart-pie"></i> Pie
+                            </button>
+                        </div>
+                        <div class="bar-wrapper">
+                            <canvas id="post-test" class="doughnut"></canvas>
+                            <div id="post-test-no-data" class="no-data-message" style="display: none;">
+                                <div class="no-data-message-cont">
+                                    <div class="no-data-icon">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div class="no-data-title">No Post-Test Data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="view-toggle">
-                    <label class="switch">
-                        <input type="checkbox" id="show-all-toggle" onchange="toggleAttendanceView()">
-                        <span class="slider round"></span>
-                    </label>
-                    <span class="toggle-label">Show All Tests</span>
+                <button class="btn-download" onclick="downloadTestData()">
+                    <i class="fas fa-download"></i> Generate Test Report
+                </button>
+            </section>
+            <section class="attendees-section">
+                <h2 class="title">
+                    <i class="fas fa-users me-2"></i>Attendees Management
+                </h2>
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search text-muted"></i>
+                        <input type="text"
+                               id="attendees-search"
+                               placeholder="Search attendees..."
+                               onkeyup="searchAttendees()">
+                    </div>
+                    <div class="view-toggle">
+                        <label class="switch">
+                            <input type="checkbox"
+                                   id="show-all-toggle"
+                                   onchange="toggleAttendanceView()">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label">Show All Tests</span>
+                    </div>
+                    <div class="rows-per-page">
+                        <span>Show:</span>
+                        <select id="attendees-rows-select" onchange="changeAttendeesRowsPerPage()">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
                 </div>
-                <div class="rows-per-page">
-                    <span>Show:</span>
-                    <select id="attendees-rows-select" onchange="changeAttendeesRowsPerPage()">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span>entries</span>
-                </div>
-            </div>
-
-            <div class="attendees-table">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 5%;">ID</th>
-                                        <th style="width: 15%;">Name</th>
-                                        <th style="width: 18%;">Email</th>
-                                        <th style="width: 12%;">Evaluation</th>
-                                        <th class="test-column" style="width: 10%;">Pre-test</th>
-                                        <th class="test-column" style="width: 10%;">Post-test</th>
-                                        <th class="timestamp-column" style="width: 20%;">Evaluation Time</th>
-                                    </tr>
-                                </thead>
+                <div class="attendees-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">ID</th>
+                                    <th style="width: 15%;">Name</th>
+                                    <th style="width: 18%;">Email</th>
+                                    <th style="width: 12%;">Evaluation</th>
+                                    <th class="test-column" style="width: 10%;">Pre-test</th>
+                                    <th class="test-column" style="width: 10%;">Post-test</th>
+                                    <th class="timestamp-column" style="width: 20%;">Evaluation Time</th>
+                                </tr>
+                            </thead>
                             <tbody id="attendees-table-body">
-               
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-
-            <div class="pagination-footer">
-                <div class="table-info" id="attendees-table-info"></div>
-                <nav>
-                    <ul class="pagination mb-0" id="attendees-pagination"></ul>
-                </nav>
-            </div>
-        </section>
-
-     
-        <section class="comments-section">
-            <h2 class="title">
-                <i class="fas fa-comments me-2"></i>Participant Comments
-            </h2>
-            
-            <div id="commentsCarousel" class="carousel slide comment-carousel" data-bs-ride="carousel">
-                <div class="carousel-indicators" id="comment-indicators">
-                   
+                <div class="pagination-footer">
+                    <div class="table-info" id="attendees-table-info"></div>
+                    <nav>
+                        <ul class="pagination mb-0" id="attendees-pagination">
+                        </ul>
+                    </nav>
                 </div>
-                
-                <div class="carousel-inner" id="comment-slides">
-                   
+            </section>
+            <section class="comments-section">
+                <h2 class="title">
+                    <i class="fas fa-comments me-2"></i>Participant Comments
+                </h2>
+                <div id="commentsCarousel"
+                     class="carousel slide comment-carousel"
+                     data-bs-ride="carousel">
+                    <div class="carousel-indicators" id="comment-indicators"></div>
+                    <div class="carousel-inner" id="comment-slides"></div>
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#commentsCarousel"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#commentsCarousel"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
-                
-                <button class="carousel-control-prev" type="button" data-bs-target="#commentsCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#commentsCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </section>
-
+            </section>
+        </div>
     </div>
-</div>
-
-<script>
+    <script>
 let chartInstances = {};
 let chartData = {};
 let testChartInstances = {};
@@ -462,7 +456,6 @@ async function DownloadExcel() {
         
         csvContent += "EVALUATION SCORES (AVERAGE)\n";
         if (data.summary.category_averages) {
-            // Format numbers to prevent Excel date conversion - use text format with equals sign
             const speakerAvg = (data.summary.category_averages.speaker || 0).toFixed(2);
             const venueAvg = (data.summary.category_averages.venue || 0).toFixed(2);
             const mealAvg = (data.summary.category_averages.meal || 0).toFixed(2);
@@ -510,7 +503,7 @@ async function DownloadExcel() {
         const escapedSchoolId = schoolId.includes(",") ? `"${schoolId}"` : schoolId;
         const escapedSex = sex.includes(",") ? `"${sex}"` : sex;
 
-        // Format timestamp
+   
         let formattedTimestamp = timestamp;
         if (timestamp) {
             const date = new Date(timestamp);
@@ -526,7 +519,6 @@ async function DownloadExcel() {
 
         const escapedTimestamp = formattedTimestamp.includes(",") ? `"${formattedTimestamp}"` : formattedTimestamp;
 
-        // Format evaluation scores to prevent Excel date conversion - use space prefix
         const formattedSpeaker = typeof speaker === 'number' ? (speaker === 0 ? '0' : ' ' + speaker.toFixed(2)) : speaker;
         const formattedVenue = typeof venue === 'number' ? (venue === 0 ? '0' : ' ' + venue.toFixed(2)) : venue;
         const formattedMeal = typeof meal === 'number' ? (meal === 0 ? '0' : ' ' + meal.toFixed(2)) : meal;
@@ -621,7 +613,6 @@ async function downloadTestData() {
         const preTestData = allTestData.filter(item => item.test_type === 'pre_test');
         const postTestData = allTestData.filter(item => item.test_type === 'post_test');
 
-        // Calculate statistics
         const preTestAverage = preTestData.length > 0 ? 
             (preTestData.reduce((sum, item) => sum + item.score, 0) / preTestData.length) : 0;
         const postTestAverage = postTestData.length > 0 ? 
@@ -821,7 +812,6 @@ async function downloadTestData() {
 }
 
 
-// Helper function to create test summary
 function createTestSummary(testData) {
     if (!testData || testData.length === 0) return [];
     
@@ -853,17 +843,16 @@ function createTestSummary(testData) {
     return summary;
 }
 
-// Helper function to create comparison data between pre and post tests
+
 function createComparisonData(preTestData, postTestData) {
     if (!preTestData.length || !postTestData.length) return [];
     
     const comparisonData = [];
-    
-    // Create maps for easier lookup
+
     const preTestMap = new Map(preTestData.map(item => [item.user, item]));
     const postTestMap = new Map(postTestData.map(item => [item.user, item]));
     
-    // Find users who took both tests
+
     const commonUsers = [...preTestMap.keys()].filter(user => postTestMap.has(user));
     
     commonUsers.forEach(userEmail => {
@@ -888,8 +877,7 @@ function createComparisonData(preTestData, postTestData) {
             'Status': status
         });
     });
-    
-    // Sort by improvement (descending)
+
     comparisonData.sort((a, b) => {
         const aImprovement = parseFloat(a.Improvement.replace('%', ''));
         const bImprovement = parseFloat(b.Improvement.replace('%', ''));
@@ -921,7 +909,7 @@ function displayAttendeesTable() {
     tableBody.innerHTML = "";
     
     if (filteredAttendeesData.length === 0) {
-        const colspan = showAllTests ? "7" : "6"; // Updated colspan
+        const colspan = showAllTests ? "7" : "6"; 
         tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">No attendees data available</td></tr>`;
         tableInfo.innerHTML = "Showing 0 entries";
         return;
@@ -986,7 +974,6 @@ function displayAttendeesTable() {
     tableInfo.innerHTML = `Showing ${start + 1} to ${actualEnd} of ${filteredAttendeesData.length} entries`;
 }
 
-// 4. Update the showErrorState function
 function showErrorState() {
     const tableBody = document.getElementById('attendees-table-body');
     const tableInfo = document.getElementById('attendees-table-info');
@@ -1013,8 +1000,7 @@ function setupAttendeesPagination() {
     if (filteredAttendeesData.length === 0) return;
     
     let pageCount = Math.ceil(filteredAttendeesData.length / attendeesRowsPerPage);
-    
-    // Previous button
+ 
     let prevLi = document.createElement("li");
     prevLi.className = `page-item ${currentAttendeesPage === 1 ? "disabled" : ""}`;
     prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
@@ -1028,7 +1014,7 @@ function setupAttendeesPagination() {
     }
     pagination.appendChild(prevLi);
     
-    // Page numbers
+
     let startPage = Math.max(1, currentAttendeesPage - 2);
     let endPage = Math.min(pageCount, currentAttendeesPage + 2);
     
@@ -1047,7 +1033,6 @@ function setupAttendeesPagination() {
         pagination.appendChild(li);
     }
     
-    // Next button
     let nextLi = document.createElement("li");
     nextLi.className = `page-item ${currentAttendeesPage === pageCount ? "disabled" : ""}`;
     nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
@@ -1325,7 +1310,7 @@ function createTestChart(chartId, type, data, labels) {
 }
 
 function changeChartType(chartId, newType) {
-    // Update active button
+
     const buttons = document.querySelectorAll(`[onclick*="'${chartId}'"]`);
     buttons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
@@ -1354,16 +1339,16 @@ function randomColor() {
 }
 
 const UPDATE_INTERVALS = {
-    CHARTS: 30000,        // 30 seconds for chart data
-    ATTENDEES: 15000,     // 15 seconds for attendees
-    COMMENTS: 60000,      // 1 minute for comments
-    TESTS: 45000          // 45 seconds for test data
+    CHARTS:60000,       
+    ATTENDEES: 60000,    
+    COMMENTS: 60000,      
+    TESTS: 60000         
 };
 
 let updateTimers = {};
 let isUpdating = false;
 
-// Real-time update functions
+
 async function updateChartsData() {
     if (isUpdating) return;
     isUpdating = true;
@@ -1381,7 +1366,7 @@ async function updateChartsData() {
             overall: data.overall
         };
         
-        // Only update if data has changed
+
         if (JSON.stringify(newChartData) !== JSON.stringify(chartData)) {
             console.log('Charts data updated');
             chartData = newChartData;
@@ -1452,7 +1437,7 @@ async function updateAttendeesData() {
                 console.log('Attendees data updated');
                 attendeesData = newAttendeesData;
                 
-                // Preserve current search and pagination state
+
                 const currentSearch = document.getElementById('attendees-search').value;
                 if (currentSearch) {
                     filteredAttendeesData = attendeesData.filter(item =>
@@ -1496,7 +1481,7 @@ async function updateCommentsData() {
             });
         }
         
-        // Check if comments have changed
+  
         const currentComments = document.querySelectorAll('#comment-slides .carousel-item').length;
         if (newCommentsData.length !== currentComments) {
             console.log('Comments data updated');
@@ -1508,24 +1493,24 @@ async function updateCommentsData() {
     }
 }
 
-// Start real-time updates
+
 function startRealTimeUpdates() {
     console.log('Starting real-time updates...');
     
-    // Clear any existing timers
+
     Object.values(updateTimers).forEach(timer => clearInterval(timer));
     
-    // Set up update intervals
+
     updateTimers.charts = setInterval(updateChartsData, UPDATE_INTERVALS.CHARTS);
     updateTimers.attendees = setInterval(updateAttendeesData, UPDATE_INTERVALS.ATTENDEES);
     updateTimers.comments = setInterval(updateCommentsData, UPDATE_INTERVALS.COMMENTS);
     updateTimers.tests = setInterval(updateTestData, UPDATE_INTERVALS.TESTS);
     
-    // Add visual indicator for real-time updates
+
     addRealTimeIndicator();
 }
 
-// Stop real-time updates
+
 function stopRealTimeUpdates() {
     console.log('Stopping real-time updates...');
     Object.values(updateTimers).forEach(timer => clearInterval(timer));
@@ -1533,7 +1518,7 @@ function stopRealTimeUpdates() {
     removeRealTimeIndicator();
 }
 
-//
+
 function removeRealTimeIndicator() {
     const indicator = document.getElementById('real-time-indicator');
     if (indicator) {
@@ -1697,16 +1682,16 @@ document.addEventListener('DOMContentLoaded', function() {
         opacity: 0.3;
         pointer-events: none;
     }
-    </style>
+</style>
     `;
 
-    // Add loading styles to the page
+
     document.head.insertAdjacentHTML('beforeend', loadingStyle);
 
     async function fetchAttendeesAndComments() {
         const id = parseInt("{{ webinar.id }}");
         
-        // Show loading state
+
         showLoadingState();
         
         try {
@@ -1743,8 +1728,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log("Final attendeesData:", attendeesData);
             filteredAttendeesData = [...attendeesData];
-            
-            // Hide loading state and display table
+
             hideLoadingState();
             displayAttendeesTable();
             setupAttendeesPagination();
@@ -1755,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorState();
         }
         
-        // Fetch comments data
+
         try {
             const response = await fetch(`/exam_portal/result_data/${id}`);
             const data = await response.json();
@@ -1783,7 +1767,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to show loading state
     function showLoadingState() {
         const attendeesSection = document.querySelector('.attendees-section');
         const attendeesTable = document.querySelector('.attendees-table');
@@ -1805,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to hide loading state
+
     function hideLoadingState() {
         const loadingOverlay = document.querySelector('.loading-overlay');
         const attendeesTable = document.querySelector('.attendees-table');
@@ -1818,14 +1801,12 @@ document.addEventListener('DOMContentLoaded', function() {
             attendeesTable.classList.remove('loading');
         }
         
-        // Remove loading styles after use
         const loadingStyles = document.getElementById('loading-styles');
         if (loadingStyles) {
             setTimeout(() => loadingStyles.remove(), 500);
         }
     }
 
-    // Function to show error state
     function showErrorState() {
         const tableBody = document.getElementById('attendees-table-body');
         const tableInfo = document.getElementById('attendees-table-info');
@@ -1857,8 +1838,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
-
-</script>
-
+    </script>
 {% endblock %}

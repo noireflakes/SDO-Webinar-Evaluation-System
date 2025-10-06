@@ -1,202 +1,195 @@
-
 {% extends "login/layout.html" %}
-
 {% load static %}
-
 {% block title %}<title>Admin Dashboard</title>{% endblock %}
-
 {% block css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
-<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_log.css' %}"> 
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="{% static 'css/admin_panel_css/admin_bar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/admin_panel_css/admin_log.css' %}">
 {% endblock %}
-
-{% block js %}  
-<script src="{% static 'js/sidebar.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block js %}
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
-
-{% block body%}
-
-<div class="topbar">
-    <div class="menu-cont">
-        <button class="nav-menu-bar" style="color:white; background: none;">
-            <i class="fas fa-bars" style="font-size: 1.5em;"></i>
-        </button>
-    </div>
-    <div class="credential-cont">        
-        <span class="username fw-semibold">{{ user.username }}</span>
-        <a class="profile">
-            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-        </a>
-    </div>
-</div>
-
-<div class="app-container">
-    <div class="sidebar nav-sb">
-        <div class="close-cont">
-            <button class="close-sb">
-                <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
+{% block body %}
+    <div class="topbar">
+        <div class="menu-cont">
+            <button class="nav-menu-bar" style="color:white; background: none;">
+                <i class="fas fa-bars" style="font-size: 1.5em;"></i>
             </button>
         </div>
-        <ul class="sidebar-nav">
-            <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
-            <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Event Calendar</a>
-            <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
-            <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
-            <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settings</a>
-            <a href="{% url 'admin_log' %}" class="sb-nav-item sb-active">Activity Logs</a>
-            <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-        </ul>
-    </div>
-
-    <aside class="d-sidebar">
-        <div class="logo">
-            <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
-            <h2>SDO Baliwag</h2>
+        <div class="credential-cont">
+            <span class="username fw-semibold">{{ user.username }}</span>
+            <a class="profile">
+                <img src="{{ user.user_profile.img.url }}"
+                     alt="Profile"
+                     style="width: 32px;
+                            height: 32px;
+                            border-radius: 50%">
+            </a>
         </div>
-        <nav class="nav">
-            <a href="{% url 'admin_events' %}" class="nav-item">Event Management</a>
-            <a href="{% url 'admin_calendar' %}" class="nav-item">Event Calendar</a>
-            <a href="{% url 'admin_certificate' %}" class="nav-item"> Certificates</a>
-            <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
-            <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
-            <a href="{% url 'admin_log' %}" class="nav-item active">Activity Logs</a>
-            <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
-        </nav>
-    </aside>
-
-    <div class="main-content">
-        <h4 style="margin-bottom:0.3rem">Activity Logs</h4>
-        <p style="color:#6c757d; margin-bottom:2rem; font-size:1rem;">
-            A record of all user and admin actions in the system.
-        </p>
-        <div class="table-container">
-            <div class="table-header">
-                <h3><i class="fas fa-database me-2"></i>Log Audits</h3>
-                <div class="table-tabs">
-                    <!-- Changed: Users tab is now first and has active class -->
-                    <button class="tab-btn active" onclick="switchTab('users', this)">
-                        <i class="fas fa-users me-1"></i>Users
-                    </button>
-                    {% if user.is_superuser %}
-                        <!-- Changed: Admin Logs tab is now second and doesn't have active class -->
-                        <button class="tab-btn" onclick="switchTab('logs', this)">
-                            <i class="fas fa-history me-1"></i>Admin Logs
+    </div>
+    <div class="app-container">
+        <div class="sidebar nav-sb">
+            <div class="close-cont">
+                <button class="close-sb">
+                    <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
+                </button>
+            </div>
+            <ul class="sidebar-nav">
+                <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
+                <a href="{% url 'admin_calendar' %}" class="sb-nav-item">Event Calendar</a>
+                <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificate</a>
+                <a href="{% url 'admin_users' %}" class="sb-nav-item">Manage Users</a>
+                <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settings</a>
+                <a href="{% url 'admin_log' %}" class="sb-nav-item sb-active">Activity Logs</a>
+                <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
+            </ul>
+        </div>
+        <aside class="d-sidebar">
+            <div class="logo">
+                <img src="{% static 'asset/logo1.png' %}" alt="Logo" />
+                <h2>SDO Baliwag</h2>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'admin_events' %}" class="nav-item">Event Management</a>
+                <a href="{% url 'admin_calendar' %}" class="nav-item">Event Calendar</a>
+                <a href="{% url 'admin_certificate' %}" class="nav-item">Certificates</a>
+                <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
+                <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
+                <a href="{% url 'admin_log' %}" class="nav-item active">Activity Logs</a>
+                <a href="{% url 'logout' %}" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+        <div class="main-content">
+            <h4 style="margin-bottom:0.3rem">Activity Logs</h4>
+            <p style="color:#6c757d; margin-bottom:2rem; font-size:1rem;">A record of all user and admin actions in the system.</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>
+                        <i class="fas fa-database me-2"></i>Log Audits
+                    </h3>
+                    <div class="table-tabs">
+                        <button class="tab-btn active" onclick="switchTab('users', this)">
+                            <i class="fas fa-users me-1"></i>Users
                         </button>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Changed: Users Tab is now first and has active class -->
-            <div id="users-tab" class="tab-content active">
-                <div class="table-controls">
-                    <div class="search-box">
-                        <i class="fas fa-search text-muted"></i>
-                        <input type="text" id="users-search" placeholder="Search users..." onkeyup="searchTable('users')">
-                    </div>
-                    <div class="rows-per-page">
-                        <span>Show:</span>
-                        <select id="users-rows-select" onchange="changeRowsPerPage('users')">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span>entries</span>
+                        {% if user.is_superuser %}
+                            <button class="tab-btn" onclick="switchTab('logs', this)">
+                                <i class="fas fa-history me-1"></i>Admin Logs
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
-
-                <div class="table-content">
-                    <table class="table custom-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 5%;">ID</th>
-                                <th style="width: 20%;">User</th>
-                                <th style="width: 25%;">Email</th>
-                                <th style="width: 15%;">Status</th>
-                                <th style="width: 15%;">Joined</th>
-                                <th style="width: 20%;">Last Login</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination-footer">
-                    <div class="table-info" id="users-table-info"></div>
-                    <nav>
-                        <ul class="pagination mb-0" id="users-pagination"></ul>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- Changed: Admin Logs Tab is now second and doesn't have active class -->
-            <div id="logs-tab" class="tab-content">
-                <div class="table-controls">
-                    <div class="search-box">
-                        <i class="fas fa-search text-muted"></i>
-                        <input type="text" id="logs-search" placeholder="Search logs..." onkeyup="searchTable('logs')">
+                <div id="users-tab" class="tab-content active">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search text-muted"></i>
+                            <input type="text"
+                                   id="users-search"
+                                   placeholder="Search users..."
+                                   onkeyup="searchTable('users')">
+                        </div>
+                        <div class="rows-per-page">
+                            <span>Show:</span>
+                            <select id="users-rows-select" onchange="changeRowsPerPage('users')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
                     </div>
-                    <div class="rows-per-page">
-                        <span>Show:</span>
-                        <select id="logs-rows-select" onchange="changeRowsPerPage('logs')">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span>entries</span>
+                    <div class="table-content">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">ID</th>
+                                    <th style="width: 20%;">User</th>
+                                    <th style="width: 25%;">Email</th>
+                                    <th style="width: 15%;">Status</th>
+                                    <th style="width: 15%;">Joined</th>
+                                    <th style="width: 20%;">Last Login</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-footer">
+                        <div class="table-info" id="users-table-info"></div>
+                        <nav>
+                            <ul class="pagination mb-0" id="users-pagination">
+                            </ul>
+                        </nav>
                     </div>
                 </div>
-
-                <div class="table-content">
-                    <table class="table custom-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 15%;">Timestamp</th>
-                                <th style="width: 12%;">User</th>
-                                <th style="width: 10%;">Type</th>
-                                <th style="width: 10%;">Action</th>
-                                <th style="width: 28%;">Message</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logs-table-body">
-                            <!-- Dynamic content -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination-footer">
-                    <div class="table-info" id="logs-table-info"></div>
-                    <nav>
-                        <ul class="pagination mb-0" id="logs-pagination"></ul>
-                    </nav>
+                <div id="logs-tab" class="tab-content">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search text-muted"></i>
+                            <input type="text"
+                                   id="logs-search"
+                                   placeholder="Search logs..."
+                                   onkeyup="searchTable('logs')">
+                        </div>
+                        <div class="rows-per-page">
+                            <span>Show:</span>
+                            <select id="logs-rows-select" onchange="changeRowsPerPage('logs')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span>entries</span>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Timestamp</th>
+                                    <th style="width: 12%;">User</th>
+                                    <th style="width: 10%;">Type</th>
+                                    <th style="width: 10%;">Action</th>
+                                    <th style="width: 28%;">Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-footer">
+                        <div class="table-info" id="logs-table-info"></div>
+                        <nav>
+                            <ul class="pagination mb-0" id="logs-pagination">
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-
-<footer>
-    <div class="container d-flex justify-content-between flex-wrap">
-        <div>
-            <p>Empowering organizations through effective performance evaluation</p>
+    <footer>
+        <div class="container d-flex justify-content-between flex-wrap">
+            <div>
+                <p>Empowering organizations through effective performance evaluation</p>
+            </div>
+            <div>
+                <h6>Contact Us</h6>
+                <p>Baliwag City North Central School, Lopez Jaena St.</p>
+                <p>
+                    <a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a>
+                </p>
+            </div>
         </div>
-        <div>
-            <h6>Contact Us</h6>
-            <p>Baliwag City North Central School, Lopez Jaena St.</p>
-            <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
-        </div>
-    </div>
-</footer>
-
-<script>
-// Enhanced date formatting function
+    </footer>
+    <script>
 function formatDateTime(dateString) {
     if (!dateString || dateString === 'None' || dateString === '' || dateString === null) {
         return 'Unknown Date';
@@ -204,7 +197,6 @@ function formatDateTime(dateString) {
     
     try {
         const date = new Date(dateString);
-        // Check if date is valid
         if (isNaN(date.getTime())) {
             return 'Unknown Date';
         }
@@ -221,10 +213,10 @@ function formatDateTime(dateString) {
     }
 }
 
-// Enhanced log processing function
+
 function getEnhancedMessage(log) {
     if (log.action === 'delete') {
-        // Handle deletion cases
+ 
         let modelName = log.contentType || 'Unknown';
         let objectId = log.objectId || 'Unknown ID';
         let objectRepr = log.object || '';
@@ -235,12 +227,12 @@ function getEnhancedMessage(log) {
             return `<span class="deletion-info">Deleted <span class="model-name">${modelName}</span>: ${objectRepr}</span>`;
         }
     } else {
-        // Handle add/change cases
+
         return log.message || log.object || 'No details available';
     }
 }
 
-// Convert Django data to JavaScript with enhanced deletion info
+
 
 
 const logsData = [
@@ -255,11 +247,9 @@ const logsData = [
         actionLabel: "{% if log.action_flag == 1 %}Add{% elif log.action_flag == 2 %}Change{% elif log.action_flag == 3 %}Delete{% endif %}",
         object: "{{ log.object_repr|escapejs }}",
         message: "{{ log.get_change_message|escapejs }}",
-        // Enhanced deletion tracking data
         contentType: "{% if log.content_type %}{{ log.content_type.model|capfirst }}{% endif %}",
         objectId: "{{ log.object_id }}",
         actionFlag: {{ log.action_flag }},
-        // Pre-computed enhanced message
         enhancedMessage: {% if log.action_flag == 3 %}
             {% if log.object_repr and log.object_repr != 'None' and log.object_repr != '' %}
                 "Deleted {% if log.content_type %}{{ log.content_type.model|capfirst }}{% else %}Item{% endif %}: {{ log.object_repr|escapejs }}"
@@ -358,11 +348,10 @@ function displayTable(tableName) {
     
     if (tableName === 'logs') {
         paginatedData.forEach(log => {
-            // Use enhanced message for better deletion tracking
+
             let displayMessage = log.enhancedMessage || log.message || 'No details available';
             let messageClass = log.action === 'delete' ? 'enhanced-deletion' : '';
-            
-            // Format the timestamp with validation
+          
             let formattedTimestamp = log.timestamp
             
             
@@ -381,7 +370,7 @@ function displayTable(tableName) {
             let statusText = ((user.isActive ? 'Active' : 'Inactive'));
             let fullName = `${user.firstName} ${user.lastName}`.trim() || user.username;
             
-            // Format dates with validation
+      
             let formattedJoinDate = formatDateTime(user.dateJoined);
             let formattedLastLogin = user.lastLogin !== 'Never' ? formatDateTime(user.lastLogin) : 'Never';
             
@@ -403,8 +392,7 @@ function displayTable(tableName) {
             tableBody.innerHTML += tr;
         });
     }
-    
-    // Update table info
+
     let actualEnd = Math.min(end, state.filteredData.length);
     tableInfo.innerHTML = `Showing ${start + 1} to ${actualEnd} of ${state.filteredData.length} entries`;
 }
@@ -418,7 +406,6 @@ function setupPagination(tableName) {
     
     let pageCount = Math.ceil(state.filteredData.length / state.rowsPerPage);
     
-    // Previous button
     let prevLi = document.createElement("li");
     prevLi.className = `page-item ${state.currentPage === 1 ? "disabled" : ""}`;
     prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
@@ -431,8 +418,7 @@ function setupPagination(tableName) {
         });
     }
     pagination.appendChild(prevLi);
-    
-    // Page numbers
+
     let startPage = Math.max(1, state.currentPage - 2);
     let endPage = Math.min(pageCount, state.currentPage + 2);
     
@@ -451,7 +437,6 @@ function setupPagination(tableName) {
         pagination.appendChild(li);
     }
     
-    // Next button
     let nextLi = document.createElement("li");
     nextLi.className = `page-item ${state.currentPage === pageCount ? "disabled" : ""}`;
     nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
@@ -508,13 +493,12 @@ function changeRowsPerPage(tableName) {
     setupPagination(tableName);
 }
 
-// Changed: Initialize users tab first on page load
+
 document.addEventListener('DOMContentLoaded', function() {
     displayTable('users');
     setupPagination('users');
     displayTable('logs');
     setupPagination('logs');
 });
-</script>
-
+    </script>
 {% endblock %}

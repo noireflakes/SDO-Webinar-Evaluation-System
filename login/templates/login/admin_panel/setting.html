@@ -241,7 +241,7 @@ function previewFile(input) {
             return;
         }
         
-        // Validate file size (5MB)
+     
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size must be less than 5MB');
@@ -271,7 +271,7 @@ function previewFile(input) {
     }
 }
 
-// Password validation functions
+
 function showPasswordError(message) {
     const errorDiv = document.getElementById('password-mismatch-error');
     const errorText = document.getElementById('password-error-text');
@@ -300,18 +300,18 @@ function validatePasswords() {
     return true;
 }
 
-// Form validation
+
 document.addEventListener('DOMContentLoaded', function() {
     const passwordForm = document.getElementById('passwordForm');
     const newPasswordField = document.getElementById('new_password');
     const confirmPasswordField = document.getElementById('confirm_password');
     
     if (passwordForm) {
-        // Real-time validation as user types
+
         newPasswordField.addEventListener('input', validatePasswords);
         confirmPasswordField.addEventListener('input', validatePasswords);
         
-        // Form submission validation
+    
         passwordForm.addEventListener('submit', function(e) {
             if (!validatePasswords()) {
                 e.preventDefault();

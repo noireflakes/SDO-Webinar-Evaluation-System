@@ -69,7 +69,7 @@
     Need Assistance
   </button>
 
-  <!-- assistance modal -->
+  
   <div class="modal-overlay" id="assistanceModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -161,7 +161,7 @@
   </section>
 
 
-  <!-- Events Section  --> 
+
   <section id="events-section" class="events-section" >
     <div class="events-header">
       <h2 class="title">Upcoming Events & Announcements</h2>
@@ -170,7 +170,7 @@
 
     {% if webinars %}
       <div class="events-container">
-        <!-- Events Render --> 
+       
         {% for webinar in webinars %}
           <div class="webinar-card" data-aos="fade-up" >
             <div class="banner-container">
@@ -213,13 +213,11 @@
       </div>
     {% endif %}
     
-    <!-- Background  --> 
     <div class="blob one blob-purple"></div>
     <div class="blob two blob-purple"></div>
             
   </section>
 
-    <!-- Participant Section  --> 
     <section id="guidelines" class="participant-guidelines">
 
       <h2 class="title">Participant Guidelines</h2>
@@ -242,13 +240,12 @@
 
       </div>
 
-      <!-- Background  --> 
       <div class="guideline-bg" ></div>
 
     </section>
 
 
-    <!-- AboutUs Section  --> 
+   
     <section id="aboutus-section" class="aboutus-section">
       <h2 class="title">About us</h2>
 
@@ -277,18 +274,18 @@
 
 
  
-<!-- Footer  --> 
+
 <footer class="footer">
   <div class="footer-container">
     
-    <!-- logo and title  --> 
+   
     <div class="footer-left">
         <img  class="logo" src="{% static 'asset/logo1.png' %}" alt="">
     
       <p>School Division Office Of The City Of BALIWAG</p>
     </div>
     
-    <!-- Links  --> 
+
     <div class="footer-links">
       <h4>Quick Links</h4>
 
@@ -304,7 +301,7 @@
 
     </div>
 
-    <!-- Contacts  --> 
+
     <div class="footer-contact">
       <h4>Contact Us</h4>
       <p> Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
@@ -323,79 +320,74 @@
 
 </footer>
 
-<script>
-  // Alert auto-hide script
-  setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function(el) {
-      el.style.display = 'none';
-    });
-  }, 10000); 
+  <script>
 
-  // Modal functions
-  function openAssistanceModal() {
-    document.getElementById('assistanceModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
+    setTimeout(function () {
+      document.querySelectorAll('.alert').forEach(function(el) {
+        el.style.display = 'none';
+      });
+    }, 10000); 
 
-  function closeAssistanceModal() {
-    document.getElementById('assistanceModal').classList.remove('active');
-    document.body.style.overflow = 'auto';
-    // Reset form and hide success message
-    document.getElementById('assistanceForm').reset();
-    document.getElementById('successMessage').style.display = 'none';
-  }
-
-  // Close modal when clicking outside
-  document.getElementById('assistanceModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeAssistanceModal();
+    function openAssistanceModal() {
+      document.getElementById('assistanceModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
-  });
 
-  // Handle form submission
-  document.getElementById('assistanceForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const submitBtn = this.querySelector('.btn-submit');
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-    
-    fetch(this.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+    function closeAssistanceModal() {
+      document.getElementById('assistanceModal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+      document.getElementById('assistanceForm').reset();
+      document.getElementById('successMessage').style.display = 'none';
+    }
+
+    document.getElementById('assistanceModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAssistanceModal();
       }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById('successMessage').style.display = 'block';
-        this.reset();
-        setTimeout(() => {
-          closeAssistanceModal();
-        }, 2000);
-      } else {
+    });
+
+    document.getElementById('assistanceForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const submitBtn = this.querySelector('.btn-submit');
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('successMessage').style.display = 'block';
+          this.reset();
+          setTimeout(() => {
+            closeAssistanceModal();
+          }, 2000);
+        } else {
+          alert('Error sending message. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
         alert('Error sending message. Please try again.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error sending message. Please try again.');
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Message';
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      });
     });
-  });
 
-  // Close modal with Escape key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeAssistanceModal();
-    }
-  });
-</script>
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAssistanceModal();
+      }
+    });
+  </script>
 {% endblock %}

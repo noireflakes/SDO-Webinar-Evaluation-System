@@ -162,7 +162,7 @@
                        placeholder="Type to search users..."
                        required>
                 <div class="suggestions-dropdown" id="suggestionsDropdown">
-                    <!-- Suggestions will be populated here -->
+    
                 </div>
             </div>
         </div>
@@ -203,11 +203,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFocus = -1;
     let searchTimeout;
     
-    // Handle input changes
+    
     emailInput.addEventListener('input', function() {
         const query = this.value.trim();
         
-        // Clear previous timeout
+        
         clearTimeout(searchTimeout);
         
         if (query.length < 2) {
@@ -215,16 +215,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Add loading indicator
+       
         showLoading();
         
-        // Debounce the search to avoid too many requests
+        
         searchTimeout = setTimeout(() => {
             fetchSuggestions(query);
         }, 300);
     });
     
-    // Handle keyboard navigation
+    
     emailInput.addEventListener('keydown', function(e) {
         const suggestions = suggestionsDropdown.querySelectorAll('.suggestion-item');
         
@@ -247,8 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hideSuggestions();
         }
     });
-    
-    // Hide suggestions when clicking outside
+
     document.addEventListener('click', function(e) {
         if (!emailInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
             hideSuggestions();

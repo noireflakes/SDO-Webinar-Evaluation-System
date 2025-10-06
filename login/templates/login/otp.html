@@ -1,336 +1,344 @@
 {% extends "login/layout.html" %}
-
 {% load static %}
-
 {% block css %}
- <link rel="stylesheet" href="{% static 'css/otp.css' %}">
- <link rel="stylesheet" href="{% static 'css/blob.css' %}">
- 
-{% endblock %}
-
+    <link rel="stylesheet" href="{% static 'css/otp.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/blob.css' %}" />
+{% endblock css %}
 {% block body %}
-
-<div class="blob one blob-yellow"><p></p></div>
-
-{% if locked_out %}
-    <div class="lockout-container" >
-        <div class="alert alert-warning lockout-alert">
-            <h2>🔒 Account Temporarily Locked</h2>
-            <p>{{ error }}</p>
-            <div id="lockout-timer" class="lockout-timer"></div>
-            <p class="lockout-info">For security reasons, you've been temporarily locked out after too many failed attempts.</p>
-            <div class="lockout-actions">
-                <a href="{% url 'login' %}" class="back-to-login">← Back to Login</a>
-            </div>
-        </div>
+    <div class="blob one blob-yellow">
+        <p></p>
     </div>
-{% else %}
-    <form action="" method="post" id="form">
-        <img class="logo" src="{% static 'asset/logo1.png' %}" alt="logo" style="width: 4rem; height: auto; margin-bottom: 5px;">
-
-        {% csrf_token %}
-        <h2>Enter OTP</h2>
-        
-        {% if error %}
-            <div class="alert alert-error" style="background-color: white;">
-                {{ error }}
-                {% if "attempts remaining" in error %}
-                    <div class="attempts-warning">
-                         Be careful! Too many wrong attempts will lock your account for 10 minutes.
-                    </div>
-                {% endif %}
-            </div>
-        {% endif %}
-        
-        <input id="otp" name="otp" type="text" required placeholder="Enter 6-digit OTP" maxlength="6">
-        <input type="submit" class="btnn"  value="Verify OTP" id="submit-btn">
-        
-        <!-- Resend OTP Button -->
-        <input type="button" class="btnn" value="Send OTP" id="resend-otp-btn" style="display: none;" onclick="window.location.href='{% url 'resend_otp' user_id %}'">
-        
-        <div id="timer" class="timer"></div>
-        
-        <div class="otp-actions">
-            <a id="otp_send_button" class="otp-send-link" href="{% url 'resend_otp' user_id %}">Send OTP again?</a>    
-        </div>
-    </form>
-{% endif %}
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
     {% if locked_out %}
-        
-        const lockoutTimerElement = document.getElementById("lockout-timer");
-        const errorText = "{{ error }}";
-        const userId = "{{ user.id }}";
-        const lockoutStorageKey = `lockout_timer_${userId}`;
-       
-        const minutesMatch = errorText.match(/(\d+) minutes/);
-        let lockoutTimeLeft = 0;
-        
-        const storedLockoutData = localStorage.getItem(lockoutStorageKey);
-        if (storedLockoutData) {
-            const lockoutData = JSON.parse(storedLockoutData);
-            const currentTime = Date.now();
-            const timeElapsed = Math.floor((currentTime - lockoutData.startTime) / 1000);
-            lockoutTimeLeft = Math.max(0, lockoutData.totalTime - timeElapsed);
-        } else {
-            lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
-            
-            if (lockoutTimeLeft > 0) {
-                const lockoutData = {
-                    startTime: Date.now(),
-                    totalTime: lockoutTimeLeft
-                };
-                localStorage.setItem(lockoutStorageKey, JSON.stringify(lockoutData));
-            }
-        }
-        
-        if (lockoutTimeLeft > 0) {
-            const lockoutCounter = setInterval(function() {
-                if (lockoutTimeLeft > 0) {
-                    let minutes = Math.floor(lockoutTimeLeft / 60);
-                    let seconds = lockoutTimeLeft % 60;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-                    
-                    lockoutTimerElement.innerHTML = `<strong>Time remaining: ${minutes}:${seconds}</strong>`;
-                    lockoutTimeLeft--;
-                } else {
-                    clearInterval(lockoutCounter);
-                    lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
-                    
-                    localStorage.removeItem(lockoutStorageKey);
-                    
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 2000);
-                }
-            }, 1000);
-        } else {
-            lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
-            localStorage.removeItem(lockoutStorageKey);
-            setTimeout(function() {
-                window.location.reload();
-            }, 2000);
-        }
+        <div class="lockout-container">
+            <div class="alert alert-warning lockout-alert">
+                <h2>🔒 Account Temporarily Locked</h2>
+                <p>{{ error }}</p>
+                <div id="lockout-timer" class="lockout-timer"></div>
+                <p class="lockout-info">
+                    For security reasons, you've been temporarily locked out after too many
+                    failed attempts.
+                </p>
+                <div class="lockout-actions">
+                    <a href="{% url 'login' %}" class="back-to-login">← Back to Login</a>
+                </div>
+            </div>
+        </div>
     {% else %}
-      
-        const timerElement = document.getElementById("timer");
-        const otpSendButton = document.getElementById("otp_send_button");
-        const submitButton = document.getElementById("submit-btn");
-        const otpInput = document.getElementById("otp");
-        const resendOtpBtn = document.getElementById("resend-otp-btn");
-        
-        const userId = "{{ user.id }}";
-        const otpStorageKey = `otp_timer_${userId}`;
-        const form = document.getElementById("form");
-        
-        let timeLeft = 300; 
-        let isExpired = false;
-        
-        function setFormState(disabled) {
-            if (disabled) {
-                otpInput.style.backgroundColor = '#f5f5f5';
-                otpInput.style.color = '#999';
-                otpInput.placeholder = 'Please click Send OTP';
-                otpInput.disabled = true;
-            } else {
-                otpInput.style.backgroundColor = '';
-                otpInput.style.color = '';
-                otpInput.placeholder = 'Enter 6-digit OTP';
-                otpInput.disabled = false;
-            }
-        }
-        
-        function showExpiredState() {
-            timerElement.style.display = 'none';
-            submitButton.style.display = 'none';
-            resendOtpBtn.style.display = 'block';
-            otpSendButton.style.display = 'none'; // Hide the old resend link
-            setFormState(true);
-        }
-        
-        const storedOtpData = localStorage.getItem(otpStorageKey);
-        let otpStartTime = Date.now();
-        
-        if (storedOtpData) {
-            const otpData = JSON.parse(storedOtpData);
-            otpStartTime = otpData.startTime;
-            const currentTime = Date.now();
-            const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
-            timeLeft = Math.max(0, otpData.totalTime - timeElapsed);
-        } else {
-            const otpCreatedAt = "{{ otp_created_at|default:'' }}";
-            
-            if (otpCreatedAt) {
-                otpStartTime = new Date(otpCreatedAt).getTime();
-                const currentTime = Date.now();
-                const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
-                timeLeft = Math.max(0, 300 - timeElapsed);
-            } else {
-                otpStartTime = Date.now();
-                timeLeft = 300;
-            }
-            
-            const otpData = {
-                startTime: otpStartTime,
-                totalTime: 300
-            };
-            localStorage.setItem(otpStorageKey, JSON.stringify(otpData));
-        }
-        
-        if (timeLeft <= 0) {
-            isExpired = true;
-            showExpiredState();
-        }
-
-        const hasError = {% if error %}true{% else %}false{% endif %};
-        if (hasError) {
-            otpSendButton.style.display = "block";
-        }
-
-        if (!isExpired) {
-            const counter = setInterval(function() {
-                if (timeLeft > 0) {
-                    let minutes = Math.floor(timeLeft / 60);
-                    let seconds = timeLeft % 60;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                    timerElement.textContent = `OTP expires in: ${minutes}:${seconds}`;
-                    timeLeft--;
-                } else {
-                    clearInterval(counter);
-                    isExpired = true;
-                    showExpiredState();
-                    localStorage.removeItem(otpStorageKey);
-                }
-            }, 1000);
-        }
-
-        if (otpInput) {
-            otpInput.addEventListener("input", function() {
-                if (isExpired) {
-                    this.value = '';
-                    return;
-                }
-                
-                this.value = this.value.replace(/[^0-9]/g, '');
-                
-                if (this.value.length === 6 && !isExpired) {
-                    document.getElementById("form").submit();
-                }
-            });
-            
-            otpInput.addEventListener("keydown", function(e) {
-                if (isExpired) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-            
-            otpInput.addEventListener("paste", function(e) {
-                if (isExpired) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            if (!isExpired) {
-                otpInput.focus();
-            }
-        }
-
-        document.getElementById("form").addEventListener("submit", function(e) {
-            if (isExpired) {
-                e.preventDefault();
-                return false;
-            }
-        });
-      
-        // Handle resend button click
-        if (resendOtpBtn) {
-            resendOtpBtn.addEventListener("click", function() {
-                localStorage.removeItem(otpStorageKey);
-            });
-            
-            // Add hover effect
-            resendOtpBtn.addEventListener("mouseenter", function() {
-                this.style.backgroundColor = "#2980b9";
-            });
-            
-            resendOtpBtn.addEventListener("mouseleave", function() {
-                this.style.backgroundColor = "#3498db";
-            });
-        }
-
-        // Handle old resend link click
-        const resendLink = document.getElementById("otp_send_button");
-        if (resendLink) {
-            resendLink.addEventListener("click", function() {
-                localStorage.removeItem(otpStorageKey);
-            });
-        }
+        <form action="" method="post" id="form">
+            <img class="logo"
+                 src="{% static 'asset/logo1.png' %}"
+                 alt="logo"
+                 style="width: 4rem;
+                        height: auto;
+                        margin-bottom: 5px" />
+            {% csrf_token %}
+            <h2>Enter OTP</h2>
+            {% if error %}
+                <div class="alert alert-error" style="background-color: white">
+                    {{ error }}
+                    {% if "attempts remaining" in error %}
+                        <div class="attempts-warning">Be careful! Too many wrong attempts will lock your account for 10 minutes.</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <input id="otp"
+                   name="otp"
+                   type="text"
+                   required
+                   placeholder="Enter 6-digit OTP"
+                   maxlength="6" />
+            <input type="submit" class="btnn" value="Verify OTP" id="submit-btn" />
+            <input type="button"
+                   class="btnn"
+                   value="Send OTP"
+                   id="resend-otp-btn"
+                   style="display: none"
+                   onclick="window.location.href='{% url 'resend_otp' user_id %}'" />
+            <div id="timer" class="timer"></div>
+            <div class="otp-actions">
+                <a id="otp_send_button"
+                   class="otp-send-link"
+                   href="{% url 'resend_otp' user_id %}">Send OTP again?</a>
+            </div>
+        </form>
     {% endif %}
-});
+    <script>
+  document.addEventListener("DOMContentLoaded", function() {
+      {% if locked_out %}
 
-// Cleanup expired localStorage entries
-document.addEventListener("DOMContentLoaded", function() {
-    const now = Date.now();
-    const keysToRemove = [];
-    
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('lockout_timer_') || key.startsWith('otp_timer_'))) {
-            try {
-                const data = JSON.parse(localStorage.getItem(key));
-                const timeElapsed = Math.floor((now - data.startTime) / 1000);
-                
-                if (timeElapsed >= data.totalTime) {
-                    keysToRemove.push(key);
-                }
-            } catch (e) {
-                keysToRemove.push(key);
-            }
-        }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-});
-</script>
+          const lockoutTimerElement = document.getElementById("lockout-timer");
+          const errorText = "{{ error }}";
+          const userId = "{{ user.id }}";
+          const lockoutStorageKey = `lockout_timer_${userId}`;
 
-<style>
-.expired-message {
+          const minutesMatch = errorText.match(/(\d+) minutes/);
+          let lockoutTimeLeft = 0;
+
+          const storedLockoutData = localStorage.getItem(lockoutStorageKey);
+          if (storedLockoutData) {
+              const lockoutData = JSON.parse(storedLockoutData);
+              const currentTime = Date.now();
+              const timeElapsed = Math.floor((currentTime - lockoutData.startTime) / 1000);
+              lockoutTimeLeft = Math.max(0, lockoutData.totalTime - timeElapsed);
+          } else {
+              lockoutTimeLeft = minutesMatch ? parseInt(minutesMatch[1]) * 60 : 0;
+
+              if (lockoutTimeLeft > 0) {
+                  const lockoutData = {
+                      startTime: Date.now(),
+                      totalTime: lockoutTimeLeft
+                  };
+                  localStorage.setItem(lockoutStorageKey, JSON.stringify(lockoutData));
+              }
+          }
+
+          if (lockoutTimeLeft > 0) {
+              const lockoutCounter = setInterval(function() {
+                  if (lockoutTimeLeft > 0) {
+                      let minutes = Math.floor(lockoutTimeLeft / 60);
+                      let seconds = lockoutTimeLeft % 60;
+                      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                      lockoutTimerElement.innerHTML = `<strong>Time remaining: ${minutes}:${seconds}</strong>`;
+                      lockoutTimeLeft--;
+                  } else {
+                      clearInterval(lockoutCounter);
+                      lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
+
+                      localStorage.removeItem(lockoutStorageKey);
+
+                      setTimeout(function() {
+                          window.location.reload();
+                      }, 2000);
+                  }
+              }, 1000);
+          } else {
+              lockoutTimerElement.innerHTML = '<strong style="color: green;">✅ You can now try again!</strong>';
+              localStorage.removeItem(lockoutStorageKey);
+              setTimeout(function() {
+                  window.location.reload();
+              }, 2000);
+          }
+      {% else %}
+
+          const timerElement = document.getElementById("timer");
+          const otpSendButton = document.getElementById("otp_send_button");
+          const submitButton = document.getElementById("submit-btn");
+          const otpInput = document.getElementById("otp");
+          const resendOtpBtn = document.getElementById("resend-otp-btn");
+
+          const userId = "{{ user.id }}";
+          const otpStorageKey = `otp_timer_${userId}`;
+          const form = document.getElementById("form");
+
+          let timeLeft = 300;
+          let isExpired = false;
+
+          function setFormState(disabled) {
+              if (disabled) {
+                  otpInput.style.backgroundColor = '#f5f5f5';
+                  otpInput.style.color = '#999';
+                  otpInput.placeholder = 'Please click Send OTP';
+                  otpInput.disabled = true;
+              } else {
+                  otpInput.style.backgroundColor = '';
+                  otpInput.style.color = '';
+                  otpInput.placeholder = 'Enter 6-digit OTP';
+                  otpInput.disabled = false;
+              }
+          }
+
+          function showExpiredState() {
+              timerElement.style.display = 'none';
+              submitButton.style.display = 'none';
+              resendOtpBtn.style.display = 'block';
+              otpSendButton.style.display = 'none'; // Hide the old resend link
+              setFormState(true);
+          }
+
+          const storedOtpData = localStorage.getItem(otpStorageKey);
+          let otpStartTime = Date.now();
+
+          if (storedOtpData) {
+              const otpData = JSON.parse(storedOtpData);
+              otpStartTime = otpData.startTime;
+              const currentTime = Date.now();
+              const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
+              timeLeft = Math.max(0, otpData.totalTime - timeElapsed);
+          } else {
+              const otpCreatedAt = "{{ otp_created_at|default:'' }}";
+
+              if (otpCreatedAt) {
+                  otpStartTime = new Date(otpCreatedAt).getTime();
+                  const currentTime = Date.now();
+                  const timeElapsed = Math.floor((currentTime - otpStartTime) / 1000);
+                  timeLeft = Math.max(0, 300 - timeElapsed);
+              } else {
+                  otpStartTime = Date.now();
+                  timeLeft = 300;
+              }
+
+              const otpData = {
+                  startTime: otpStartTime,
+                  totalTime: 300
+              };
+              localStorage.setItem(otpStorageKey, JSON.stringify(otpData));
+          }
+
+          if (timeLeft <= 0) {
+              isExpired = true;
+              showExpiredState();
+          }
+
+          const hasError = {% if error %}true{% else %}false{% endif %};
+          if (hasError) {
+              otpSendButton.style.display = "block";
+          }
+
+          if (!isExpired) {
+              const counter = setInterval(function() {
+                  if (timeLeft > 0) {
+                      let minutes = Math.floor(timeLeft / 60);
+                      let seconds = timeLeft % 60;
+                      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                      timerElement.textContent = `OTP expires in: ${minutes}:${seconds}`;
+                      timeLeft--;
+                  } else {
+                      clearInterval(counter);
+                      isExpired = true;
+                      showExpiredState();
+                      localStorage.removeItem(otpStorageKey);
+                  }
+              }, 1000);
+          }
+
+          if (otpInput) {
+              otpInput.addEventListener("input", function() {
+                  if (isExpired) {
+                      this.value = '';
+                      return;
+                  }
+
+                  this.value = this.value.replace(/[^0-9]/g, '');
+
+                  if (this.value.length === 6 && !isExpired) {
+                      document.getElementById("form").submit();
+                  }
+              });
+
+              otpInput.addEventListener("keydown", function(e) {
+                  if (isExpired) {
+                      e.preventDefault();
+                      return false;
+                  }
+              });
+
+              otpInput.addEventListener("paste", function(e) {
+                  if (isExpired) {
+                      e.preventDefault();
+                      return false;
+                  }
+              });
+
+              if (!isExpired) {
+                  otpInput.focus();
+              }
+          }
+
+          document.getElementById("form").addEventListener("submit", function(e) {
+              if (isExpired) {
+                  e.preventDefault();
+                  return false;
+              }
+          });
+
+          // Handle resend button click
+          if (resendOtpBtn) {
+              resendOtpBtn.addEventListener("click", function() {
+                  localStorage.removeItem(otpStorageKey);
+              });
+
+              // Add hover effect
+              resendOtpBtn.addEventListener("mouseenter", function() {
+                  this.style.backgroundColor = "#2980b9";
+              });
+
+              resendOtpBtn.addEventListener("mouseleave", function() {
+                  this.style.backgroundColor = "#3498db";
+              });
+          }
+
+          // Handle old resend link click
+          const resendLink = document.getElementById("otp_send_button");
+          if (resendLink) {
+              resendLink.addEventListener("click", function() {
+                  localStorage.removeItem(otpStorageKey);
+              });
+          }
+      {% endif %}
+  });
+
+  // Cleanup expired localStorage entries
+  document.addEventListener("DOMContentLoaded", function() {
+      const now = Date.now();
+      const keysToRemove = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('lockout_timer_') || key.startsWith('otp_timer_'))) {
+              try {
+                  const data = JSON.parse(localStorage.getItem(key));
+                  const timeElapsed = Math.floor((now - data.startTime) / 1000);
+
+                  if (timeElapsed >= data.totalTime) {
+                      keysToRemove.push(key);
+                  }
+              } catch (e) {
+                  keysToRemove.push(key);
+              }
+          }
+      }
+
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+  });
+    </script>
+    <style>
+  .expired-message {
     animation: fadeIn 0.5s ease-in;
-}
+  }
 
-.resend-otp-button {
+  .resend-otp-button {
     animation: slideIn 0.5s ease-out;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-.resend-otp-button:active {
+  .resend-otp-button:active {
     transform: translateY(1px);
-}
+  }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+    to {
+      opacity: 1;
     }
-}
+  }
 
-.resend-container {
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .resend-container {
     margin-top: 15px;
-}
-</style>
-
+  }
+    </style>
 {% endblock %}

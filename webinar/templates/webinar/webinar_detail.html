@@ -1,146 +1,131 @@
 {% extends "login/layout.html" %}
 {% load static %}
-
 {% block css %}
-<link rel="stylesheet" href="{% static 'webinar/css/webinar_detail.css' %}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+    <link rel="stylesheet" href="{% static 'webinar/css/webinar_detail.css' %}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
-
 {% block body %}
-<section class="header-section">
-    <div class="header-container">
-        
-        <p>
-            {% if user.is_superuser or user.is_staff %}
-                <a href="{% url 'admin_events' %}">Admin Panel</a> 
-            {% else %}
-                <a href="{% url 'user_dashboard' %}">Dashboard</a>
-            {% endif  %}> Webinar Details
-        </p>
-        <h2>{{ webinar.title }}</h2>
-    </div>
-</section>
-
-<section class="webinar-section">
-    <div class="webinar-container">
-        <div class="webinar-contents">
-            <h4>Overview</h4>
-            <p>{{ webinar.description }}</p>
+    <section class="header-section">
+        <div class="header-container">
+            <p>
+                {% if user.is_superuser or user.is_staff %}
+                    <a href="{% url 'admin_events' %}">Admin Panel</a>
+                {% else %}
+                    <a href="{% url 'user_dashboard' %}">Dashboard</a>
+                {% endif %}
+                > Webinar Details
+            </p>
+            <h2>{{ webinar.title }}</h2>
         </div>
-<div class="webinar-img-container">
-    <!-- Image Container with Hover Effect -->
-    <div class="img-con">
-        <img src="{{ webinar.banner.url }}" alt="{{ webinar.title }}" class="webinar-banner">
-        <!-- Date Badge Overlay -->
-        <div class="date-badge">
-            <span class="month">{{ webinar.start_date|date:"M" }}</span>
-            <span class="day">{{ webinar.start_date|date:"d" }}</span>
-        </div>
- 
-    </div>
-    
-    <!-- Content Container -->
-    <div class="img-contents">
-        <div class="content">
-        <div class="meta-item d-flex align-items-center rounded shadow-sm" >
-        <span class="event-type" style="background: linear-gradient(135deg, #6f42c1, #6610f2); color:white; padding: 5px; padding-right:10px; padding-left: 10px; border-radius: 20px;">{{ webinar.event_type }}</span>
-        </div>
-        
-            <h5 class="webinar-title">{{ webinar.title }}</h5>
-            
-         
-            <div class="webinar-meta">
-               
-                <div class="meta-item">
-                    <i class="bi bi-calendar-event"></i>
-                    <span class="date-range">
-                        {{ webinar.start_date|date:"M d, Y" }} - {{ webinar.until_date|date:"M d, Y" }}
-                    </span>
+    </section>
+    <section class="webinar-section">
+        <div class="webinar-container">
+            <div class="webinar-contents">
+                <h4>Overview</h4>
+                <p>{{ webinar.description }}</p>
+            </div>
+            <div class="webinar-img-container">
+                <div class="img-con">
+                    <img src="{{ webinar.banner.url }}"
+                         alt="{{ webinar.title }}"
+                         class="webinar-banner">
+                    <div class="date-badge">
+                        <span class="month">{{ webinar.start_date|date:"M" }}</span>
+                        <span class="day">{{ webinar.start_date|date:"d" }}</span>
+                    </div>
                 </div>
-                
-                <!-- Time -->
-                <div class="meta-item">
-                    <i class="bi bi-clock"></i>
-                    <span class="time">{{ webinar.time|time:"h:i A" }}</span>
-                </div>
-    
-                
-                <!-- Venue -->
-                <div class="meta-item">
-                    <i class="bi bi-geo-alt"></i>
-                    <span class="venue">{{ webinar.venue }}</span>
+                <div class="img-contents">
+                    <div class="content">
+                        <div class="meta-item d-flex align-items-center rounded shadow-sm">
+                            <span class="event-type"
+                                  style="background: linear-gradient(135deg, #6f42c1, #6610f2);
+                                         color:white;
+                                         padding: 5px;
+                                         padding-right:10px;
+                                         padding-left: 10px;
+                                         border-radius: 20px">{{ webinar.event_type }}</span>
+                        </div>
+                        <h5 class="webinar-title">{{ webinar.title }}</h5>
+                        <div class="webinar-meta">
+                            <div class="meta-item">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="date-range">{{ webinar.start_date|date:"M d, Y" }} - {{ webinar.until_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="bi bi-clock"></i>
+                                <span class="time">{{ webinar.time|time:"h:i A" }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="bi bi-geo-alt"></i>
+                                <span class="venue">{{ webinar.venue }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-
         </div>
-    </div>
-</div>
-    </div>
-</section>
-
-{% if user.is_superuser or user.is_staff %}
-<section class="admin-controls">
-    <div class="admin-container">
-        <a class="register btn" href="{% url 'register' webinar.id %}">
-            <i class="fas fa-user-plus"></i> 
-            <span>Register Attendees</span>
-        </a>
-        <a class="statistics btn" href="{% url 'display_result' webinar.id %}">
-            <i class="fas fa-chart-bar"></i><span>Evaluation Tool</span>
-        </a>
-        <a class="create-test btn" href="{% url 'create_test' webinar.id %}">
-            <i class="fas fa-edit"></i><span>Create Test</span>
-        </a>
-        <a class="create-test btn" href="{% url 'questionaire' webinar.id %}">
-            <i class="fas fa-clipboard-list"></i><span>Evaluation</span>
-        </a>
-        <a class="create-test btn" href="{% url 'edit_events' webinar.id %}">
-            <i class="fas fa-edit"></i><span>Edit Event</span>
-        </a>
-    </div>
-</section>
-{% endif %}
-
-<section class="instructor-section">
-    <h2>Instructor & Speaker</h2>
-    <div class="instructor-container">
-        {% for speaker in webinar.speaker.all %}
-        <div class="instrutor-card">
-            <div class="sp-cont-img">
-                <img src="{{ speaker.img.url }}">
+    </section>
+    {% if user.is_superuser or user.is_staff %}
+        <section class="admin-controls">
+            <div class="admin-container">
+                <a class="register btn" href="{% url 'register' webinar.id %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Register Attendees</span>
+                </a>
+                <a class="statistics btn" href="{% url 'display_result' webinar.id %}">
+                    <i class="fas fa-chart-bar"></i><span>Evaluation Tool</span>
+                </a>
+                <a class="create-test btn" href="{% url 'create_test' webinar.id %}">
+                    <i class="fas fa-edit"></i><span>Create Test</span>
+                </a>
+                <a class="create-test btn" href="{% url 'questionaire' webinar.id %}">
+                    <i class="fas fa-clipboard-list"></i><span>Evaluation</span>
+                </a>
+                <a class="create-test btn" href="{% url 'edit_events' webinar.id %}">
+                    <i class="fas fa-edit"></i><span>Edit Event</span>
+                </a>
             </div>
-            <div class="speaker-content">
-                <h2>{{ speaker.name }}</h2>
-                <p>{{ speaker.email }}</p>
+        </section>
+    {% endif %}
+    <section class="instructor-section">
+        <h2>Instructor & Speaker</h2>
+        <div class="instructor-container">
+            {% for speaker in webinar.speaker.all %}
+                <div class="instrutor-card">
+                    <div class="sp-cont-img">
+                        <img src="{{ speaker.img.url }}">
+                    </div>
+                    <div class="speaker-content">
+                        <h2>{{ speaker.name }}</h2>
+                        <p>{{ speaker.email }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <img class="logo" src="{% static 'asset/logo1.png' %}" alt="">
+                <p>School Division Office Of The City Of BALIWAG</p>
+            </div>
+            <div class="footer-links">
+                <h4></h4>
+                <div class="link-columns"></div>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <p>
+                    Baliwag City North Central School,
+                    <br>
+                    Lopez Jaena St, Baliwag, Bulacan
+                </p>
+                <p>+63912376421</p>
+                <p>sdo@deped.com</p>
             </div>
         </div>
-        {% endfor %}
-    </div>
-</section>
-
-
-
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-left">
-            <img class="logo" src="{% static 'asset/logo1.png' %}" alt="">
-            <p>School Division Office Of The City Of BALIWAG</p>
-        </div>
-        <div class="footer-links">
-            <h4></h4>
-            <div class="link-columns"></div>
-        </div>
-        <div class="footer-contact">
-            <h4>Contact Us</h4>
-            <p>Baliwag City North Central School,<br> Lopez Jaena St, Baliwag, Bulacan</p>
-            <p>+63912376421</p>
-            <p>sdo@deped.com</p>
-        </div>
-    </div>
-</footer>
-
-
+    </footer>
 {% endblock %}

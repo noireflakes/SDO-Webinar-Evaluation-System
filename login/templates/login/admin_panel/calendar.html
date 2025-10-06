@@ -1,43 +1,47 @@
 {% extends "login/layout.html" %}
-
 {% load static %}
-
 {% block title %}<title>Calendar</title>{% endblock %}
-
 {% block css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/admin_bar.css' %}"> 
-<link rel="stylesheet" href="{% static 'css/admin_panel_css/calendar.css' %}">
-<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="{% static 'css/admin_panel_css/admin_bar.css' %}">
+  <link rel="stylesheet"
+        href="{% static 'css/admin_panel_css/calendar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
 {% endblock %}
-{% block js %}  
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-<script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
-<script src="{% static 'js/sidebar.js' %}"></script>
+{% block js %}
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css"
+        rel="stylesheet">
+  <script src="{% static 'js/full_calendar/index.global.min.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
 {% endblock %}
-
-{% block body%}
-
+{% block body %}
   <div class="topbar">
-    
-        <div class="menu-cont"><button class="nav-menu-bar" style="color:white; background: none;" ><i class="fas fa-bars" style="font-size: 1.5em;"></i></button></div>
-        <div class="credential-cont">        
-          <span class="username fw-semibold">{{ user.username }}</span>
-          <a class="profile">
-            <img src="{{ user.user_profile.img.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-          </a>
-        </div>
-   
+    <div class="menu-cont">
+      <button class="nav-menu-bar" style="color:white; background: none;">
+        <i class="fas fa-bars" style="font-size: 1.5em;"></i>
+      </button>
+    </div>
+    <div class="credential-cont">
+      <span class="username fw-semibold">{{ user.username }}</span>
+      <a class="profile">
+        <img src="{{ user.user_profile.img.url }}"
+             alt="Profile"
+             style="width: 32px;
+                    height: 32px;
+                    border-radius: 50%">
+      </a>
+    </div>
   </div>
-
-
   <div class="app-container">
-
-     <div class="sidebar nav-sb">
-    <div class="close-cont"><button class="close-sb"><i class="fa-solid fa-x" style="font-size: 1.5em;"></i></button></div>
-
-    <ul class="sidebar-nav">
+    <div class="sidebar nav-sb">
+      <div class="close-cont">
+        <button class="close-sb">
+          <i class="fa-solid fa-x" style="font-size: 1.5em;"></i>
+        </button>
+      </div>
+      <ul class="sidebar-nav">
         <a href="{% url 'admin_events' %}" class="sb-nav-item">Event Management</a>
         <a href="{% url 'admin_calendar' %}" class="sb-nav-item sb-active">Event Calendar</a>
         <a href="{% url 'admin_certificate' %}" class="sb-nav-item">Certificates</a>
@@ -45,8 +49,7 @@
         <a href="{% url 'admin_setting' %}" class="sb-nav-item">Settting</a>
         <a href="{% url 'admin_log' %}" class="sb-nav-item">Activity Logs</a>
         <a href="{% url 'logout' %}" class="sb-nav-item">Logout</a>
-    </ul>
-
+      </ul>
     </div>
     <aside class="d-sidebar">
       <div class="logo">
@@ -60,59 +63,53 @@
         <a href="{% url 'admin_users' %}" class="nav-item">Manage Users</a>
         <a href="{% url 'admin_setting' %}" class="nav-item">Settings</a>
         <a href="{% url 'admin_log' %}" class="nav-item">Activity Logs</a>
-        <a href="{% url 'logout' %}" class="nav-item">Logout</a> 
+        <a href="{% url 'logout' %}" class="nav-item">Logout</a>
       </nav>
     </aside>
-
     <div class="main-content">
       <section class="calendar-section">
-        <div class="title"><h2>Calendar</h2>
+        <div class="title">
+          <h2>Calendar</h2>
           <p>Stay Updated with Upcoming Events and Seminar</p>
         </div>
-
-
         <div id="calendar"></div>
       </section>
-
       <section class="events-section">
         <h3>Upcoming Events</h3>
-
         <div class="events-container">
           {% if upcoming_webinars %}
             {% for up_webinar in upcoming_webinars %}
               <div class="event-card">
                 <h6>{{ up_webinar.title }}</h6>
-                
                 <p class="address">{{ up_webinar.venue }}</p>
                 <p class="date">{{ up_webinar.start_date }} – {{ up_webinar.until_date }}</p>
-                <p class=" date view"><a  href="{% url 'webinar_detail' up_webinar.id %}">View Details</a></p>
+                <p class=" date view">
+                  <a href="{% url 'webinar_detail' up_webinar.id %}">View Details</a>
+                </p>
               </div>
             {% endfor %}
-          {% else %} 
+          {% else %}
             <p class="no-event">No Scheduled Upcoming Webinar</p>
           {% endif %}
         </div>
-
-
       </section>
     </div>
   </div>
 </div>
-
 <footer>
   <div class="container d-flex justify-content-between flex-wrap">
-      <div>
-          <p>Empowering organizations through effective performance evaluation</p>
-      </div>
-      <div>
-          <h6>Contact Us</h6>
-          <p>Baliwag City North Central School, Lopez Jaena St.</p>
-          <p><a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a></p>
-      </div>
+    <div>
+      <p>Empowering organizations through effective performance evaluation</p>
+    </div>
+    <div>
+      <h6>Contact Us</h6>
+      <p>Baliwag City North Central School, Lopez Jaena St.</p>
+      <p>
+        <a href="mailto:sdo@deped.com" class="text-light">sdo@deped.com</a>
+      </p>
+    </div>
   </div>
 </footer>
-
-
 <script>
 
 
@@ -128,7 +125,4 @@
     calendar.render();
   });
 </script>
-
-
-
 {% endblock %}

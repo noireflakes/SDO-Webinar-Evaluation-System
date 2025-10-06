@@ -1,51 +1,68 @@
 {% extends "login/layout.html" %}
-
 {% load static %}
-
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/result.css' %}">
+    <link rel="stylesheet" href="{% static 'css/result.css' %}">
 {% endblock %}
-
-{% block js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
+{% block js %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
 {% block body %}
-<div class="container-fluid">
-    <h2>{{ webinar.title }}</h2>
-
-    <img src="{{ webinar.banner.url }}" alt="works">
-
-    <div class="chart-container">
-        <div class="chart-box">
-            <canvas id="myPieChart"></canvas>
+    <div class="container-fluid">
+        <h2>{{ webinar.title }}</h2>
+        <img src="{{ webinar.banner.url }}" alt="works">
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="myPieChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="myBarChart"></canvas>
+            </div>
         </div>
-        <div class="chart-box">
-            <canvas id="myBarChart"></canvas>
+        <table>
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Question 1</td>
+                    <td>{{ average.q1|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Question 2</td>
+                    <td>{{ average.q2|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Question 3</td>
+                    <td>{{ average.q3|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Question 4</td>
+                    <td>{{ average.q4|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Question 5</td>
+                    <td>{{ average.q5|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Question 6</td>
+                    <td>{{ average.q6|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Total</strong>
+                    </td>
+                    <td>
+                        <strong>{{ total|floatformat:2 }}</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <a href="{% url 'index' %}">Back to the homepage</a>
         </div>
     </div>
-
-    <table>
-        <thead>
-            <tr><th>Question</th><th>Average</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Question 1</td><td>{{ average.q1|floatformat:2 }}</td></tr>
-            <tr><td>Question 2</td><td>{{ average.q2|floatformat:2 }}</td></tr>
-            <tr><td>Question 3</td><td>{{ average.q3|floatformat:2 }}</td></tr>
-            <tr><td>Question 4</td><td>{{ average.q4|floatformat:2 }}</td></tr>
-            <tr><td>Question 5</td><td>{{ average.q5|floatformat:2 }}</td></tr>
-            <tr><td>Question 6</td><td>{{ average.q6|floatformat:2 }}</td></tr>
-            <tr><td><strong>Total</strong></td><td><strong>{{ total|floatformat:2 }}</strong></td></tr>
-        </tbody>
-    </table>
-
-
-    <div><a href="{% url 'index' %}">Back to the homepage</a></div>
-</div>
-
-
-<script>
+    <script>
 document.addEventListener("DOMContentLoaded", function () {
     const sampleData = {
         labels: ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6"],
@@ -118,5 +135,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-</script>
+    </script>
 {% endblock %}
