@@ -182,4 +182,3 @@ For questions or inquiries, please contact: [Your Name/Organization] - [Your Ema
 
 Thank you for your interest in Evalsync! We hope this platform helps you streamline your webinar management process.
 
-This is written by [readme.ai](https://readme-generator-phi.vercel.app/).
