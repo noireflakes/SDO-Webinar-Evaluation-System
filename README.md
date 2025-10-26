@@ -33,8 +33,6 @@ Evalsync is a comprehensive platform designed to simplify and enhance the manage
   - Cloudinary
 - **Email Service:**
   - Resend
-- **Task Queue:**
-  - Celery (Likely, based on `login/task.py`)
 - **Other:**
   - QR code generation library
   - Supabase CLI
