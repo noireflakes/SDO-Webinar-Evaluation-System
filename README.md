@@ -1,4 +1,4 @@
-# Evalsync: Streamlining Webinar Management 🚀
+# SDO-Webinar-Evaluation-System 🚀
 
 Evalsync is a comprehensive platform designed to simplify and enhance the management of webinars. It provides tools for creating, organizing, and delivering engaging online events, along with features for attendee registration, feedback collection, and performance analysis. It addresses the challenges of managing webinars efficiently, offering a centralized solution for all aspects of the webinar lifecycle.
 
