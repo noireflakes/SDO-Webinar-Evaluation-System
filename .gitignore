@@ -1,7 +1,7 @@
 /venv/
 /supabase/
 /staticfiles/
-data.json
-dp.sqlite3
+/data.json
+/dp.sqlite3
 
 /.venv/
