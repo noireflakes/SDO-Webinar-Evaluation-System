@@ -5,3 +5,5 @@
 /dp.sqlite3
 
 /.venv/
+
+/evalsync/.env
