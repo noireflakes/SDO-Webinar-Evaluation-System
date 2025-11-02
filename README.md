@@ -1,184 +1,263 @@
-# SDO-Webinar-Evaluation-System 🚀
+# 🎓 Evalsync - Webinar Evaluation System
 
-Evalsync is a comprehensive platform designed to simplify and enhance the management of webinars. It provides tools for creating, organizing, and delivering engaging online events, along with features for attendee registration, feedback collection, and performance analysis. It addresses the challenges of managing webinars efficiently, offering a centralized solution for all aspects of the webinar lifecycle.
+<div align="center">
 
-## 🚀 Key Features
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
+![Django](https://img.shields.io/badge/Django-Framework-green.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue.svg)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-- **Webinar Creation & Management:** Easily create and manage webinar details, including title, description, date, time, venue, and banner.
-- **Speaker Management:** Add and manage speakers associated with webinars, including their name, image, and email.
-- **Attendee Registration:** Streamline the registration process for attendees, capturing essential information.
-- **Questionnaires & Tests:** Create and manage questionnaires and tests to gather feedback and assess attendee understanding.
-- **Comment Management:** Facilitate discussions and gather feedback through comment management features.
-- **QR Code Generation:** Generate QR codes for easy access to webinar registration and information.
-- **User Authentication & Authorization:** Secure access to the platform with robust authentication and authorization mechanisms.
-- **Email Notifications:** Send automated email notifications for registration confirmation and reminders.
-- **Asynchronous Task Execution:** Utilizes task queues for sending OTP emails, preventing delays in the user interface.
-- **Cloudinary Integration:** Seamlessly store and manage images using Cloudinary cloud storage.
-- **Supabase Integration:** Uses Supabase for backend services, including database and API management.
+A comprehensive platform designed to simplify and enhance the management of webinars, providing tools for creating, organizing, and delivering engaging online events.
+
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Usage](#-usage) • [Contributing](#-contributing)
+
+</div>
+
+---
+
+## 📖 About
+
+Evalsync is a powerful webinar management platform that addresses the challenges of managing webinars efficiently. It offers a centralized solution for all aspects of the webinar lifecycle, from creation and speaker management to attendee registration, feedback collection, and performance analysis.
+
+## ✨ Features
+
+### 🎯 Core Features
+
+- **Webinar Creation & Management**
+  - Create and manage comprehensive webinar details
+  - Set title, description, date, time, venue, and custom banners
+  - Organize and track all webinars from a single dashboard
+
+- **Speaker Management**
+  - Add and manage multiple speakers per webinar
+  - Store speaker profiles with name, image, and contact information
+  - Seamless speaker-webinar association
+
+- **Attendee Registration**
+  - Streamlined registration process for participants
+  - Capture essential attendee information
+  - Track registration status and attendance
+
+- **Questionnaires & Tests**
+  - Create custom questionnaires for feedback collection
+  - Design tests to assess attendee understanding
+  - Analyze responses and generate insights
+
+- **Interactive Features**
+  - Comment management system for discussions
+  - Real-time feedback collection
+  - QR code generation for easy registration access
+
+### 🔐 Security & Authentication
+
+- Robust user authentication and authorization
+- Secure login system with OTP verification
+- Trusted device management
+- Role-based access control
+
+### 📧 Communication
+
+- Automated email notifications
+- Registration confirmation emails
+- Webinar reminders
+- Asynchronous email delivery using task queues
+
+### ☁️ Cloud Integration
+
+- **Cloudinary** integration for image storage and management
+- **Supabase** backend for database and API services
+- Scalable cloud infrastructure
 
 ## 🛠️ Tech Stack
 
-- **Frontend:**
-  - HTML
-  - CSS
-  - JavaScript
-- **Backend:**
-  - Python
-  - Django
-- **Database:**
-  - PostgreSQL (via Supabase)
-- **Build Tools:**
-  - pip
-- **Cloud Storage:**
-  - Cloudinary
-- **Email Service:**
-  - Resend
-- **Other:**
-  - QR code generation library
-  - Supabase CLI
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
 
-## 📦 Getting Started
+### Backend
+- **Python 3.x**
+- **Django Framework**
+
+### Database
+- **PostgreSQL** (via Supabase)
+
+### Cloud Services
+- **Supabase** - Backend services and database
+- **Cloudinary** - Image storage and CDN
+- **Resend** - Email delivery service
+
+### Tools & Libraries
+- pip - Package management
+- QR code generation library
+- Supabase CLI
+- Django ORM
+
+## 📦 Installation
 
 ### Prerequisites
+
+Before you begin, ensure you have the following installed:
 
 - Python 3.x
 - pip (Python package installer)
 - Django
 - Supabase CLI
-- Resend API Key (set as environment variable `RESEND_API_KEY`)
-- Cloudinary account and API keys (configured in Django settings)
+- Resend API Key
+- Cloudinary account and API keys
 
-### Installation
+### Setup Instructions
 
-1.  Clone the repository:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/noireflakes/SDO-Webinar-Evaluation-System.git
+   cd SDO-Webinar-Evaluation-System
+   ```
 
-    ```bash
-    git clone <repository_url>
-    cd <repository_directory>
-    ```
+2. **Create a virtual environment**
+   ```bash
+   python -m venv venv
+   ```
 
-2.  Create a virtual environment:
+3. **Activate the virtual environment**
+   
+   On Windows:
+   ```bash
+   venv\Scripts\activate
+   ```
+   
+   On macOS/Linux:
+   ```bash
+   source venv/bin/activate
+   ```
 
-    ```bash
-    python -m venv venv
-    ```
+4. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
+   > **Note:** If you encounter encoding errors, ensure `requirements.txt` is UTF-8 encoded.
 
-3.  Activate the virtual environment:
+5. **Set up Supabase**
+   
+   Install Supabase CLI (follow [official instructions](https://supabase.com/docs/guides/cli))
+   ```bash
+   supabase init
+   supabase start
+   supabase db push
+   ```
 
-    -   On Windows:
+6. **Configure environment variables**
+   
+   Set the following environment variables:
+   ```bash
+   export DJANGO_SETTINGS_MODULE=your_project.settings
+   export RESEND_API_KEY=your_resend_api_key
+   ```
+   
+   Configure in Django settings:
+   - Database connection to Supabase PostgreSQL
+   - Cloudinary API keys
+   - Email service settings
 
-        ```bash
-        venv\Scripts\activate
-        ```
+7. **Apply Django migrations**
+   ```bash
+   python manage.py migrate
+   ```
 
-    -   On macOS and Linux:
+8. **Create a superuser**
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-        ```bash
-        source venv/bin/activate
-        ```
+9. **Start the development server**
+   ```bash
+   python manage.py runserver
+   ```
 
-4.  Install the dependencies:
+10. **Access the application**
+    
+    Open your browser and navigate to: `http://localhost:8000`
 
-    ```bash
-    pip install -r requirements.txt
-    ```
-    **Note:** If you encounter an error reading `requirements.txt`, ensure the file is properly encoded (UTF-8) and not corrupted.
-
-5.  Set up Supabase:
-
-    -   Install the Supabase CLI: Follow the instructions on the Supabase website.
-    -   Initialize Supabase:
-
-        ```bash
-        supabase init
-        ```
-
-    -   Start Supabase:
-
-        ```bash
-        supabase start
-        ```
-
-    -   Apply database migrations:
-
-        ```bash
-        supabase db push
-        ```
-
-6. Configure Django settings:
-
-    - Set the `DJANGO_SETTINGS_MODULE` environment variable.
-    - Configure database settings to connect to the Supabase PostgreSQL instance.
-    - Configure Cloudinary settings with your Cloudinary API keys.
-    - Configure Resend API key as an environment variable (`RESEND_API_KEY`).
-    - Configure email settings for sending OTP emails (if not using Resend exclusively).
-
-### Running Locally
-
-1.  Apply Django migrations:
-
-    ```bash
-    python manage.py migrate
-    ```
-
-2.  Create a superuser:
-
-    ```bash
-    python manage.py createsuperuser
-    ```
-
-3.  Start the Django development server:
-
-    ```bash
-    python manage.py runserver
-    ```
-
-4.  Access the application in your web browser at `http://localhost:8000` (or the port specified in your Django settings).
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 .
-├── manage.py               # Django management script
-├── login/                  # Login application
-│   ├── models.py           # Data models for user profiles, trusted devices, and OTP
-│   ├── task.py             # Asynchronous task for sending OTP emails
-│   ├── email_service.py    # Function for sending emails using Resend
+├── manage.py                 # Django management script
+├── login/                    # Login application
+│   ├── models.py            # User profiles, trusted devices, OTP models
+│   ├── task.py              # Asynchronous OTP email tasks
+│   ├── email_service.py     # Email sending functionality
 │   └── ...
-├── webinar/                # Webinar application
-│   ├── models.py           # Data models for webinars, speakers, and attendees
-│   ├── views.py            # View functions for handling HTTP requests
-│   ├── admin.py            # Django admin configuration
-│   ├── urls.py             # URL patterns for the webinar app
+├── webinar/                  # Webinar application
+│   ├── models.py            # Webinar, speaker, attendee models
+│   ├── views.py             # HTTP request handlers
+│   ├── admin.py             # Django admin configuration
+│   ├── urls.py              # URL routing
 │   └── ...
-├── supabase/               # Supabase configuration
-│   └── config.toml         # Configuration file for local Supabase environment
-├── requirements.txt        # Python package dependencies
+├── supabase/                 # Supabase configuration
+│   └── config.toml          # Local environment config
+├── requirements.txt          # Python dependencies
 └── ...
 ```
 
-## 📸 Screenshots
+## 🚀 Usage
 
-(Add screenshots of the application here to showcase its features and UI)
+1. **Admin Panel**: Access the Django admin at `/admin` using your superuser credentials
+2. **Create Webinar**: Navigate to the webinar creation page and fill in the details
+3. **Add Speakers**: Associate speakers with your webinar
+4. **Generate QR Codes**: Create QR codes for easy attendee registration
+5. **Manage Registrations**: Track and manage attendee registrations
+6. **Collect Feedback**: Create questionnaires and tests for evaluation
+7. **Analyze Results**: View feedback and generate performance reports
 
 ## 🤝 Contributing
 
-We welcome contributions to Evalsync! To contribute:
+We welcome contributions to Evalsync! Here's how you can help:
 
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with descriptive messages.
-4.  Submit a pull request.
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/YourFeatureName
+   ```
+3. **Make your changes**
+4. **Commit with descriptive messages**
+   ```bash
+   git commit -m "Add: Description of your feature"
+   ```
+5. **Push to your branch**
+   ```bash
+   git push origin feature/YourFeatureName
+   ```
+6. **Submit a Pull Request**
 
-## 📝 License
+### Contribution Guidelines
 
-This project is licensed under the [MIT License](LICENSE).
+- Follow PEP 8 style guide for Python code
+- Write clear commit messages
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
 
-## 📬 Contact
+## 📄 License
 
-For questions or inquiries, please contact: [Your Name/Organization] - [Your Email]
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 
-## 💖 Thanks
+## 📧 Contact
 
-Thank you for your interest in Evalsync! We hope this platform helps you streamline your webinar management process.
+For questions, suggestions, or support:
+
+- **GitHub Issues**: [Create an issue](https://github.com/noireflakes/SDO-Webinar-Evaluation-System/issues)
+- **Repository**: [SDO-Webinar-Evaluation-System](https://github.com/noireflakes/SDO-Webinar-Evaluation-System)
+
+## 🙏 Acknowledgments
+
+- Django Framework
+- Supabase
+- Cloudinary
+- Resend
+- All contributors and supporters
+
+---
 
