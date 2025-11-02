@@ -1,4 +1,4 @@
-# 🎓 Evalsync - Webinar Evaluation System
+# 🎓 Webinar Evaluation System
 
 <div align="center">
 
